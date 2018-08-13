@@ -96,11 +96,19 @@
 #include <vtkLookupTable.h>
 #include <vtkTextureUnitManager.h>
 
+#if VTK_MAJOR_VERSION > 7
+#include <vtkTexture.h>
+#endif
+
 #include <pcl/visualization/common/shapes.h>
 #include <pcl/visualization/pcl_visualizer.h>
 #include <pcl/visualization/common/common.h>
 #include <pcl/common/time.h>
+#if (BOOST_VERSION >= 106600)
+#include <boost/uuid/detail/sha1.hpp>
+#else
 #include <boost/uuid/sha1.hpp>
+#endif
 #include <boost/filesystem.hpp>
 #include <pcl/console/parse.h>
 
@@ -1587,7 +1595,9 @@ pcl::visualization::PCLVisualizer::setPointCloudRenderingProperties (
     // using immediate more rendering.
     case PCL_VISUALIZER_IMMEDIATE_RENDERING:
     {
+#if VTK_RENDERING_BACKEND_OPENGL_VERSION < 2
       actor->GetMapper ()->SetImmediateModeRendering (int (value));
+#endif
       actor->Modified ();
       break;
     }
@@ -3508,82 +3518,57 @@ pcl::visualization::PCLVisualizer::addTextureMesh (const pcl::TextureMesh &mesh,
   vtkTextureUnitManager* tex_manager = vtkOpenGLRenderWindow::SafeDownCast (win_)->GetTextureUnitManager ();
   if (!tex_manager)
     return (false);
-  // Check if hardware support multi texture
+  // hardware always supports multitexturing of some degree
   int texture_units = tex_manager->GetNumberOfTextureUnits ();
-  if ((mesh.tex_materials.size () > 1) && (texture_units > 1))
+  if ((size_t) texture_units < mesh.tex_materials.size ())
+    PCL_WARN ("[PCLVisualizer::addTextureMesh] GPU texture units %d < mesh textures %d!\n",
+              texture_units, mesh.tex_materials.size ());
+  // Load textures
+  std::size_t last_tex_id = std::min (static_cast<int> (mesh.tex_materials.size ()), texture_units);
+  std::size_t tex_id = 0;
+  while (tex_id < last_tex_id)
   {
-    if ((size_t) texture_units < mesh.tex_materials.size ())
-      PCL_WARN ("[PCLVisualizer::addTextureMesh] GPU texture units %d < mesh textures %d!\n",
-                texture_units, mesh.tex_materials.size ());
-    // Load textures
-    std::size_t last_tex_id = std::min (static_cast<int> (mesh.tex_materials.size ()), texture_units);
-    int tu = vtkProperty::VTK_TEXTURE_UNIT_0;
-    std::size_t tex_id = 0;
-    while (tex_id < last_tex_id)
-    {
-      vtkSmartPointer<vtkTexture> texture = vtkSmartPointer<vtkTexture>::New ();
-      if (textureFromTexMaterial (mesh.tex_materials[tex_id], texture))
-      {
-        PCL_WARN ("[PCLVisualizer::addTextureMesh] Failed to load texture %s, skipping!\n",
-                  mesh.tex_materials[tex_id].tex_name.c_str ());
-        continue;
-      }
-      // the first texture is in REPLACE mode others are in ADD mode
-      if (tex_id == 0)
-        texture->SetBlendingMode(vtkTexture::VTK_TEXTURE_BLENDING_MODE_REPLACE);
-      else
-        texture->SetBlendingMode(vtkTexture::VTK_TEXTURE_BLENDING_MODE_ADD);
-      // add a texture coordinates array per texture
-      vtkSmartPointer<vtkFloatArray> coordinates = vtkSmartPointer<vtkFloatArray>::New ();
-      coordinates->SetNumberOfComponents (2);
-      std::stringstream ss; ss << "TCoords" << tex_id;
-      std::string this_coordinates_name = ss.str ();
-      coordinates->SetName (this_coordinates_name.c_str ());
-
-      for (std::size_t t = 0; t < mesh.tex_coordinates.size (); ++t)
-        if (t == tex_id)
-          for (std::size_t tc = 0; tc < mesh.tex_coordinates[t].size (); ++tc)
-            coordinates->InsertNextTuple2 (mesh.tex_coordinates[t][tc][0],
-                                           mesh.tex_coordinates[t][tc][1]);
-        else
-          for (std::size_t tc = 0; tc < mesh.tex_coordinates[t].size (); ++tc)
-            coordinates->InsertNextTuple2 (-1.0, -1.0);
-
-      mapper->MapDataArrayToMultiTextureAttribute(tu,
-                                                  this_coordinates_name.c_str (),
-                                                  vtkDataObject::FIELD_ASSOCIATION_POINTS);
-      polydata->GetPointData ()->AddArray (coordinates);
-      actor->GetProperty ()->SetTexture (tu, texture);
-      ++tex_id;
-      ++tu;
-    }
-  } // end of multi texturing
-  else
-  {
-    if ((mesh.tex_materials.size () > 1) && (texture_units < 2))
-      PCL_WARN ("[PCLVisualizer::addTextureMesh] Your GPU doesn't support multi texturing. "
-                "Will use first one only!\n");
+#if VTK_MAJOR_VERSION < 9
+    int tu = vtkProperty::VTK_TEXTURE_UNIT_0 + tex_id;
+#else
+    const char *tu = mesh.tex_materials[tex_id].tex_name.c_str ();
+#endif
 
     vtkSmartPointer<vtkTexture> texture = vtkSmartPointer<vtkTexture>::New ();
-    // fill vtkTexture from pcl::TexMaterial structure
-    if (textureFromTexMaterial (mesh.tex_materials[0], texture))
-      PCL_WARN ("[PCLVisualizer::addTextureMesh] Failed to create vtkTexture from %s!\n",
-                mesh.tex_materials[0].tex_name.c_str ());
-
-    // set texture coordinates
+    if (textureFromTexMaterial (mesh.tex_materials[tex_id], texture))
+    {
+      PCL_WARN ("[PCLVisualizer::addTextureMesh] Failed to load texture %s, skipping!\n",
+                mesh.tex_materials[tex_id].tex_name.c_str ());
+      continue;
+    }
+    // the first texture is in REPLACE mode others are in ADD mode
+    if (tex_id == 0)
+      texture->SetBlendingMode(vtkTexture::VTK_TEXTURE_BLENDING_MODE_REPLACE);
+    else
+      texture->SetBlendingMode(vtkTexture::VTK_TEXTURE_BLENDING_MODE_ADD);
+    // add a texture coordinates array per texture
     vtkSmartPointer<vtkFloatArray> coordinates = vtkSmartPointer<vtkFloatArray>::New ();
     coordinates->SetNumberOfComponents (2);
-    coordinates->SetNumberOfTuples (mesh.tex_coordinates[0].size ());
-    for (std::size_t tc = 0; tc < mesh.tex_coordinates[0].size (); ++tc)
-    {
-      const Eigen::Vector2f &uv = mesh.tex_coordinates[0][tc];
-      coordinates->SetTuple2 (tc, uv[0], uv[1]);
-    }
-    coordinates->SetName ("TCoords");
-    polydata->GetPointData ()->SetTCoords (coordinates);
-    // apply texture
-    actor->SetTexture (texture);
-  } // end of one texture
+    std::stringstream ss; ss << "TCoords" << tex_id;
+    std::string this_coordinates_name = ss.str ();
+    coordinates->SetName (this_coordinates_name.c_str ());
+
+    for (std::size_t t = 0; t < mesh.tex_coordinates.size (); ++t)
+      if (t == tex_id)
+        for (std::size_t tc = 0; tc < mesh.tex_coordinates[t].size (); ++tc)
+          coordinates->InsertNextTuple2 (mesh.tex_coordinates[t][tc][0],
+                                         mesh.tex_coordinates[t][tc][1]);
+      else
+        for (std::size_t tc = 0; tc < mesh.tex_coordinates[t].size (); ++tc)
+          coordinates->InsertNextTuple2 (-1.0, -1.0);
+
+    mapper->MapDataArrayToMultiTextureAttribute(tu,
+                                                this_coordinates_name.c_str (),
+                                                vtkDataObject::FIELD_ASSOCIATION_POINTS);
+    polydata->GetPointData ()->AddArray (coordinates);
+    actor->GetProperty ()->SetTexture (tu, texture);
+    ++tex_id;
+  }
 
   // set mapper
   actor->SetMapper (mapper);
@@ -3787,7 +3772,7 @@ pcl::visualization::PCLVisualizer::renderViewTesselatedSphere (
   ico->SetSolidTypeToIcosahedron ();
   ico->Update ();
 
-  //tesselate cells from icosahedron
+  //tessellate cells from icosahedron
   vtkSmartPointer<vtkLoopSubdivisionFilter> subdivide = vtkSmartPointer<vtkLoopSubdivisionFilter>::New ();
   subdivide->SetNumberOfSubdivisions (tesselation_level);
   subdivide->SetInputConnection (ico->GetOutputPort ());
@@ -3856,7 +3841,7 @@ pcl::visualization::PCLVisualizer::renderViewTesselatedSphere (
   cam->SetViewAngle (view_angle);
   cam->Modified ();
 
-  //For each camera position, traposesnsform the object and render view
+  //For each camera position, transform the object and render view
   for (size_t i = 0; i < cam_positions.size (); i++)
   {
     cam_pos[0] = cam_positions[i][0];

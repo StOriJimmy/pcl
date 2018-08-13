@@ -78,6 +78,9 @@
   (pcl::NormalBasedSignature12) \
   (pcl::FPFHSignature33)        \
   (pcl::VFHSignature308)        \
+  (pcl::GASDSignature512)       \
+  (pcl::GASDSignature984)       \
+  (pcl::GASDSignature7992)      \
   (pcl::GRSDSignature21)        \
   (pcl::ESFSignature640)        \
   (pcl::BRISKSignature512)      \
@@ -146,6 +149,9 @@
   (pcl::NormalBasedSignature12) \
   (pcl::FPFHSignature33)        \
   (pcl::VFHSignature308)        \
+  (pcl::GASDSignature512)       \
+  (pcl::GASDSignature984)       \
+  (pcl::GASDSignature7992)      \
   (pcl::GRSDSignature21)        \
   (pcl::ESFSignature640)        \
   (pcl::BRISKSignature512)      \
@@ -342,10 +348,17 @@ namespace pcl
       r = g = b = 0;
       a = 255;
     }
-  
+
+    inline RGB (uint8_t _r, uint8_t _g, uint8_t _b)
+    {
+      r = _r;
+      g = _g;
+      b = _b;
+      a = 255;
+    }
+
     friend std::ostream& operator << (std::ostream& os, const RGB& p);
   };
-  
 
   struct _Intensity
   {
@@ -1519,7 +1532,7 @@ namespace pcl
 
     union
     {
-      /** \brief Diameter of the meaningfull keypoint neighborhood. */
+      /** \brief Diameter of the meaningful keypoint neighborhood. */
       float scale;
       float size;
     };
