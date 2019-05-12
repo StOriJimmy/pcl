@@ -34,10 +34,8 @@
  *
  */
 
-#ifndef PCL_MODELER_MAIN_WINDOW_H_
-#define PCL_MODELER_MAIN_WINDOW_H_
+#pragma once
 
-#include <pcl/apps/modeler/qt.h>
 #include <boost/shared_ptr.hpp>
 
 #include <ui_main_window.h>
@@ -130,8 +128,7 @@ namespace pcl
         friend class AbstractItem;
 
         MainWindow();
-        MainWindow(const MainWindow &) : QMainWindow () {}            // copy ctor hidden
-        MainWindow& operator=(const MainWindow &) { return (*this); } // assign op. hidden
+        MainWindow& operator=(const MainWindow &) = delete;
         ~MainWindow();
 
         Ui::MainWindow                    *ui_; // Designer form
@@ -145,5 +142,3 @@ namespace pcl
     };
   }
 }
-
-#endif // PCL_MODELER_MAIN_WINDOW_H_

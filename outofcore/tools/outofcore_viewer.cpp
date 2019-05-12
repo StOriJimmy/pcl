@@ -131,7 +131,6 @@ typedef Eigen::aligned_allocator<PointT> AlignedPointT;
 // Boost
 #include <boost/date_time.hpp>
 #include <boost/filesystem.hpp>
-#include <boost/thread.hpp>
 
 // Globals
 vtkSmartPointer<vtkRenderWindow> window;
@@ -150,7 +149,7 @@ public:
   }
 
   void
-  Execute (vtkObject *caller, unsigned long vtkNotUsed(eventId), void* vtkNotUsed(callData))
+  Execute (vtkObject *caller, unsigned long vtkNotUsed(eventId), void* vtkNotUsed(callData)) override
   {
     vtkRenderWindowInteractor *interactor = vtkRenderWindowInteractor::SafeDownCast (caller);
     vtkRenderer *renderer = interactor->FindPokedRenderer (interactor->GetEventPosition ()[0],

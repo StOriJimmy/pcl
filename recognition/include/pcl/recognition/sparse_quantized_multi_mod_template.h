@@ -35,8 +35,7 @@
  *
  */
 
-#ifndef PCL_FEATURES_SPARSE_QUANTIZED_MULTI_MOD_TEMPLATE
-#define PCL_FEATURES_SPARSE_QUANTIZED_MULTI_MOD_TEMPLATE
+#pragma once
 
 #include <vector>
 
@@ -109,7 +108,7 @@ namespace pcl
   struct SparseQuantizedMultiModTemplate
   {
     /** \brief Constructor. */
-    SparseQuantizedMultiModTemplate () : features (), region () {}
+    SparseQuantizedMultiModTemplate () {}
 
     /** \brief The storage for the multi-modality features. */
     std::vector<QuantizedMultiModFeature> features;
@@ -152,5 +151,3 @@ namespace pcl
   };
 
 }
-
-#endif 

@@ -1,5 +1,5 @@
-#ifndef PCL_MESSAGE_IMAGE_H
-#define PCL_MESSAGE_IMAGE_H
+#pragma once
+
 #include <string>
 #include <vector>
 #include <ostream>
@@ -15,8 +15,8 @@ namespace pcl
 {
   struct PCLImage
   {
-    PCLImage () : header (), height (0), width (0), encoding (),
-               is_bigendian (0), step (0), data ()
+    PCLImage () : height (0), width (0),
+               is_bigendian (0), step (0)
     {}
 
      ::pcl::PCLHeader  header;
@@ -60,6 +60,3 @@ namespace pcl
     return (s);
   }
 } // namespace pcl
-
-#endif // PCL_MESSAGE_IMAGE_H
-

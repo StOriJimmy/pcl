@@ -36,8 +36,7 @@
  *
  */
 
-#ifndef PCL_COMMON_TIME_TRIGGER_H_
-#define PCL_COMMON_TIME_TRIGGER_H_
+#pragma once
 
 #include <pcl/pcl_macros.h>
 #ifndef Q_MOC_RUN
@@ -45,6 +44,10 @@
 #include <boost/thread.hpp>
 #include <boost/signals2.hpp>
 #endif
+
+#include <condition_variable>
+#include <mutex>
+#include <thread>
 
 namespace pcl
 {
@@ -99,10 +102,8 @@ namespace pcl
       bool quit_;
       bool running_;
 
-      boost::thread timer_thread_;
-      boost::condition_variable condition_;
-      boost::mutex condition_mutex_;
+      std::thread timer_thread_;
+      std::condition_variable condition_;
+      std::mutex condition_mutex_;
   };
 }
-
-#endif

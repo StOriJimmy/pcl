@@ -37,10 +37,11 @@
  * $Id: feature.h 2784 2011-10-15 22:05:38Z aichim $
  */
 
-#ifndef PCL_INTEGRAL_IMAGE2D_H_
-#define PCL_INTEGRAL_IMAGE2D_H_
+#pragma once
 
 #include <vector>
+
+#include <boost/shared_ptr.hpp>
 
 namespace pcl
 {
@@ -107,6 +108,7 @@ namespace pcl
   class IntegralImage2D
   {
     public:
+      typedef boost::shared_ptr<IntegralImage2D<DataType, Dimension>> Ptr;
       static const unsigned second_order_size = (Dimension * (Dimension + 1)) >> 1;
       typedef Eigen::Matrix<typename IntegralImageTypeTraits<DataType>::IntegralType, Dimension, 1> ElementType;
       typedef Eigen::Matrix<typename IntegralImageTypeTraits<DataType>::IntegralType, second_order_size, 1> SecondOrderType;
@@ -117,7 +119,6 @@ namespace pcl
       IntegralImage2D (bool compute_second_order_integral_images) :
         first_order_integral_image_ (),
         second_order_integral_image_ (),
-        finite_values_integral_image_ (),
         width_ (1), 
         height_ (1), 
         compute_second_order_integral_images_ (compute_second_order_integral_images)
@@ -230,6 +231,8 @@ namespace pcl
   class IntegralImage2D <DataType, 1>
   {
     public:
+      typedef boost::shared_ptr<IntegralImage2D<DataType, 1>> Ptr;
+
       static const unsigned second_order_size = 1;
       typedef typename IntegralImageTypeTraits<DataType>::IntegralType ElementType;
       typedef typename IntegralImageTypeTraits<DataType>::IntegralType SecondOrderType;
@@ -240,7 +243,7 @@ namespace pcl
       IntegralImage2D (bool compute_second_order_integral_images) : 
         first_order_integral_image_ (),
         second_order_integral_image_ (),
-        finite_values_integral_image_ (),
+        
         width_ (1), height_ (1), 
         compute_second_order_integral_images_ (compute_second_order_integral_images)
       {
@@ -341,6 +344,3 @@ namespace pcl
  }
 
 #include <pcl/features/impl/integral_image2D.hpp>
-
-#endif    // PCL_INTEGRAL_IMAGE2D_H_
-

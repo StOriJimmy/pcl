@@ -38,8 +38,7 @@
  *
  */
 
-#ifndef PCL_ELCH_H_
-#define PCL_ELCH_H_
+#pragma once
 
 #include <pcl/pcl_base.h>
 #include <pcl/point_types.h>
@@ -85,7 +84,7 @@ namespace pcl
 
         typedef boost::shared_ptr< LoopGraph > LoopGraphPtr;
 
-        typedef typename pcl::Registration<PointT, PointT> Registration;
+        typedef pcl::Registration<PointT, PointT> Registration;
         typedef typename Registration::Ptr RegistrationPtr;
         typedef typename Registration::ConstPtr RegistrationConstPtr;
 
@@ -95,13 +94,12 @@ namespace pcl
           loop_start_ (0), 
           loop_end_ (0), 
           reg_ (new pcl::IterativeClosestPoint<PointT, PointT>), 
-          loop_transform_ (),
           compute_loop_ (true),
           vd_ ()
         {};
       
         /** \brief Empty destructor */
-        virtual ~ELCH () {}
+        ~ELCH () {}
 
         /** \brief Add a new point cloud to the internal graph.
          * \param[in] cloud the new point cloud
@@ -255,5 +253,3 @@ namespace pcl
 }
 
 #include <pcl/registration/impl/elch.hpp>
-
-#endif // PCL_ELCH_H_

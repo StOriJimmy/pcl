@@ -1,5 +1,4 @@
-#ifndef PCL_TRACKING_COHERENCE_H_
-#define PCL_TRACKING_COHERENCE_H_
+#pragma once
 
 #include <pcl/pcl_base.h>
 
@@ -22,7 +21,7 @@ namespace pcl
       
     public:
       /** \brief empty constructor */
-      PointCoherence () : coherence_name_ () {}
+      PointCoherence () {}
       
       /** \brief empty distructor */
       virtual ~PointCoherence () {}
@@ -69,7 +68,7 @@ namespace pcl
       
       typedef typename PointCoherence<PointInT>::Ptr PointCoherencePtr;
       /** \brief Constructor. */
-      PointCloudCoherence () : coherence_name_ (), target_input_ (), point_coherences_ () {}
+      PointCloudCoherence () : target_input_ (), point_coherences_ () {}
 
       /** \brief Destructor. */
       virtual ~PointCloudCoherence () {}
@@ -129,8 +128,4 @@ namespace pcl
   }
 }
 
-
 #include <pcl/tracking/impl/coherence.hpp>
-
-
-#endif

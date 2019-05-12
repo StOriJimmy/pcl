@@ -1,5 +1,5 @@
-#ifndef PCL_MESSAGE_MODELCOEFFICIENTS_H
-#define PCL_MESSAGE_MODELCOEFFICIENTS_H
+#pragma once
+
 #include <string>
 #include <vector>
 #include <ostream>
@@ -11,7 +11,7 @@ namespace pcl
 {
   struct ModelCoefficients
   {
-    ModelCoefficients () : header (), values ()
+    ModelCoefficients ()
     {
     }
 
@@ -41,6 +41,3 @@ namespace pcl
   }
 
 } // namespace pcl
-
-#endif // PCL_MESSAGE_MODELCOEFFICIENTS_H
-

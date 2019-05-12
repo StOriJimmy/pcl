@@ -35,8 +35,7 @@
  *
  */
 
-#ifndef PCL_SEGMENT_DIFFERENCES_H_
-#define PCL_SEGMENT_DIFFERENCES_H_
+#pragma once
 
 #include <pcl/pcl_base.h>
 #include <pcl/search/pcl_search.h>
@@ -56,16 +55,16 @@ namespace pcl
   void getPointCloudDifference (
       const pcl::PointCloud<PointT> &src,
       double threshold,
-      const boost::shared_ptr<pcl::search::Search<PointT> > &tree,
+      const typename pcl::search::Search<PointT>::Ptr &tree,
       pcl::PointCloud<PointT> &output);
 
   template <typename PointT>
-  PCL_DEPRECATED("getPointCloudDifference() does not use the tgt parameter, thus it is deprecated and will be removed in future releases.")
+  [[deprecated("tgt parameter is not used; it is deprecated and will be removed in future releases")]]
   inline void getPointCloudDifference (
       const pcl::PointCloud<PointT> &src,
       const pcl::PointCloud<PointT> & /* tgt */,
       double threshold,
-      const boost::shared_ptr<pcl::search::Search<PointT> > &tree,
+      const typename pcl::search::Search<PointT>::Ptr &tree,
       pcl::PointCloud<PointT> &output)
   {
     getPointCloudDifference<PointT> (src, threshold, tree, output);
@@ -90,8 +89,8 @@ namespace pcl
       typedef typename PointCloud::Ptr PointCloudPtr;
       typedef typename PointCloud::ConstPtr PointCloudConstPtr;
 
-      typedef typename pcl::search::Search<PointT> KdTree;
-      typedef typename pcl::search::Search<PointT>::Ptr KdTreePtr;
+      typedef pcl::search::Search<PointT> KdTree;
+      typedef typename KdTree::Ptr KdTreePtr;
 
       typedef PointIndices::Ptr PointIndicesPtr;
       typedef PointIndices::ConstPtr PointIndicesConstPtr;
@@ -170,5 +169,3 @@ namespace pcl
 #ifdef PCL_NO_PRECOMPILE
 #include <pcl/segmentation/impl/segment_differences.hpp>
 #endif
-
-#endif  //#ifndef PCL_SEGMENT_DIFFERENCES_H_

@@ -38,8 +38,7 @@
  *
  */
 
-#ifndef PCL_PFH_H_
-#define PCL_PFH_H_
+#pragma once
 
 #include <pcl/point_types.h>
 #include <pcl/features/feature.h>
@@ -101,10 +100,7 @@ namespace pcl
         */
       PFHEstimation () : 
         nr_subdiv_ (5), 
-        pfh_histogram_ (),
-        pfh_tuple_ (),
         d_pi_ (1.0f / (2.0f * static_cast<float> (M_PI))), 
-        feature_map_ (),
         key_list_ (),
         // Default 1GB memory size. Need to set it to something more conservative.
         max_cache_size_ ((1ul*1024ul*1024ul*1024ul) / sizeof (std::pair<std::pair<int, int>, Eigen::Vector4f>)),
@@ -190,7 +186,7 @@ namespace pcl
         * \param[out] output the resultant point cloud model dataset that contains the PFH feature estimates
         */
       void 
-      computeFeature (PointCloudOut &output);
+      computeFeature (PointCloudOut &output) override;
 
       /** \brief The number of subdivisions for each angular feature interval. */
       int nr_subdiv_;
@@ -224,6 +220,3 @@ namespace pcl
 #ifdef PCL_NO_PRECOMPILE
 #include <pcl/features/impl/pfh.hpp>
 #endif
-
-#endif  //#ifndef PCL_PFH_H_
-

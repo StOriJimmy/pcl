@@ -36,8 +36,7 @@
  * $Id$
  */
 
-#ifndef PCL_OCTREE_TREE_2BUF_BASE_H
-#define PCL_OCTREE_TREE_2BUF_BASE_H
+#pragma once
 
 #include <vector>
 
@@ -73,13 +72,10 @@ namespace pcl
         inline BufferedBranchNode&
         operator = (const BufferedBranchNode &source_arg)
         {
-
-          unsigned char i, b;
-
           memset (child_node_array_, 0, sizeof(child_node_array_));
 
-          for (b = 0; b < 2; ++b)
-            for (i = 0; i < 8; ++i)
+          for (unsigned char b = 0; b < 2; ++b)
+            for (unsigned char i = 0; i < 8; ++i)
               if (source_arg.child_node_array_[b][i])
                 child_node_array_[b][i] = source_arg.child_node_array_[b][i]->deepCopy ();
 
@@ -88,13 +84,13 @@ namespace pcl
         }
 
         /** \brief Empty constructor. */
-        virtual ~BufferedBranchNode ()
+        ~BufferedBranchNode ()
         {
         }
 
         /** \brief Method to perform a deep copy of the octree */
-        virtual BufferedBranchNode*
-        deepCopy () const
+        BufferedBranchNode*
+        deepCopy () const override
         {
           return new BufferedBranchNode (*this);
         }
@@ -131,11 +127,11 @@ namespace pcl
         inline bool hasChild (unsigned char buffer_arg, unsigned char index_arg) const
         {
           assert( (buffer_arg<2) && (index_arg<8));
-          return (child_node_array_[buffer_arg][index_arg] != 0);
+          return (child_node_array_[buffer_arg][index_arg] != nullptr);
         }
 
         /** \brief Get the type of octree node. Returns LEAVE_NODE type */
-        virtual node_type_t getNodeType () const
+        node_type_t getNodeType () const override
         {
           return BRANCH_NODE;
         }
@@ -255,13 +251,13 @@ namespace pcl
         typedef OctreeLeafNodeDepthFirstIterator<OctreeT> LeafNodeIterator;
         typedef const OctreeLeafNodeDepthFirstIterator<OctreeT> ConstLeafNodeIterator;
 
-        PCL_DEPRECATED ("Please use leaf_depth_begin () instead.")
+        [[deprecated("use leaf_depth_begin() instead")]]
         LeafNodeIterator leaf_begin (unsigned int max_depth_arg = 0)
         {
           return LeafNodeIterator (this, max_depth_arg);
         };
 
-        PCL_DEPRECATED ("Please use leaf_depth_end () instead.")
+        [[deprecated("use leaf_depth_end() instead")]]
         const LeafNodeIterator leaf_end ()
         {
           return LeafNodeIterator ();
@@ -303,7 +299,7 @@ namespace pcl
 
         const LeafNodeBreadthIterator leaf_breadth_end ()
         {
-          return LeafNodeBreadthIterator (this, 0, NULL);
+          return LeafNodeBreadthIterator (this, 0, nullptr);
         };
 
         /** \brief Empty constructor. */
@@ -507,7 +503,7 @@ namespace pcl
         inline LeafContainerT*
         findLeaf (const OctreeKey& key_arg) const
         {
-          LeafContainerT* result = 0;
+          LeafContainerT* result = nullptr;
           findLeafRecursive (key_arg, depth_mask_, root_node_, result);
           return result;
         }
@@ -536,7 +532,7 @@ namespace pcl
          * */
         inline bool existLeaf (const OctreeKey& key_arg) const
         {
-          return (findLeaf(key_arg) != 0);
+          return (findLeaf(key_arg) != nullptr);
         }
 
         /** \brief Remove leaf node from octree
@@ -566,7 +562,7 @@ namespace pcl
         branchHasChild (const BranchNode& branch_arg, unsigned char child_idx_arg) const
         {
           // test occupancyByte for child existence
-          return (branch_arg.getChildPtr(buffer_selector_, child_idx_arg) != 0);
+          return (branch_arg.getChildPtr(buffer_selector_, child_idx_arg) != nullptr);
         }
 
         /** \brief Retrieve a child node pointer for child node at child_idx.
@@ -598,12 +594,11 @@ namespace pcl
          * */
         inline char getBranchBitPattern (const BranchNode& branch_arg) const
         {
-          unsigned char i;
           char node_bits;
 
           // create bit pattern
           node_bits = 0;
-          for (i = 0; i < 8; i++)
+          for (unsigned char i = 0; i < 8; i++)
           {
             const OctreeNode* child = branch_arg.getChildPtr(buffer_selector_, i);
             node_bits |= static_cast<char> ( (!!child) << i);
@@ -620,12 +615,11 @@ namespace pcl
         inline char getBranchBitPattern (const BranchNode& branch_arg,
             unsigned char bufferSelector_arg) const
         {
-          unsigned char i;
           char node_bits;
 
           // create bit pattern
           node_bits = 0;
-          for (i = 0; i < 8; i++)
+          for (unsigned char i = 0; i < 8; i++)
           {
             const OctreeNode* child = branch_arg.getChildPtr(bufferSelector_arg, i);
             node_bits |= static_cast<char> ( (!!child) << i);
@@ -641,13 +635,12 @@ namespace pcl
         inline char getBranchXORBitPattern (
             const BranchNode& branch_arg) const
         {
-          unsigned char i;
           char node_bits[2];
 
           // create bit pattern for both buffers
           node_bits[0] = node_bits[1] = 0;
 
-          for (i = 0; i < 8; i++)
+          for (unsigned char i = 0; i < 8; i++)
           {
             const OctreeNode* childA = branch_arg.getChildPtr(0, i);
             const OctreeNode* childB = branch_arg.getChildPtr(1, i);
@@ -704,7 +697,7 @@ namespace pcl
             }
 
             // set branch child pointer to 0
-            branch_arg.setChildPtr(buffer_selector_arg, child_idx_arg, 0);
+            branch_arg.setChildPtr(buffer_selector_arg, child_idx_arg, nullptr);
           }
         }
 
@@ -722,10 +715,8 @@ namespace pcl
          * */
         inline void deleteBranch (BranchNode& branch_arg)
         {
-          char i;
-
           // delete all branch node children
-          for (i = 0; i < 8; i++)
+          for (char i = 0; i < 8; i++)
           {
 
             if (branch_arg.getChildPtr(0, i) == branch_arg.getChildPtr(1, i))
@@ -734,8 +725,8 @@ namespace pcl
               deleteBranchChild (branch_arg, 0, i);
 
               // remove pointers from both buffers
-              branch_arg.setChildPtr(0, i, 0);
-              branch_arg.setChildPtr(1, i, 0);
+              branch_arg.setChildPtr(0, i, nullptr);
+              branch_arg.setChildPtr(1, i, nullptr);
             }
             else
             {
@@ -894,9 +885,10 @@ namespace pcl
          * \param n_arg: some value
          * \return binary logarithm (log2) of argument n_arg
          */
+        [[deprecated("use std::log2 instead")]]
         inline double Log2 (double n_arg)
         {
-          return log (n_arg) / log (2.0);
+          return std::log2 (n_arg);
         }
 
         /** \brief Test if octree is able to dynamically change its depth. This is required for adaptive bounding box adjustment.
@@ -962,6 +954,3 @@ namespace pcl
 #ifdef PCL_NO_PRECOMPILE
 #include <pcl/octree/impl/octree2buf_base.hpp>
 #endif
-
-#endif
-

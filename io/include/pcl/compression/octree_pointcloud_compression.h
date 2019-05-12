@@ -35,8 +35,7 @@
  *
  */
 
-#ifndef OCTREE_COMPRESSION_H
-#define OCTREE_COMPRESSION_H
+#pragma once
 
 #include <pcl/common/common.h>
 #include <pcl/common/io.h>
@@ -48,13 +47,11 @@
 
 #include "compression_profiles.h"
 
+#include <cstdio>
+#include <cstring>
+#include <iostream>
 #include <iterator>
-#include <iostream>
 #include <vector>
-#include <string.h>
-#include <iostream>
-#include <stdio.h>
-#include <string.h>
 
 using namespace pcl::octree;
 
@@ -111,13 +108,8 @@ namespace pcl
                                const unsigned char colorBitResolution_arg = 6) :
           OctreePointCloud<PointT, LeafT, BranchT, OctreeT> (octreeResolution_arg),
           output_ (PointCloudPtr ()),
-          binary_tree_data_vector_ (),
-          binary_color_tree_vector_ (),
-          point_count_data_vector_ (),
-          point_count_data_vector_iterator_ (),
           color_coder_ (),
           point_coder_ (),
-          entropy_coder_ (),
           do_voxel_grid_enDecoding_ (doVoxelGridDownDownSampling_arg), i_frame_rate_ (iFrameRate_arg),
           i_frame_counter_ (0), frame_ID_ (0), point_count_ (0), i_frame_ (true),
           do_color_encoding_ (doColorEncoding_arg), cloud_with_color_ (false), data_with_color_ (false),
@@ -131,7 +123,7 @@ namespace pcl
         }
 
         /** \brief Empty deconstructor. */
-        virtual
+        
         ~OctreePointCloudCompression ()
         {
         }
@@ -170,8 +162,8 @@ namespace pcl
         /** \brief Add point at index from input pointcloud dataset to octree
          * \param[in] pointIdx_arg the index representing the point in the dataset given by \a setInputCloud to be added
          */
-        virtual void
-        addPointIdx (const int pointIdx_arg)
+        void
+        addPointIdx (const int pointIdx_arg) override
         {
           ++object_count_;
           OctreePointCloud<PointT, LeafT, BranchT, OctreeT>::addPointIdx(pointIdx_arg);
@@ -248,15 +240,15 @@ namespace pcl
           * \param leaf_arg: reference to new leaf node
           * \param key_arg: octree key of new leaf node
          */
-        virtual void
-        serializeTreeCallback (LeafT &leaf_arg, const OctreeKey& key_arg);
+        void
+        serializeTreeCallback (LeafT &leaf_arg, const OctreeKey& key_arg) override;
 
         /** \brief Decode leaf nodes information during deserialization
          * \param key_arg octree key of new leaf node
          */
         // param leaf_arg reference to new leaf node
-        virtual void
-        deserializeTreeCallback (LeafT&, const OctreeKey& key_arg);
+        void
+        deserializeTreeCallback (LeafT&, const OctreeKey& key_arg) override;
 
 
         /** \brief Pointer to output point cloud dataset. */
@@ -318,7 +310,3 @@ namespace pcl
   }
 
 }
-
-
-#endif
-

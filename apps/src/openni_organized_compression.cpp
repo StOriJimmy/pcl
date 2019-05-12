@@ -34,6 +34,7 @@
  * Author: Julius Kammerl (julius@kammerl.de)
  */
 
+#include <thread>
 
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
@@ -46,9 +47,9 @@
 
 #include <iostream>
 #include <vector>
-#include <stdio.h>
+#include <cstdio>
 #include <sstream>
-#include <stdlib.h>
+#include <cstdlib>
 #include <iostream>
 #include <string>
 
@@ -60,6 +61,7 @@ using namespace pcl;
 using namespace pcl::io;
 
 using namespace std;
+using namespace std::chrono_literals;
 
 char usage[] = "\n"
   "  PCL organized point cloud stream compression\n"
@@ -105,7 +107,7 @@ do \
 }while(false)
 
 void
-print_usage (std::string msg)
+print_usage (const std::string &msg)
 {
   std::cerr << msg << std::endl;
   std::cout << usage << std::endl;
@@ -165,7 +167,7 @@ class SimpleOpenNIViewer
 
         while (!outputFile_.fail())
         {
-          boost::this_thread::sleep(boost::posix_time::seconds(1));
+          std::this_thread::sleep_for(1s);
         }
 
         interface->stop ();
@@ -212,8 +214,8 @@ struct EventHelper
   }
 
   void
-  image_callback (const boost::shared_ptr<openni_wrapper::Image> &image,
-                  const boost::shared_ptr<openni_wrapper::DepthImage> &depth_image, float)
+  image_callback (const openni_wrapper::Image::Ptr &image,
+                  const openni_wrapper::DepthImage::Ptr &depth_image, float)
   {
 
     vector<uint16_t> disparity_data;
@@ -255,7 +257,7 @@ struct EventHelper
 
       while (!outputFile_.fail ())
       {
-        boost::this_thread::sleep(boost::posix_time::seconds(1));
+        std::this_thread::sleep_for(1s);
       }
 
       interface->stop ();
@@ -269,13 +271,14 @@ struct EventHelper
       // Set the depth output format
       grabber.getDevice ()->setDepthOutputFormat (static_cast<openni_wrapper::OpenNIDevice::DepthMode> (depthformat));
 
-      boost::function<void (const boost::shared_ptr<openni_wrapper::Image>&, const boost::shared_ptr<openni_wrapper::DepthImage>&, float) > image_cb = boost::bind (&EventHelper::image_callback, this, _1, _2, _3);
+      boost::function<void (const openni_wrapper::Image::Ptr&, const openni_wrapper::DepthImage::Ptr&, float) > image_cb
+        = boost::bind (&EventHelper::image_callback, this, _1, _2, _3);
       boost::signals2::connection image_connection = grabber.registerCallback (image_cb);
 
       grabber.start ();
       while (!outputFile_.fail())
       {
-        boost::this_thread::sleep(boost::posix_time::seconds(1));
+        std::this_thread::sleep_for(1s);
       }
       grabber.stop ();
 
@@ -450,7 +453,7 @@ main (int argc, char **argv)
 
         std::cout << "Disconnected!" << std::endl;
 
-        boost::this_thread::sleep(boost::posix_time::seconds(3));
+        std::this_thread::sleep_for(3s);
 
       }
       catch (std::exception& e)

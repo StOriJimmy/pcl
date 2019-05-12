@@ -109,7 +109,6 @@ typedef pcl::ScopeTime ScopeTimeT;
 #include "pcl/common/common.h"
 #include "pcl/common/transforms.h"
 #include <pcl/console/print.h>
-#include <pcl/console/time.h>
 // define the following in order to eliminate the deprecated headers warning
 #define VTK_EXCLUDE_STRSTREAM_HEADERS
 #include <pcl/io/vtk_lib_io.h>
@@ -197,7 +196,7 @@ getViewerPose (visualization::PCLVisualizer& viewer)
                  -1,  0,  0,
                   0, -1,  0;
 
-  rotation = rotation * axis_reorder;
+  rotation *= axis_reorder;
   pose.linear() = rotation;
   return pose;
 }
@@ -326,8 +325,8 @@ write_rgb_image(const uint8_t* rgb_buffer)
 void
 depthBufferToMM(const float* depth_buffer,unsigned short* depth_img)
 {
-  int npixels = range_likelihood_->getWidth() * range_likelihood_->getHeight();
- // unsigned short * depth_img = new unsigned short[npixels ];
+  //int npixels = range_likelihood_->getWidth() * range_likelihood_->getHeight();
+  //unsigned short * depth_img = new unsigned short[npixels ];
   for (int y = 0; y <  480; ++y)
   {
     for (int x = 0; x < 640; ++x)
@@ -410,7 +409,6 @@ capture (Eigen::Isometry3d pose_in,unsigned short* depth_buffer_mm,const uint8_t
 
   std::vector<Eigen::Isometry3d, Eigen::aligned_allocator<Eigen::Isometry3d> > poses;
   std::vector<float> scores;
-  int n = 1;
   poses.push_back (pose_in);
   // HACK: mfallon modified computeLikelihoods to only call render()  (which is currently private)
   // need to make render public and use it.
@@ -976,7 +974,7 @@ struct KinFuApp
   }
 
   void
-  execute (int argc, char** argv, std::string plyfile)
+  execute (int argc, char** argv, const std::string &plyfile)
   {
     PtrStepSz<const unsigned short> depth;
     PtrStepSz<const KinfuTracker::PixelRGB> rgb24;
@@ -1049,7 +1047,6 @@ struct KinFuApp
     generate_halo(poses,focus_center,halo_r,halo_dz,n_poses);    
     
     unsigned short * disparity_buf_ = new unsigned short[width*height ];
-    const KinfuTracker::PixelRGB* color_buf_;
     const uint8_t* color_buf_uint;
     
     // loop though and create the mesh:
@@ -1067,7 +1064,7 @@ struct KinFuApp
       std::cout << i << ": " << ss.str() << " pose_simulatedposition\n";      
       
       capture (poses[i],disparity_buf_, color_buf_uint);//,ss.str());
-      color_buf_ = (const KinfuTracker::PixelRGB*) color_buf_uint;
+      const KinfuTracker::PixelRGB* color_buf_ = (const KinfuTracker::PixelRGB*) color_buf_uint;
       PtrStepSz<const unsigned short> depth_sim = PtrStepSz<const unsigned short>(height, width, disparity_buf_, 2*width);
       //cout << depth_sim.rows << " by " << depth_sim.cols << " | s: " << depth_sim.step << "\n";
       // RGB-KinFu currently disabled for now - problems with color in KinFu apparently

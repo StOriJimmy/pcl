@@ -35,15 +35,14 @@
  *
  */
 
-#ifndef PCL_IO_BUFFERS_H
-#define PCL_IO_BUFFERS_H
+#pragma once
 
-#include <vector>
-#include <limits>
 #include <cassert>
+#include <limits>
+#include <mutex>
+#include <vector>
 
 #include <boost/cstdint.hpp>
-#include <boost/thread/mutex.hpp>
 
 namespace pcl
 {
@@ -113,19 +112,19 @@ namespace pcl
         /** Construct a buffer of given size. */
         SingleBuffer (size_t size);
 
-        virtual
+        
         ~SingleBuffer ();
 
-        virtual T
-        operator[] (size_t idx) const;
+        T
+        operator[] (size_t idx) const override;
 
-        virtual void
-        push (std::vector<T>& data);
+        void
+        push (std::vector<T>& data) override;
 
       private:
 
         std::vector<T> data_;
-        mutable boost::mutex data_mutex_;
+        mutable std::mutex data_mutex_;
 
         using Buffer<T>::size_;
 
@@ -157,22 +156,22 @@ namespace pcl
           * value should be computed (0..255) */
         MedianBuffer (size_t size, unsigned char window_size);
 
-        virtual
+        
         ~MedianBuffer ();
 
         /** Access an element at a given index.
           *
           * This operation is constant time. */
-        virtual T
-        operator[] (size_t idx) const;
+        T
+        operator[] (size_t idx) const override;
 
         /** Insert a new chunk of data into the buffer.
           *
           * This operation is linear in buffer size and window size.
           *
           * \param[in] data input data chunk, the memory will be "stolen" */
-        virtual void
-        push (std::vector<T>& data);
+        void
+        push (std::vector<T>& data) override;
 
       private:
 
@@ -201,7 +200,7 @@ namespace pcl
         /// Number of invalid values in the buffer
         std::vector<unsigned char> data_invalid_count_;
 
-        mutable boost::mutex data_mutex_;
+        mutable std::mutex data_mutex_;
 
         using Buffer<T>::size_;
 
@@ -233,22 +232,22 @@ namespace pcl
           * value should be computed (0..255) */
         AverageBuffer (size_t size, unsigned char window_size);
 
-        virtual
+        
         ~AverageBuffer ();
 
         /** Access an element at a given index.
           *
           * This operation is constant time. */
-        virtual T
-        operator[] (size_t idx) const;
+        T
+        operator[] (size_t idx) const override;
 
         /** Insert a new chunk of data into the buffer.
           *
           * This operation is linear in buffer size.
           *
           * \param[in] data input data chunk, the memory will be "stolen" */
-        virtual void
-        push (std::vector<T>& data);
+        void
+        push (std::vector<T>& data) override;
 
       private:
 
@@ -267,7 +266,7 @@ namespace pcl
         /// Number of invalid values in the buffer
         std::vector<unsigned char> data_invalid_count_;
 
-        mutable boost::mutex data_mutex_;
+        mutable std::mutex data_mutex_;
 
         using Buffer<T>::size_;
 
@@ -278,6 +277,3 @@ namespace pcl
 }
 
 #include <pcl/io/impl/buffers.hpp>
-
-#endif /* PCL_IO_BUFFERS_H */
-

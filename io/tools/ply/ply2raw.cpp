@@ -65,16 +65,14 @@ class ply_to_raw_converter
       ostream_ (), vertex_x_ (0), vertex_y_ (0), vertex_z_ (0), 
       face_vertex_indices_element_index_ (),
       face_vertex_indices_first_element_ (), 
-      face_vertex_indices_previous_element_ (),
-      vertices_ ()
+      face_vertex_indices_previous_element_ ()
     {}
 
     ply_to_raw_converter (const ply_to_raw_converter &f) :
       ostream_ (), vertex_x_ (0), vertex_y_ (0), vertex_z_ (0), 
       face_vertex_indices_element_index_ (),
       face_vertex_indices_first_element_ (), 
-      face_vertex_indices_previous_element_ (),
-      vertices_ ()
+      face_vertex_indices_previous_element_ ()
     {
       *this = f;
     }
@@ -186,7 +184,7 @@ ply_to_raw_converter::element_definition_callback (const std::string& element_na
     );
   }
   else {
-    return boost::tuple<boost::function<void ()>, boost::function<void ()> > (0, 0);
+    return {};
   }
 }
 
@@ -204,11 +202,11 @@ ply_to_raw_converter::scalar_property_definition_callback (const std::string& el
       return boost::bind (&ply_to_raw_converter::vertex_z, this, _1);
     }
     else {
-      return 0;
+      return {};
     }
   }
   else {
-    return 0;
+    return {};
   }
 }
 
@@ -228,9 +226,7 @@ ply_to_raw_converter::list_property_definition_callback (const std::string& elem
     );
   }
   else {
-    return boost::tuple<boost::function<void (pcl::io::ply::uint8)>, 
-      boost::function<void (pcl::io::ply::int32)>, 
-      boost::function<void ()> > (0, 0, 0);
+    return {};
   }
 }
 
@@ -258,7 +254,7 @@ ply_to_raw_converter::vertex_z (pcl::io::ply::float32 z)
 void
 ply_to_raw_converter::vertex_end ()
 {
-  vertices_.push_back (boost::tuple<pcl::io::ply::float32, pcl::io::ply::float32, pcl::io::ply::float32 > (vertex_x_, vertex_y_, vertex_z_));
+  vertices_.emplace_back(vertex_x_, vertex_y_, vertex_z_);
 }
 
 void

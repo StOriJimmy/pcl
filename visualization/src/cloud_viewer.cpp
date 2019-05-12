@@ -39,10 +39,13 @@
 #include <pcl/visualization/pcl_visualizer.h>
 #include <pcl/visualization/boost.h>
 
+#include <thread>
+
 namespace pcl
 {
   struct cloud_show_base
   {
+    virtual ~cloud_show_base() = default;
     virtual void pop () = 0;
     virtual bool popped () const = 0;
     typedef boost::shared_ptr<cloud_show_base> Ptr;
@@ -52,7 +55,7 @@ namespace pcl
   struct cloud_show : cloud_show_base
   {
     cloud_show (const std::string &cloud_name, typename CloudT::ConstPtr cloud,
-      boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer) :
+      pcl::visualization::PCLVisualizer::Ptr viewer) :
       cloud_name (cloud_name), cloud (cloud), viewer (viewer),popped_ (false)
     {}
 
@@ -77,17 +80,17 @@ namespace pcl
       popped_ = true;
     }
 
-    virtual void pop ();
+    void pop () override;
     
-    virtual bool
-    popped () const
+    bool
+    popped () const override
     {
       return popped_;
     }
     
     std::string cloud_name;
     typename CloudT::ConstPtr cloud;
-    boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer;
+    pcl::visualization::PCLVisualizer::Ptr viewer;
     bool popped_;
   };
   
@@ -131,10 +134,10 @@ struct pcl::visualization::CloudViewer::CloudViewer_impl
   CloudViewer_impl (const std::string& window_name) :
     window_name_ (window_name), has_cloud_ (false), quit_ (false)
   {
-    viewer_thread_ = boost::thread (boost::ref (*this));
+    viewer_thread_ = std::thread (&CloudViewer_impl::operator(), this);
     while (!viewer_)
     {
-      boost::thread::yield ();
+      std::this_thread::yield ();
     }
   }
 
@@ -153,7 +156,7 @@ struct pcl::visualization::CloudViewer::CloudViewer_impl
     }
     while (!cs->popped ())
     {
-      boost::thread::yield ();
+      std::this_thread::yield ();
     }
   }
 
@@ -174,11 +177,7 @@ struct pcl::visualization::CloudViewer::CloudViewer_impl
   {
     using namespace pcl::visualization;
 
-#if ((VTK_MAJOR_VERSION == 5) && (VTK_MINOR_VERSION <= 4))
-    viewer_ = boost::shared_ptr<PCLVisualizer>(new PCLVisualizer (window_name_));
-#else
     viewer_ = boost::shared_ptr<PCLVisualizer>(new PCLVisualizer (window_name_, true));
-#endif
     viewer_->setBackgroundColor (0.1, 0.1, 0.1);
     viewer_->addCoordinateSystem (0.1, "global");
 
@@ -247,9 +246,9 @@ struct pcl::visualization::CloudViewer::CloudViewer_impl
   }
 
   std::string window_name_;
-  boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer_;
+  pcl::visualization::PCLVisualizer::Ptr viewer_;
   boost::mutex mtx_, spin_mtx_, c_mtx, once_mtx;
-  boost::thread viewer_thread_;
+  std::thread viewer_thread_;
   bool has_cloud_;
   bool quit_;
   std::list<boost::shared_ptr<cloud_show_base> > cloud_shows_;
@@ -335,7 +334,7 @@ pcl::visualization::CloudViewer::removeVisualizationCallable (const std::string 
 bool
 pcl::visualization::CloudViewer::wasStopped (int)
 {
-  boost::thread::yield (); //allow this to be called in a loop
+  std::this_thread::yield (); //allow this to be called in a loop
   return !impl_->viewer_;
 }
 

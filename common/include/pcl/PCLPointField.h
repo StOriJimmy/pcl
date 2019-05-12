@@ -1,5 +1,4 @@
-#ifndef PCL_SENSOR_MSGS_MESSAGE_POINTFIELD_H
-#define PCL_SENSOR_MSGS_MESSAGE_POINTFIELD_H
+#pragma once
 
 #ifdef USE_ROS
    #error USE_ROS setup requires PCL to compile against ROS message headers, which is now deprecated
@@ -15,7 +14,7 @@ namespace pcl
 {
   struct PCLPointField
   {
-    PCLPointField () : name (), offset (0), datatype (0), count (0)
+    PCLPointField () : offset (0), datatype (0), count (0)
     {}
 
     std::string name;
@@ -54,6 +53,3 @@ namespace pcl
     return (s);
   }
 } // namespace pcl
-
-#endif // PCL_SENSOR_MSGS_MESSAGE_POINTFIELD_H
-

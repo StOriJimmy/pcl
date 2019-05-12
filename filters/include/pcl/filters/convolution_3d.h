@@ -37,8 +37,7 @@
  *
  */
 
-#ifndef PCL_FILTERS_CONVOLUTION_3D_H
-#define PCL_FILTERS_CONVOLUTION_3D_H
+#pragma once
 
 #include <pcl/pcl_base.h>
 #include <pcl/filters/boost.h>
@@ -200,11 +199,11 @@ namespace pcl
     class Convolution3D : public pcl::PCLBase <PointIn>
     {
       public:
-        typedef typename pcl::PointCloud<PointIn> PointCloudIn;
+        typedef pcl::PointCloud<PointIn> PointCloudIn;
         typedef typename PointCloudIn::ConstPtr PointCloudInConstPtr;
-        typedef typename pcl::search::Search<PointIn> KdTree;
-        typedef typename pcl::search::Search<PointIn>::Ptr KdTreePtr;
-        typedef typename pcl::PointCloud<PointOut> PointCloudOut;
+        typedef pcl::search::Search<PointIn> KdTree;
+        typedef typename KdTree::Ptr KdTreePtr;
+        typedef pcl::PointCloud<PointOut> PointCloudOut;
         typedef boost::shared_ptr<Convolution3D<PointIn, PointOut, KernelT> > Ptr;
         typedef boost::shared_ptr<Convolution3D<PointIn, PointOut, KernelT> > ConstPtr;
 
@@ -288,5 +287,3 @@ namespace pcl
 }
 
 #include <pcl/filters/impl/convolution_3d.hpp>
-
-#endif // PCL_FILTERS_CONVOLUTION_3D_H

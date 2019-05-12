@@ -36,8 +36,7 @@
  * $Id$
  */
 
-#ifndef PCL_OCTREE_SEARCH_H_
-#define PCL_OCTREE_SEARCH_H_
+#pragma once
 
 #include <pcl/point_cloud.h>
 
@@ -85,7 +84,7 @@ namespace pcl
         }
 
         /** \brief Empty class destructor. */
-        virtual
+        
         ~OctreePointCloudSearch ()
         {
         }
@@ -264,7 +263,7 @@ namespace pcl
         public:
           /** \brief Empty constructor  */
           prioBranchQueueEntry () :
-              node (), point_distance (0), key ()
+              node (), point_distance (0)
           {
           }
 
@@ -603,5 +602,3 @@ namespace pcl
 #ifdef PCL_NO_PRECOMPILE
 #include <pcl/octree/impl/octree_search.hpp>
 #endif
-
-#endif    // PCL_OCTREE_SEARCH_H_

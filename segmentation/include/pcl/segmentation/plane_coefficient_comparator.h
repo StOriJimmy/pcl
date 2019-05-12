@@ -37,8 +37,7 @@
  *
  */
 
-#ifndef PCL_SEGMENTATION_PLANE_COEFFICIENT_COMPARATOR_H_
-#define PCL_SEGMENTATION_PLANE_COEFFICIENT_COMPARATOR_H_
+#pragma once
 
 #include <pcl/common/angles.h>
 #include <pcl/segmentation/boost.h>
@@ -58,7 +57,7 @@ namespace pcl
       typedef typename Comparator<PointT>::PointCloud PointCloud;
       typedef typename Comparator<PointT>::PointCloudConstPtr PointCloudConstPtr;
       
-      typedef typename pcl::PointCloud<PointNT> PointCloudN;
+      typedef pcl::PointCloud<PointNT> PointCloudN;
       typedef typename PointCloudN::Ptr PointCloudNPtr;
       typedef typename PointCloudN::ConstPtr PointCloudNConstPtr;
       
@@ -70,7 +69,6 @@ namespace pcl
       /** \brief Empty constructor for PlaneCoefficientComparator. */
       PlaneCoefficientComparator ()
         : normals_ ()
-        , plane_coeff_d_ ()
         , angular_threshold_ (pcl::deg2rad (2.0f))
         , distance_threshold_ (0.02f)
         , depth_dependent_ (true)
@@ -92,13 +90,13 @@ namespace pcl
       }
       
       /** \brief Destructor for PlaneCoefficientComparator. */
-      virtual
+      
       ~PlaneCoefficientComparator ()
       {
       }
 
-      virtual void 
-      setInputCloud (const PointCloudConstPtr& cloud)
+      void 
+      setInputCloud (const PointCloudConstPtr& cloud) override
       {
         input_ = cloud;
       }
@@ -184,8 +182,8 @@ namespace pcl
         * \param idx1 The first index for the comparison
         * \param idx2 The second index for the comparison
         */
-      virtual bool
-      compare (int idx1, int idx2) const
+      bool
+      compare (int idx1, int idx2) const override
       {
         float threshold = distance_threshold_;
         if (depth_dependent_)
@@ -211,5 +209,3 @@ namespace pcl
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   };
 }
-
-#endif // PCL_SEGMENTATION_PLANE_COEFFICIENT_COMPARATOR_H_

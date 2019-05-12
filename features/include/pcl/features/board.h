@@ -37,8 +37,7 @@
  *
  */
 
-#ifndef PCL_BOARD_H_
-#define PCL_BOARD_H_
+#pragma once
 
 #include <pcl/point_types.h>
 #include <pcl/features/feature.h>
@@ -69,19 +68,14 @@ namespace pcl
         margin_thresh_ (0.85f),
         check_margin_array_size_ (24),
         hole_size_prob_thresh_ (0.2f),
-        steep_thresh_ (0.1f),
-        check_margin_array_ (),
-        margin_array_min_angle_ (),
-        margin_array_max_angle_ (),
-        margin_array_min_angle_normal_ (),
-        margin_array_max_angle_normal_ ()
+        steep_thresh_ (0.1f)
       {
         feature_name_ = "BOARDLocalReferenceFrameEstimation";
         setCheckMarginArraySize (check_margin_array_size_);
       }
       
       /** \brief Empty destructor */
-      virtual ~BOARDLocalReferenceFrameEstimation () {}
+      ~BOARDLocalReferenceFrameEstimation () {}
 
       //Getters/Setters
 
@@ -255,8 +249,8 @@ namespace pcl
       /** \brief Abstract feature estimation method.
         * \param[out] output the resultant features
         */
-      virtual void
-      computeFeature (PointCloudOut &output);
+      void
+      computeFeature (PointCloudOut &output) override;
 
       /** \brief Given an axis (with origin axis_origin), return the orthogonal axis directed to point.
         *
@@ -365,5 +359,3 @@ namespace pcl
 #ifdef PCL_NO_PRECOMPILE
 #include <pcl/features/impl/board.hpp>
 #endif
-
-#endif  //#ifndef PCL_BOARD_H_

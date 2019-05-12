@@ -36,10 +36,9 @@
  *  Author: Victor Lamoine (victor.lamoine@gmail.com)
  */
 
-#include <pcl/pcl_config.h>
+#pragma once
 
-#ifndef __PCL_IO_ENSENSO_GRABBER__
-#define __PCL_IO_ENSENSO_GRABBER__
+#include <pcl/pcl_config.h>
 
 #include <pcl/common/time.h>
 #include <pcl/common/io.h>
@@ -47,13 +46,13 @@
 #include <Eigen/Geometry>
 #include <Eigen/StdVector>
 #include <pcl/io/boost.h>
-#include <boost/thread.hpp>
-#include <boost/lexical_cast.hpp> // TODO: Remove when setExtrinsicCalibration is fixed
 
 #include <pcl/io/grabber.h>
 #include <pcl/common/synchronizer.h>
 
 #include <nxLib.h> // Ensenso SDK
+
+#include <thread>
 
 namespace pcl
 {
@@ -437,7 +436,7 @@ namespace pcl
 
     protected:
       /** @brief Grabber thread */
-      boost::thread grabber_thread_;
+      std::thread grabber_thread_;
 
       /** @brief Boost point cloud signal */
       boost::signals2::signal<sig_cb_ensenso_point_cloud>* point_cloud_signal_;
@@ -461,7 +460,7 @@ namespace pcl
       pcl::EventFrequency frequency_;
 
       /** @brief Mutual exclusion for FPS computation */
-      mutable boost::mutex fps_mutex_;
+      mutable std::mutex fps_mutex_;
 
       /** @brief Convert an Ensenso time stamp into a PCL/ROS time stamp
        * @param[in] ensenso_stamp
@@ -490,6 +489,3 @@ namespace pcl
       processGrabbing ();
   };
 }  // namespace pcl
-
-#endif // __PCL_IO_ENSENSO_GRABBER__
-

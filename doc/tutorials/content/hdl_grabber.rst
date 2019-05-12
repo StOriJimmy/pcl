@@ -101,7 +101,7 @@ So let's look at the code. The following represents a simplified version of *vis
    {
      public:
        typedef pcl::PointCloud<pcl::PointXYZI> Cloud;
-       typedef typename Cloud::ConstPtr CloudConstPtr;
+       typedef Cloud::ConstPtr CloudConstPtr;
 
        SimpleHDLViewer (Grabber& grabber,
            pcl::visualization::PointCloudColorHandler<pcl::PointXYZI> &handler) :
@@ -163,7 +163,7 @@ So let's look at the code. The following represents a simplified version of *vis
          cloud_connection.disconnect ();
        }
 
-       boost::shared_ptr<pcl::visualization::PCLVisualizer> cloud_viewer_;
+       pcl::visualization::PCLVisualizer::Ptr cloud_viewer_;
 
        pcl::Grabber& grabber_;
        boost::mutex cloud_mutex_;
@@ -197,7 +197,7 @@ the *Grabber* interface so generic, leading to the relatively complicated
 *boost::bind* line. In fact, we can register the following callback types as of
 this writing:
 
-* `void (const boost::shared_ptr<const pcl::PointCloud<pcl::PointXYZRGB> >&)`
+* `void (const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr&)`
 
 Compiling and running the program
 ---------------------------------

@@ -33,8 +33,7 @@
  *
  */
 
-#ifndef	PCL_IMPLICIT_SHAPE_MODEL_H_
-#define	PCL_IMPLICIT_SHAPE_MODEL_H_
+#pragma once
 
 #include <vector>
 #include <fstream>
@@ -49,8 +48,6 @@
 #include <pcl/filters/extract_indices.h>
 #include <pcl/search/search.h>
 #include <pcl/kdtree/kdtree.h>
-#include <pcl/kdtree/kdtree_flann.h>
-#include <pcl/kdtree/impl/kdtree_flann.hpp>
 
 namespace pcl
 {
@@ -77,6 +74,8 @@ namespace pcl
     class PCL_EXPORTS ISMVoteList
     {
       public:
+
+        typedef boost::shared_ptr<ISMVoteList<PointT>> Ptr;
 
         /** \brief Empty constructor with member variables initialization. */
         ISMVoteList ();
@@ -243,6 +242,8 @@ namespace pcl
       public:
 
         typedef boost::shared_ptr<pcl::features::ISMModel> ISMModelPtr;
+        typedef pcl::Feature<PointT, pcl::Histogram<FeatureSize>> Feature;
+        typedef typename Feature::Ptr FeaturePtr;
 
       protected:
 
@@ -378,7 +379,7 @@ namespace pcl
         setSamplingSize (float sampling_size);
 
         /** \brief Returns the current feature estimator used for extraction of the descriptors. */
-        boost::shared_ptr<pcl::Feature<PointT, pcl::Histogram<FeatureSize> > >
+        FeaturePtr
         getFeatureEstimator ();
 
         /** \brief Changes the feature estimator.
@@ -386,7 +387,7 @@ namespace pcl
           * Note that it must be fully initialized and configured.
           */
         void
-        setFeatureEstimator (boost::shared_ptr<pcl::Feature<PointT, pcl::Histogram<FeatureSize> > > feature);
+        setFeatureEstimator (FeaturePtr feature);
 
         /** \brief Returns the number of clusters used for descriptor clustering. */
         unsigned int
@@ -438,7 +439,7 @@ namespace pcl
           * \param[in] in_normals cloud of normals corresponding to the input cloud
           * \param[in] in_class_of_interest class which we are looking for
           */
-        boost::shared_ptr<pcl::features::ISMVoteList<PointT> >
+        typename pcl::features::ISMVoteList<PointT>::Ptr
         findObjects (ISMModelPtr model, typename pcl::PointCloud<PointT>::Ptr in_cloud, typename pcl::PointCloud<Normal>::Ptr in_normals, int in_class_of_interest);
 
       protected:
@@ -598,7 +599,7 @@ namespace pcl
         float sampling_size_;
 
         /** \brief Stores the feature estimator. */
-        boost::shared_ptr<pcl::Feature<PointT, pcl::Histogram<FeatureSize> > > feature_estimator_;
+        typename Feature::Ptr feature_estimator_;
 
         /** \brief Number of clusters, is used for clustering descriptors during the training. */
         unsigned int number_of_clusters_;
@@ -625,5 +626,3 @@ POINT_CLOUD_REGISTER_POINT_STRUCT (pcl::ISMPeak,
   (float, density, ism_density)
   (float, class_id, ism_class_id)
 )
-
-#endif  //#ifndef PCL_IMPLICIT_SHAPE_MODEL_H_

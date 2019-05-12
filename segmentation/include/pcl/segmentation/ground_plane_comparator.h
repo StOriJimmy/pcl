@@ -37,8 +37,7 @@
  *
  */
 
-#ifndef PCL_SEGMENTATION_GROUND_PLANE_COMPARATOR_H_
-#define PCL_SEGMENTATION_GROUND_PLANE_COMPARATOR_H_
+#pragma once
 
 #include <pcl/common/angles.h>
 #include <pcl/segmentation/comparator.h>
@@ -58,7 +57,7 @@ namespace pcl
       typedef typename Comparator<PointT>::PointCloud PointCloud;
       typedef typename Comparator<PointT>::PointCloudConstPtr PointCloudConstPtr;
       
-      typedef typename pcl::PointCloud<PointNT> PointCloudN;
+      typedef pcl::PointCloud<PointNT> PointCloudN;
       typedef typename PointCloudN::Ptr PointCloudNPtr;
       typedef typename PointCloudN::ConstPtr PointCloudNConstPtr;
       
@@ -70,7 +69,6 @@ namespace pcl
       /** \brief Empty constructor for GroundPlaneComparator. */
       GroundPlaneComparator ()
         : normals_ ()
-        , plane_coeff_d_ ()
         , angular_threshold_ (cosf (pcl::deg2rad (2.0f)))
         , road_angular_threshold_ ( cosf(pcl::deg2rad (10.0f)))
         , distance_threshold_ (0.1f)
@@ -96,15 +94,15 @@ namespace pcl
       }
       
       /** \brief Destructor for GroundPlaneComparator. */
-      virtual
+      
       ~GroundPlaneComparator ()
       {
       }
       /** \brief Provide the input cloud.
         * \param[in] cloud the input point cloud.
         */
-      virtual void 
-      setInputCloud (const PointCloudConstPtr& cloud)
+      void 
+      setInputCloud (const PointCloudConstPtr& cloud) override
       {
         input_ = cloud;
       }
@@ -209,8 +207,8 @@ namespace pcl
         * \param idx1 The first index for the comparison
         * \param idx2 The second index for the comparison
         */
-      virtual bool
-      compare (int idx1, int idx2) const
+      bool
+      compare (int idx1, int idx2) const override
       {
         // Normal must be similar to neighbor
         // Normal must be similar to expected normal
@@ -246,5 +244,3 @@ namespace pcl
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   };
 }
-
-#endif // PCL_SEGMENTATION_GROUND_PLANE_COMPARATOR_H_

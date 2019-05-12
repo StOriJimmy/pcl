@@ -1,5 +1,4 @@
-#ifndef PCL_RANGE_LIKELIHOOD
-#define PCL_RANGE_LIKELIHOOD
+#pragma once
 
 #include <GL/glew.h>
 
@@ -11,11 +10,6 @@
 # include <GL/gl.h>
 # include <GL/glu.h>
 #endif
-
-#include <boost/random/linear_congruential.hpp>
-#include <boost/random/normal_distribution.hpp>
-#include <boost/random/variate_generator.hpp>
-#include <boost/math/distributions/normal.hpp> // for normal_distribution
 
 //#include <math.h>
 #include <Eigen/StdVector>
@@ -269,5 +263,3 @@ namespace pcl
   } // namespace - simulation
 
 } // namespace - pcl
-
-#endif

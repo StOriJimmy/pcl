@@ -35,8 +35,10 @@
  *	
  */
 
+#include <thread>
+
 #include <pcl/apps/openni_passthrough.h>
-// QT4
+// QT
 #include <QApplication>
 #include <QMutexLocker>
 #include <QEvent>
@@ -46,14 +48,11 @@
 
 #include <vtkRenderWindow.h>
 
+using namespace std::chrono_literals;
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 OpenNIPassthrough::OpenNIPassthrough (pcl::OpenNIGrabber& grabber) 
-  : vis_ ()
-  , grabber_(grabber)
-  , device_id_ ()
-  , cloud_pass_()
-  , pass_ ()
-  , mtx_ ()
+  : grabber_(grabber)
   , ui_ (new Ui::MainWindow)
   , vis_timer_ (new QTimer (this))
 {
@@ -105,7 +104,7 @@ OpenNIPassthrough::timeoutSlot ()
 {
   if (!cloud_pass_)
   {
-    boost::this_thread::sleep (boost::posix_time::milliseconds (1));
+    std::this_thread::sleep_for(1ms);
     return;
   }
 
@@ -141,5 +140,5 @@ main (int argc, char ** argv)
 
   OpenNIPassthrough v (grabber);
   v.show ();
-  return (app.exec ());
+  return (QApplication::exec ());
 }

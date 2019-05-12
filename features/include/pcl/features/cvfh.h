@@ -38,8 +38,7 @@
  *
  */
 
-#ifndef PCL_FEATURES_CVFH_H_
-#define PCL_FEATURES_CVFH_H_
+#pragma once
 
 #include <pcl/features/feature.h>
 #include <pcl/features/vfh.h>
@@ -77,7 +76,7 @@ namespace pcl
 
       typedef typename Feature<PointInT, PointOutT>::PointCloudOut PointCloudOut;
       typedef typename pcl::search::Search<PointNormal>::Ptr KdTreePtr;
-      typedef typename pcl::VFHEstimation<PointInT, PointNT, pcl::VFHSignature308> VFHEstimator;
+      typedef pcl::VFHEstimation<PointInT, PointNT, pcl::VFHSignature308> VFHEstimator;
 
       /** \brief Empty constructor. */
       CVFHEstimation () :
@@ -88,9 +87,7 @@ namespace pcl
         cluster_tolerance_ (leaf_size_ * 3), 
         eps_angle_threshold_ (0.125f), 
         min_points_ (50),
-        radius_normals_ (leaf_size_ * 3),
-        centroids_dominant_orientations_ (),
-        dominant_normals_ ()
+        radius_normals_ (leaf_size_ * 3)
       {
         search_radius_ = 0;
         k_ = 1;
@@ -255,7 +252,7 @@ namespace pcl
         * feature estimates
         */
       void
-      computeFeature (PointCloudOut &output);
+      computeFeature (PointCloudOut &output) override;
 
       /** \brief Region growing method using Euclidean distances and neighbors normals to 
         * add points to a region.
@@ -289,5 +286,3 @@ namespace pcl
 #ifdef PCL_NO_PRECOMPILE
 #include <pcl/features/impl/cvfh.hpp>
 #endif
-
-#endif  //#ifndef PCL_FEATURES_CVFH_H_

@@ -37,10 +37,11 @@
  *  $Id$
  */
 
-#ifndef PCL_OUTOFCORE_OCTREE_RAM_CONTAINER_H_
-#define PCL_OUTOFCORE_OCTREE_RAM_CONTAINER_H_
+#pragma once
 
 // C++
+#include <mutex>
+#include <random>
 #include <vector>
 
 #include <pcl/outofcore/boost.h>
@@ -165,10 +166,8 @@ namespace pcl
         /** \brief linear container to hold the points */
         AlignedPointTVector container_;
 
-        static boost::mutex rng_mutex_;
-        static boost::mt19937 rand_gen_;
+        static std::mutex rng_mutex_;
+        static std::mt19937 rng_;
     };
   }
 }
-
-#endif //PCL_OUTOFCORE_OCTREE_RAM_CONTAINER_H_

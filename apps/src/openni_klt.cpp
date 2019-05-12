@@ -40,7 +40,6 @@
 #include <pcl/visualization/image_viewer.h>
 #include <pcl/console/print.h>
 #include <pcl/console/parse.h>
-#include <pcl/console/time.h>
 #include <pcl/tracking/pyramidal_klt.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/keypoints/harris_2d.h>
@@ -110,9 +109,8 @@ class OpenNIViewer
     typedef typename Cloud::ConstPtr CloudConstPtr;
 
     OpenNIViewer (pcl::Grabber& grabber)
-      : image_viewer_ ()
-      , grabber_ (grabber)
-      , rgb_data_ (0), rgb_data_size_ (0)
+      : grabber_ (grabber)
+      , rgb_data_ (nullptr), rgb_data_size_ (0)
     { }
 
     void
@@ -154,7 +152,7 @@ class OpenNIViewer
     }
 
     void
-    image_callback (const boost::shared_ptr<openni_wrapper::Image>& image)
+    image_callback (const openni_wrapper::Image::Ptr& image)
     {
       FPS_CALC ("image callback");
       boost::mutex::scoped_lock lock (image_mutex_);
@@ -210,10 +208,10 @@ class OpenNIViewer
       boost::signals2::connection cloud_connection = grabber_.registerCallback (cloud_cb);
 
       boost::signals2::connection image_connection;
-      if (grabber_.providesCallback<void (const boost::shared_ptr<openni_wrapper::Image>&)>())
+      if (grabber_.providesCallback<void (const openni_wrapper::Image::Ptr&)>())
       {
         image_viewer_.reset (new pcl::visualization::ImageViewer ("Pyramidal KLT Tracker"));
-        boost::function<void (const boost::shared_ptr<openni_wrapper::Image>&) > image_cb = boost::bind (&OpenNIViewer::image_callback, this, _1);
+        boost::function<void (const openni_wrapper::Image::Ptr&) > image_cb = boost::bind (&OpenNIViewer::image_callback, this, _1);
         image_connection = grabber_.registerCallback (image_cb);
       }
 
@@ -225,7 +223,7 @@ class OpenNIViewer
 
       while (!image_viewer_->wasStopped ())
       {
-        boost::shared_ptr<openni_wrapper::Image> image;
+        openni_wrapper::Image::Ptr image;
         CloudConstPtr cloud;
 
         // See if we can get a cloud
@@ -248,7 +246,7 @@ class OpenNIViewer
           {
             image_viewer_->setPosition (0, 0);
             image_viewer_->setSize (cloud->width, cloud->height);
-            image_init = !image_init;
+            image_init = true;
           }
 
           if (image->getEncoding() == openni_wrapper::Image::RGB)
@@ -292,7 +290,7 @@ class OpenNIViewer
         delete[] rgb_data_;
     }
 
-    boost::shared_ptr<pcl::visualization::ImageViewer> image_viewer_;
+    pcl::visualization::ImageViewer::Ptr image_viewer_;
 
     pcl::Grabber& grabber_;
     boost::mutex cloud_mutex_;
@@ -300,10 +298,10 @@ class OpenNIViewer
     boost::mutex points_mutex_;
 
     CloudConstPtr cloud_;
-    boost::shared_ptr<openni_wrapper::Image> image_;
+    openni_wrapper::Image::Ptr image_;
     unsigned char* rgb_data_;
     unsigned rgb_data_size_;
-    boost::shared_ptr<pcl::tracking::PyramidalKLTTracker<PointType> > tracker_;
+    typename pcl::tracking::PyramidalKLTTracker<PointType>::Ptr tracker_;
     pcl::PointCloud<pcl::PointUV>::ConstPtr keypoints_;
     pcl::PointIndicesConstPtr points_;
     pcl::PointIndicesConstPtr points_status_;
@@ -311,13 +309,13 @@ class OpenNIViewer
 };
 
 // Create the PCLVisualizer object
-boost::shared_ptr<pcl::visualization::ImageViewer> img;
+pcl::visualization::ImageViewer::Ptr img;
 
 /* ---[ */
 int
 main (int argc, char** argv)
 {
-  std::string device_id("");
+  std::string device_id;
   pcl::OpenNIGrabber::Mode depth_mode = pcl::OpenNIGrabber::OpenNI_Default_Mode;
   pcl::OpenNIGrabber::Mode image_mode = pcl::OpenNIGrabber::OpenNI_Default_Mode;
   bool xyz = false;
@@ -335,7 +333,7 @@ main (int argc, char** argv)
       if (argc >= 3)
       {
         pcl::OpenNIGrabber grabber(argv[2]);
-        boost::shared_ptr<openni_wrapper::OpenNIDevice> device = grabber.getDevice();
+        auto device = grabber.getDevice();
         cout << "Supported depth modes for device: " << device->getVendorName() << " , " << device->getProductName() << endl;
         std::vector<std::pair<int, XnMapOutputMode > > modes = grabber.getAvailableDepthModes();
         for (std::vector<std::pair<int, XnMapOutputMode > >::const_iterator it = modes.begin(); it != modes.end(); ++it)

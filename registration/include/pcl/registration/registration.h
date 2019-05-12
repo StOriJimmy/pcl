@@ -38,15 +38,13 @@
  *
  */
 
-#ifndef PCL_REGISTRATION_H_
-#define PCL_REGISTRATION_H_
+#pragma once
 
 // PCL includes
 #include <pcl/pcl_base.h>
 #include <pcl/common/transforms.h>
 #include <pcl/pcl_macros.h>
 #include <pcl/search/kdtree.h>
-#include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/registration/boost.h>
 #include <pcl/registration/transformation_estimation.h>
 #include <pcl/registration/correspondence_estimation.h>
@@ -72,9 +70,9 @@ namespace pcl
       typedef boost::shared_ptr< Registration<PointSource, PointTarget, Scalar> > Ptr;
       typedef boost::shared_ptr< const Registration<PointSource, PointTarget, Scalar> > ConstPtr;
 
-      typedef typename pcl::registration::CorrespondenceRejector::Ptr CorrespondenceRejectorPtr;
+      typedef pcl::registration::CorrespondenceRejector::Ptr CorrespondenceRejectorPtr;
       typedef pcl::search::KdTree<PointTarget> KdTree;
-      typedef typename pcl::search::KdTree<PointTarget>::Ptr KdTreePtr;
+      typedef typename KdTree::Ptr KdTreePtr;
 
       typedef pcl::search::KdTree<PointSource> KdTreeReciprocal;
       typedef typename KdTreeReciprocal::Ptr KdTreeReciprocalPtr;
@@ -93,14 +91,13 @@ namespace pcl
       typedef typename TransformationEstimation::Ptr TransformationEstimationPtr;
       typedef typename TransformationEstimation::ConstPtr TransformationEstimationConstPtr;
 
-      typedef typename pcl::registration::CorrespondenceEstimationBase<PointSource, PointTarget, Scalar> CorrespondenceEstimation;
+      typedef pcl::registration::CorrespondenceEstimationBase<PointSource, PointTarget, Scalar> CorrespondenceEstimation;
       typedef typename CorrespondenceEstimation::Ptr CorrespondenceEstimationPtr;
       typedef typename CorrespondenceEstimation::ConstPtr CorrespondenceEstimationConstPtr;
 
       /** \brief Empty constructor. */
       Registration () 
-        : reg_name_ ()
-        , tree_ (new KdTree)
+        : tree_ (new KdTree)
         , tree_reciprocal_ (new KdTreeReciprocal)
         , nr_iterations_ (0)
         , max_iterations_ (10)
@@ -119,7 +116,6 @@ namespace pcl
         , correspondences_ (new Correspondences)
         , transformation_estimation_ ()
         , correspondence_estimation_ ()
-        , correspondence_rejectors_ ()
         , target_cloud_updated_ (true)
         , source_cloud_updated_ (true)
         , force_no_recompute_ (false)
@@ -129,7 +125,7 @@ namespace pcl
       }
 
       /** \brief destructor. */
-      virtual ~Registration () {}
+      ~Registration () {}
 
       /** \brief Provide a pointer to the transformation estimation object.
         * (e.g., SVD, point to plane etc.) 
@@ -374,7 +370,7 @@ namespace pcl
       template<typename FunctionSignature> inline bool
       registerVisualizationCallback (boost::function<FunctionSignature> &visualizerCallback)
       {
-        if (visualizerCallback != NULL)
+        if (!visualizerCallback.empty())
         {
           update_visualizer_ = visualizerCallback;
           return (true);
@@ -610,5 +606,3 @@ namespace pcl
 }
 
 #include <pcl/registration/impl/registration.hpp>
-
-#endif  //#ifndef PCL_REGISTRATION_H_

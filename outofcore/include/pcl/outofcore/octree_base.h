@@ -37,8 +37,7 @@
  *  $Id$
  */
 
-#ifndef PCL_OUTOFCORE_OUTOFCOREOCTREEBASE_H_
-#define PCL_OUTOFCORE_OUTOFCOREOCTREEBASE_H_
+#pragma once
 
 #include <pcl/outofcore/boost.h>
 #include <pcl/common/io.h>
@@ -63,6 +62,8 @@
 #include <pcl/filters/random_sample.h>
 
 #include <pcl/PCLPointCloud2.h>
+
+#include <shared_mutex>
 
 namespace pcl
 {
@@ -381,7 +382,7 @@ namespace pcl
         inline virtual void
         queryBoundingBox (const Eigen::Vector3d &min, const Eigen::Vector3d &max, const int query_depth, std::list<std::string> &filenames) const
         {
-          boost::shared_lock < boost::shared_mutex > lock (read_write_mutex_);
+          std::shared_lock < std::shared_timed_mutex > lock (read_write_mutex_);
           filenames.clear ();
           this->root_node_->queryBBIntersects (min, max, query_depth, filenames);
         }
@@ -633,9 +634,9 @@ namespace pcl
         OutofcoreNodeType* root_node_;
 
         /** \brief shared mutex for controlling read/write access to disk */
-        mutable boost::shared_mutex read_write_mutex_;
+        mutable std::shared_timed_mutex read_write_mutex_;
 
-        boost::shared_ptr<OutofcoreOctreeBaseMetadata> metadata_;
+        OutofcoreOctreeBaseMetadata::Ptr metadata_;
         
         /** \brief defined as ".octree" to append to treepath files
          *  \note this might change
@@ -662,6 +663,3 @@ namespace pcl
     };
   }
 }
-
-  
-#endif // PCL_OUTOFCORE_OUTOFCOREOCTREEBASE_H_

@@ -29,13 +29,11 @@
  *      Author: Julius Kammerl (jkammerl@willowgarage.com)
  */
 
-#ifndef PCL_IO_OPENNI2_DEVICE_MANAGER_H_
-#define PCL_IO_OPENNI2_DEVICE_MANAGER_H_
+#pragma once
 
 #include <pcl/pcl_exports.h>
 #include "pcl/io/openni2/openni2_device_info.h"
 
-#include <boost/thread/mutex.hpp>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 
@@ -98,5 +96,3 @@ namespace pcl
     } // namespace
   }
 }
-
-#endif // PCL_IO_OPENNI2_DEVICE_MANAGER_H_

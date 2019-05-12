@@ -35,8 +35,7 @@
  *
  */
 
-#ifndef PCL_SURFACE_GRID_PROJECTION_H_
-#define PCL_SURFACE_GRID_PROJECTION_H_
+#pragma once
 
 #include <pcl/surface/boost.h>
 #include <pcl/surface/reconstruction.h>
@@ -80,13 +79,13 @@ namespace pcl
 
       typedef typename pcl::PointCloud<PointNT>::Ptr PointCloudPtr;
 
-      typedef typename pcl::KdTree<PointNT> KdTree;
-      typedef typename pcl::KdTree<PointNT>::Ptr KdTreePtr;
+      typedef pcl::KdTree<PointNT> KdTree;
+      typedef typename KdTree::Ptr KdTreePtr;
 
       /** \brief Data leaf. */
       struct Leaf
       {
-        Leaf () : data_indices (), pt_on_surface (), vect_at_grid_pt () {}
+        Leaf () {}
 
         std::vector<int> data_indices;
         Eigen::Vector4f pt_on_surface; 
@@ -213,7 +212,7 @@ namespace pcl
         * \param[out] output the resultant polygonal mesh
         */
       void 
-      performReconstruction (pcl::PolygonMesh &output);
+      performReconstruction (pcl::PolygonMesh &output) override;
 
       /** \brief Create the surface. 
         *
@@ -227,7 +226,7 @@ namespace pcl
         */
       void 
       performReconstruction (pcl::PointCloud<PointNT> &points, 
-                             std::vector<pcl::Vertices> &polygons);
+                             std::vector<pcl::Vertices> &polygons) override;
 
       /** \brief When the input data points don't fill into the 1*1*1 box, 
         * scale them so that they can be filled in the unit box. Otherwise, 
@@ -495,12 +494,9 @@ namespace pcl
       boost::dynamic_bitset<> occupied_cell_list_;
 
       /** \brief Class get name method. */
-      std::string getClassName () const { return ("GridProjection"); }
+      std::string getClassName () const override { return ("GridProjection"); }
 
     public:
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   };
 }
-
-#endif  // PCL_SURFACE_GRID_PROJECTION_H_
- 

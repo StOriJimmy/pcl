@@ -35,16 +35,14 @@
  *
  */
 
-#ifndef PCL_IO_REAL_SENSE_GRABBER_H
-#define PCL_IO_REAL_SENSE_GRABBER_H
-
-#include <boost/thread/thread.hpp>
-#include <boost/thread/mutex.hpp>
+#pragma once
 
 #include <pcl/io/grabber.h>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/common/time.h>
+
+#include <thread>
 
 namespace pcl
 {
@@ -265,9 +263,9 @@ namespace pcl
       bool need_xyzrgba_;
 
       EventFrequency frequency_;
-      mutable boost::mutex fps_mutex_;
+      mutable std::mutex fps_mutex_;
 
-      boost::thread thread_;
+      std::thread thread_;
 
       /// Depth buffer to perform temporal filtering of the depth images
       boost::shared_ptr<pcl::io::Buffer<unsigned short> > depth_buffer_;
@@ -275,6 +273,3 @@ namespace pcl
   };
 
 }
-
-#endif /* PCL_IO_REAL_SENSE_GRABBER_H */
-

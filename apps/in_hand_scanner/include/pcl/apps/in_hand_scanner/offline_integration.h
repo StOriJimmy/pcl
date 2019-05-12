@@ -38,8 +38,7 @@
  *
  */
 
-#ifndef PCL_APPS_IN_HAND_SCANNER_OFFLINE_INTEGRATION_H
-#define PCL_APPS_IN_HAND_SCANNER_OFFLINE_INTEGRATION_H
+#pragma once
 
 #include <vector>
 #include <string>
@@ -87,7 +86,7 @@ namespace pcl
         typedef pcl::ihs::OfflineIntegration Self;
 
         /** \brief Constructor. */
-        explicit OfflineIntegration (Base* parent=0);
+        explicit OfflineIntegration (Base* parent=nullptr);
 
         /** \brief Destructor. */
         ~OfflineIntegration ();
@@ -132,7 +131,7 @@ namespace pcl
         class ComputationFPS : public Base::FPS
         {
           public:
-            ComputationFPS () : Base::FPS () {}
+            ComputationFPS () {}
             ~ComputationFPS () {}
         };
 
@@ -141,7 +140,7 @@ namespace pcl
         class VisualizationFPS : public Base::FPS
         {
           public:
-            VisualizationFPS () : Base::FPS () {}
+            VisualizationFPS () {}
             ~VisualizationFPS () {}
         };
 
@@ -180,11 +179,11 @@ namespace pcl
           * \see http://doc.qt.digia.com/qt/opengl-overpainting.html
           */
         void
-        paintEvent (QPaintEvent* event);
+        paintEvent (QPaintEvent* event) override;
 
         /** \see http://doc.qt.digia.com/qt/qwidget.html#keyPressEvent */
         void
-        keyPressEvent (QKeyEvent* event);
+        keyPressEvent (QKeyEvent* event) override;
 
         //////////////////////////////////////////////////////////////////////////
         // Members
@@ -223,5 +222,3 @@ namespace pcl
     };
   } // End namespace ihs
 } // End namespace pcl
-
-#endif // PCL_APPS_IN_HAND_SCANNER_OFFLINE_INTEGRATION_H

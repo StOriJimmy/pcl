@@ -47,17 +47,15 @@
 //////////////////////////////////////////////////////////////////////////////////////////////
 template <typename PointNT>
 pcl::GridProjection<PointNT>::GridProjection () :
-  cell_hash_map_ (), min_p_ (), max_p_ (), leaf_size_ (0.001), gaussian_scale_ (),
-  data_size_ (0), max_binary_search_level_ (10), k_ (50), padding_size_ (3), data_ (),
-  vector_at_data_point_ (), surface_ (), occupied_cell_list_ ()
+  cell_hash_map_ (), leaf_size_ (0.001), gaussian_scale_ (),
+  data_size_ (0), max_binary_search_level_ (10), k_ (50), padding_size_ (3), data_ () 
 {}
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 template <typename PointNT>
 pcl::GridProjection<PointNT>::GridProjection (double resolution) :
-  cell_hash_map_ (), min_p_ (), max_p_ (), leaf_size_ (resolution), gaussian_scale_ (),
-  data_size_ (0), max_binary_search_level_ (10), k_ (50), padding_size_ (3), data_ (),
-  vector_at_data_point_ (), surface_ (), occupied_cell_list_ ()
+  cell_hash_map_ (), leaf_size_ (resolution), gaussian_scale_ (),
+  data_size_ (0), max_binary_search_level_ (10), k_ (50), padding_size_ (3), data_ () 
 {}
 
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -422,7 +420,7 @@ pcl::GridProjection<PointNT>::getVectorAtPointKNN (const Eigen::Vector4f &p,
   vector_average.getEigenVector1 (out_vector);
   out_vector.normalize ();
   double d1 = getD1AtPoint (p, out_vector, k_indices);
-  out_vector = out_vector * sum;
+  out_vector *= sum;
   vo = ((d1 > 0) ? -1 : 1) * out_vector;
 
 }
@@ -636,9 +634,9 @@ pcl::GridProjection<PointNT>::reconstructPolygons (std::vector<pcl::Vertices> &p
   for (int cp = 0; cp < static_cast<int> (data_->points.size ()); ++cp)
   {
     // Check if the point is invalid
-    if (!pcl_isfinite (data_->points[cp].x) ||
-        !pcl_isfinite (data_->points[cp].y) ||
-        !pcl_isfinite (data_->points[cp].z))
+    if (!std::isfinite (data_->points[cp].x) ||
+        !std::isfinite (data_->points[cp].y) ||
+        !std::isfinite (data_->points[cp].z))
       continue;
 
     Eigen::Vector3i index_3d;

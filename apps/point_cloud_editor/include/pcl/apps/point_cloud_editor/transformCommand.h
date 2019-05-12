@@ -38,13 +38,11 @@
 /// functionalities.  // XXX - transformation of what?
 /// @author  Yue Li and Matthew Hielsberg
 
-#ifndef TRANSFORM_COMMAND_H_
-#define TRANSFORM_COMMAND_H_
+#pragma once
 
 #include <pcl/apps/point_cloud_editor/command.h>
 #include <pcl/apps/point_cloud_editor/localTypes.h>
 #include <pcl/apps/point_cloud_editor/cloud.h>
-
 
 class TransformCommand : public Command
 {
@@ -57,34 +55,24 @@ class TransformCommand : public Command
     TransformCommand (ConstSelectionPtr selection_ptr, CloudPtr cloud_ptr,
                       const float* matrix, float translate_x,
                       float translate_y, float translate_z);
-  
-    /// @brief Destructor
-    ~TransformCommand ()
-    {
-    }
 
   protected:
     // Transforms the coorindates of the selected points according to the transform
     // matrix.
     void
-    execute ();
+    execute () override;
 
     // Restore the coordinates of the transformed points.
     void
-    undo ();
+    undo () override;
 
   private:
     /// @brief Copy constructor  - object is not copy-constructable
-    TransformCommand (const TransformCommand&)
-    {
-    }
+    TransformCommand (const TransformCommand&) = delete;
 
     /// @brief Equal operator - object is non-copyable
     TransformCommand&
-    operator= (const TransformCommand&)
-    {
-      assert(false); return (*this);
-    }
+    operator= (const TransformCommand&) = delete;
 
     /// @brief Applies the transformation to the point values
     /// @param sel_ptr A pointer to the selection object whose points are to be
@@ -115,5 +103,3 @@ class TransformCommand : public Command
     /// The center of the cloud used by this command
     float cloud_center_[XYZ_SIZE];
 };
-
-#endif // TRANSFORM_COMMAND_H_

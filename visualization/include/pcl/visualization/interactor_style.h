@@ -37,8 +37,8 @@
  * $Id$
  *
  */
-#ifndef PCL_PCL_VISUALIZER_INTERACTOR_STYLE_H_
-#define PCL_PCL_VISUALIZER_INTERACTOR_STYLE_H_
+
+#pragma once
 
 #include <pcl/console/print.h>
 #include <pcl/visualization/common/actor_map.h>
@@ -114,15 +114,14 @@ namespace pcl
 
         /** \brief Empty constructor. */
         PCLVisualizerInteractorStyle () : 
-          init_ (), rens_ (), cloud_actors_ (), shape_actors_ (), win_height_ (), win_width_ (), win_pos_x_ (), win_pos_y_ (),
-          max_win_height_ (), max_win_width_ (), use_vbos_ (false), grid_enabled_ (), grid_actor_ (), lut_enabled_ (),
-          lut_actor_ (), snapshot_writer_ (), wif_ (), mouse_signal_ (), keyboard_signal_ (),
-          point_picking_signal_ (), area_picking_signal_ (), stereo_anaglyph_mask_default_ (),
-          mouse_callback_ (), modifier_ (), camera_file_ (), camera_ (), camera_saved_ (), win_ (), lut_actor_id_ ("")
+          init_ (), win_height_ (), win_width_ (), win_pos_x_ (), win_pos_y_ (),
+          max_win_height_ (), max_win_width_ (), use_vbos_ (false), grid_enabled_ (), lut_enabled_ (),
+          stereo_anaglyph_mask_default_ (),
+          modifier_ (), camera_saved_ (), lut_actor_id_ ("")
         {}
       
         /** \brief Empty destructor */
-        virtual ~PCLVisualizerInteractorStyle () {}
+        ~PCLVisualizerInteractorStyle () {}
 
         // this macro defines Superclass, the isA functionality and the safe downcast method
         vtkTypeMacro (PCLVisualizerInteractorStyle, vtkInteractorStyleRubberBandPick);
@@ -205,11 +204,9 @@ namespace pcl
         bool
         saveCameraParameters (const std::string &file);
 
-        /** \brief Get camera parameters and save them to a \ref pcl::visualization::Camera.
-          * \param[out] camera the name of the \ref pcl::visualization::Camera
-          */
+        /** \brief Get camera parameters of a given viewport (0 means default viewport). */
         void
-        getCameraParameters (Camera &camera);
+        getCameraParameters (Camera &camera, int viewport = 0) const;
 
         /** \brief Load camera parameters from a camera parameter file.
           * \param[in] file the name of the camera parameter file
@@ -310,39 +307,39 @@ namespace pcl
         boost::signals2::signal<void (const pcl::visualization::AreaPickingEvent&)> area_picking_signal_;
 
         /** \brief Interactor style internal method. Gets called whenever a key is pressed. */
-        virtual void 
-        OnChar ();
+        void 
+        OnChar () override;
 
         // Keyboard events
-        virtual void 
-        OnKeyDown ();
-        virtual void 
-        OnKeyUp ();
+        void 
+        OnKeyDown () override;
+        void 
+        OnKeyUp () override;
         
         // mouse button events
-        virtual void 	
-        OnMouseMove ();
-        virtual void 	
-        OnLeftButtonDown ();
-        virtual void 	
-        OnLeftButtonUp ();
-        virtual void 	
-        OnMiddleButtonDown ();
-        virtual void 	
-        OnMiddleButtonUp ();
-        virtual void 	
-        OnRightButtonDown ();
-        virtual void 	
-        OnRightButtonUp ();
-        virtual void 	
-        OnMouseWheelForward ();
-        virtual void 	
-        OnMouseWheelBackward ();
+        void 	
+        OnMouseMove () override;
+        void 	
+        OnLeftButtonDown () override;
+        void 	
+        OnLeftButtonUp () override;
+        void 	
+        OnMiddleButtonDown () override;
+        void 	
+        OnMiddleButtonUp () override;
+        void 	
+        OnRightButtonDown () override;
+        void 	
+        OnRightButtonUp () override;
+        void 	
+        OnMouseWheelForward () override;
+        void 	
+        OnMouseWheelBackward () override;
         
         // mouse move event
         /** \brief Interactor style internal method. Gets called periodically if a timer is set. */
-        virtual void 
-        OnTimer ();
+        void 
+        OnTimer () override;
 
         /** \brief Interactor style internal method. Zoom in. */
         void 
@@ -412,7 +409,7 @@ namespace pcl
         static PCLHistogramVisualizerInteractorStyle *New ();
 
         /** \brief Empty constructor. */
-        PCLHistogramVisualizerInteractorStyle () : wins_ (), init_ (false) {}
+        PCLHistogramVisualizerInteractorStyle () : init_ (false) {}
 
         /** \brief Initialization routine. Must be called before anything else. */
         void 
@@ -432,12 +429,10 @@ namespace pcl
         bool init_;
 
         /** \brief Interactor style internal method. Gets called whenever a key is pressed. */
-        void OnKeyDown ();
+        void OnKeyDown () override;
 
         /** \brief Interactor style internal method. Gets called periodically if a timer is set. */
-        void OnTimer ();
+        void OnTimer () override;
     };
   }
 }
-
-#endif

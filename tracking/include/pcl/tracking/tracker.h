@@ -37,8 +37,7 @@
  *
  */
 
-#ifndef PCL_TRACKING_TRACKER_H_
-#define PCL_TRACKING_TRACKER_H_
+#pragma once
 
 #include <pcl/tracking/tracking.h>
 #include <pcl/pcl_base.h>
@@ -79,7 +78,7 @@ namespace pcl
       
     public:
       /** \brief Empty constructor. */
-      Tracker (): tracker_name_ (), search_ () {}
+      Tracker (): search_ () {}
       
       /** \brief Base method for tracking for all points given in 
         * <setInputCloud (), setIndices ()> using the indices in setIndices () 
@@ -132,5 +131,3 @@ namespace pcl
 }
 
 #include <pcl/tracking/impl/tracker.hpp>
-
-#endif

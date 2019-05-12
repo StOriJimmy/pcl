@@ -37,8 +37,7 @@
  *
  */
 
-#ifndef PCL_GP3_H_
-#define PCL_GP3_H_
+#pragma once
 
 // PCL includes
 #include <pcl/surface/reconstruction.h>
@@ -46,7 +45,6 @@
 
 #include <pcl/conversions.h>
 #include <pcl/kdtree/kdtree.h>
-#include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/PolygonMesh.h>
 
 #include <fstream>
@@ -145,8 +143,8 @@ namespace pcl
       using MeshConstruction<PointInT>::input_;
       using MeshConstruction<PointInT>::indices_;
 
-      typedef typename pcl::KdTree<PointInT> KdTree;
-      typedef typename pcl::KdTree<PointInT>::Ptr KdTreePtr;
+      typedef pcl::KdTree<PointInT> KdTree;
+      typedef typename KdTree::Ptr KdTreePtr;
 
       typedef pcl::PointCloud<PointInT> PointCloudIn;
       typedef typename PointCloudIn::Ptr PointCloudInPtr;
@@ -171,16 +169,8 @@ namespace pcl
         eps_angle_(M_PI/4), //45 degrees,
         consistent_(false), 
         consistent_ordering_ (false),
-        triangle_ (),
-        coords_ (),
         angles_ (),
         R_ (),
-        state_ (),
-        source_ (),
-        ffn_ (),
-        sfn_ (),
-        part_ (),
-        fringe_queue_ (),
         is_current_free_ (false),
         current_index_ (),
         prev_is_ffn_ (false),
@@ -190,15 +180,7 @@ namespace pcl
         changed_1st_fn_ (false),
         changed_2nd_fn_ (false),
         new2boundary_ (),
-        already_connected_ (false),
-        proj_qp_ (),
-        u_ (),
-        v_ (),
-        uvn_ffn_ (),
-        uvn_sfn_ (),
-        uvn_next_ffn_ (),
-        uvn_next_sfn_ (),
-        tmp_ ()
+        already_connected_ (false)
       {};
 
       /** \brief Set the multiplier of the nearest neighbor distance to obtain the final search radius for each point
@@ -347,7 +329,7 @@ namespace pcl
       /** \brief Struct for storing the edges starting from a fringe point **/
       struct doubleEdge
       {
-        doubleEdge () : index (0), first (), second () {}
+        doubleEdge () : index (0) {}
         int index;
         Eigen::Vector2f first;
         Eigen::Vector2f second;
@@ -423,13 +405,13 @@ namespace pcl
         * \param[out] output the resultant polygonal mesh
         */
       void 
-      performReconstruction (pcl::PolygonMesh &output);
+      performReconstruction (pcl::PolygonMesh &output) override;
 
       /** \brief The actual surface reconstruction method.
         * \param[out] polygons the resultant polygons, as a set of vertices. The Vertices structure contains an array of point indices.
         */
       void 
-      performReconstruction (std::vector<pcl::Vertices> &polygons);
+      performReconstruction (std::vector<pcl::Vertices> &polygons) override;
 
       /** \brief The actual surface reconstruction method.
         * \param[out] polygons the resultant polygons, as a set of vertices. The Vertices structure contains an array of point indices.
@@ -439,7 +421,7 @@ namespace pcl
 
       /** \brief Class get name method. */
       std::string 
-      getClassName () const { return ("GreedyProjectionTriangulation"); }
+      getClassName () const override { return ("GreedyProjectionTriangulation"); }
 
       /** \brief Forms a new triangle by connecting the current neighbor to the query point 
         * and the previous neighbor
@@ -543,6 +525,3 @@ namespace pcl
 #ifdef PCL_NO_PRECOMPILE
 #include <pcl/surface/impl/gp3.hpp>
 #endif
-
-#endif  //#ifndef PCL_GP3_H_
-

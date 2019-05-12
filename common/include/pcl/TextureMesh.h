@@ -36,8 +36,7 @@
  *
  */
 
-#ifndef PCL_TEXTUREMESH_H_
-#define PCL_TEXTUREMESH_H_
+#pragma once
 
 #include <Eigen/Core>
 #include <string>
@@ -49,7 +48,7 @@ namespace pcl
   /** \author Khai Tran */
   struct TexMaterial
   {
-    TexMaterial () : tex_name (), tex_file (), tex_Ka (), tex_Kd (), tex_Ks (), tex_d (), tex_Ns (), tex_illum () {}
+    TexMaterial () : tex_Ka (), tex_Kd (), tex_Ks (), tex_d (), tex_Ns (), tex_illum () {}
 
     struct RGB
     {
@@ -90,8 +89,7 @@ namespace pcl
   /** \author Khai Tran */
   struct TextureMesh
   {
-    TextureMesh () : 
-      cloud (), tex_polygons (), tex_coordinates (), tex_materials () {}
+    TextureMesh () {}
 
     pcl::PCLPointCloud2  cloud;
     pcl::PCLHeader  header;
@@ -109,6 +107,3 @@ namespace pcl
    typedef boost::shared_ptr<pcl::TextureMesh> TextureMeshPtr;
    typedef boost::shared_ptr<pcl::TextureMesh const> TextureMeshConstPtr;
 } // namespace pcl
-
-#endif /* PCL_TEXTUREMESH_H_ */
-

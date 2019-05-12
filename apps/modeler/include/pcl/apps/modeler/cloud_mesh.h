@@ -33,8 +33,8 @@
  *
  *
  */
-#ifndef PCL_MODELER_CLOUD_MESH_H_
-#define PCL_MODELER_CLOUD_MESH_H_
+
+#pragma once
 
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
@@ -56,6 +56,7 @@ namespace pcl
       typedef pcl::PointCloud<PointT>             PointCloud;
       typedef PointCloud::Ptr                     PointCloudPtr;
       typedef PointCloud::ConstPtr                PointCloudConstPtr;
+      typedef boost::shared_ptr<CloudMesh>        Ptr;
 
       CloudMesh ();
       CloudMesh (PointCloudPtr cloud);
@@ -117,5 +118,3 @@ namespace pcl
     };
   }
 }
-
-#endif // PCL_MODELER_CLOUD_MESH_H_

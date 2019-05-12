@@ -37,8 +37,7 @@
  *
  */
 
-#ifndef PCL_IO_PLY_IO_H_
-#define PCL_IO_PLY_IO_H_
+#pragma once
 
 #include <pcl/io/boost.h>
 #include <pcl/io/file_io.h>
@@ -84,33 +83,29 @@ namespace pcl
       };
       
       PLYReader ()
-        : FileReader ()
-        , parser_ ()
-        , origin_ (Eigen::Vector4f::Zero ())
+        : origin_ (Eigen::Vector4f::Zero ())
         , orientation_ (Eigen::Matrix3f::Zero ())
         , cloud_ ()
         , vertex_count_ (0)
         , vertex_offset_before_ (0)
-        , range_grid_ (0)
+        , range_grid_ (nullptr)
         , rgb_offset_before_ (0)
         , do_resize_ (false)
-        , polygons_ (0)
+        , polygons_ (nullptr)
         , r_(0), g_(0), b_(0)
         , a_(0), rgba_(0)
       {}
 
       PLYReader (const PLYReader &p)
-        : FileReader ()
-        , parser_ ()
-        , origin_ (Eigen::Vector4f::Zero ())
+        : origin_ (Eigen::Vector4f::Zero ())
         , orientation_ (Eigen::Matrix3f::Zero ())
         , cloud_ ()
         , vertex_count_ (0)
         , vertex_offset_before_ (0)
-        , range_grid_ (0)
+        , range_grid_ (nullptr)
         , rgb_offset_before_ (0)
         , do_resize_ (false)
-        , polygons_ (0)
+        , polygons_ (nullptr)
         , r_(0), g_(0), b_(0)
         , a_(0), rgba_(0)
       {
@@ -153,7 +148,7 @@ namespace pcl
       int 
       readHeader (const std::string &file_name, pcl::PCLPointCloud2 &cloud,
                   Eigen::Vector4f &origin, Eigen::Quaternionf &orientation,
-                  int &ply_version, int &data_type, unsigned int &data_idx, const int offset = 0);
+                  int &ply_version, int &data_type, unsigned int &data_idx, const int offset = 0) override;
 
       /** \brief Read a point cloud data from a PLY file and store it into a pcl/PCLPointCloud2.
         * \param[in] file_name the name of the file containing the actual PointCloud data
@@ -169,7 +164,7 @@ namespace pcl
         */
       int 
       read (const std::string &file_name, pcl::PCLPointCloud2 &cloud,
-            Eigen::Vector4f &origin, Eigen::Quaternionf &orientation, int& ply_version, const int offset = 0);
+            Eigen::Vector4f &origin, Eigen::Quaternionf &orientation, int& ply_version, const int offset = 0) override;
 
       /** \brief Read a point cloud data from a PLY file and store it into a pcl/PCLPointCloud2.
         * \note This function is provided for backwards compatibility only
@@ -549,7 +544,7 @@ namespace pcl
   {
     public:
       ///Constructor
-      PLYWriter () : FileWriter () {};
+      PLYWriter () {};
 
       ///Destructor
       ~PLYWriter () {};
@@ -634,7 +629,7 @@ namespace pcl
       write (const std::string &file_name, const pcl::PCLPointCloud2 &cloud,
              const Eigen::Vector4f &origin = Eigen::Vector4f::Zero (), 
              const Eigen::Quaternionf &orientation = Eigen::Quaternionf::Identity (),
-             const bool binary = false)
+             const bool binary = false) override
       {
         if (binary)
           return (this->writeBinary (file_name, cloud, origin, orientation, true));
@@ -896,5 +891,3 @@ namespace pcl
     savePLYFileBinary (const std::string &file_name, const pcl::PolygonMesh &mesh);
   }
 }
-
-#endif  //#ifndef PCL_IO_PLY_IO_H_

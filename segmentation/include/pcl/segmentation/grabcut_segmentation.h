@@ -37,8 +37,7 @@
  *
  */
 
-#ifndef PCL_SEGMENTATION_GRABCUT
-#define PCL_SEGMENTATION_GRABCUT
+#pragma once
 
 #include <pcl/point_cloud.h>
 #include <pcl/pcl_base.h>
@@ -318,8 +317,8 @@ namespace pcl
   class GrabCut : public pcl::PCLBase<PointT>
   {
     public:
-      typedef typename pcl::search::Search<PointT> KdTree;
-      typedef typename pcl::search::Search<PointT>::Ptr KdTreePtr;
+      typedef pcl::search::Search<PointT> KdTree;
+      typedef typename KdTree::Ptr KdTreePtr;
       typedef typename PCLBase<PointT>::PointCloudConstPtr PointCloudConstPtr;
       typedef typename PCLBase<PointT>::PointCloudPtr PointCloudPtr;
       using PCLBase<PointT>::input_;
@@ -334,10 +333,10 @@ namespace pcl
         , initialized_ (false)
       {}
       /// Destructor
-      virtual ~GrabCut () {};
+      ~GrabCut () {};
       // /// Set input cloud
       void
-      setInputCloud (const PointCloudConstPtr& cloud);
+      setInputCloud (const PointCloudConstPtr& cloud) override;
       /// Set background points, foreground points = points \ background points
       void
       setBackgroundPoints (const PointCloudConstPtr& background_points);
@@ -480,5 +479,3 @@ namespace pcl
 }
 
 #include <pcl/segmentation/impl/grabcut_segmentation.hpp>
-
-#endif

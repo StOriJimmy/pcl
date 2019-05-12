@@ -35,16 +35,16 @@
  *
  */
 
-#ifndef PCL_IO_DEPTH_SENSE_GRABBER_IMPL_H
-#define PCL_IO_DEPTH_SENSE_GRABBER_IMPL_H
-
-#include <boost/thread/mutex.hpp>
+#pragma once
 
 #include <DepthSense.hxx>
 
 #include <pcl/common/time.h>
 #include <pcl/io/buffers.h>
 #include <pcl/io/depth_sense_grabber.h>
+
+#include <mutex>
+
 
 namespace pcl
 {
@@ -88,7 +88,7 @@ namespace pcl
         bool need_xyzrgba_;
 
         EventFrequency frequency_;
-        mutable boost::mutex fps_mutex_;
+        mutable std::mutex fps_mutex_;
 
         /// Temporary buffer to store color data
         std::vector<uint8_t> color_data_;
@@ -155,6 +155,3 @@ namespace pcl
   }
 
 }
-
-#endif /* PCL_IO_DEPTH_SENSE_GRABBER_IMPL_H */
-

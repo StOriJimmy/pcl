@@ -1,5 +1,5 @@
-#ifndef PCL_MESSAGE_VERTICES_H
-#define PCL_MESSAGE_VERTICES_H
+#pragma once
+
 #include <string>
 #include <vector>
 #include <ostream>
@@ -13,7 +13,7 @@ namespace pcl
     */
   struct Vertices
   {
-    Vertices () : vertices ()
+    Vertices ()
     {}
 
     std::vector<uint32_t> vertices;
@@ -38,6 +38,3 @@ namespace pcl
     return (s);
   }
 } // namespace pcl
-
-#endif // PCL_MESSAGE_VERTICES_H
-

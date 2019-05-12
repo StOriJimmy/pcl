@@ -64,9 +64,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 pcl::ihs::detail::FaceVertexMesh::FaceVertexMesh ()
-  : vertices       (),
-    triangles      (),
-    transformation (Eigen::Isometry3d::Identity ())
+  : transformation (Eigen::Isometry3d::Identity ())
 {
 }
 
@@ -74,7 +72,6 @@ pcl::ihs::detail::FaceVertexMesh::FaceVertexMesh ()
 
 pcl::ihs::detail::FaceVertexMesh::FaceVertexMesh (const Mesh& mesh, const Eigen::Isometry3d& T)
   : vertices       (mesh.getVertexDataCloud ()),
-    triangles      (),
     transformation (T)
 {
   if (typeid (Mesh::MeshTag) != typeid (pcl::geometry::TriangleMeshTag))
@@ -83,15 +80,15 @@ pcl::ihs::detail::FaceVertexMesh::FaceVertexMesh (const Mesh& mesh, const Eigen:
     exit (EXIT_FAILURE);
   }
 
-  for (CloudIHS::iterator it=vertices.begin (); it!=vertices.end (); ++it)
+  for (auto &vertex : vertices)
   {
-    std::swap (it->r, it->b);
+    std::swap (vertex.r, vertex.b);
   }
 
   triangles.reserve (mesh.sizeFaces ());
   pcl::ihs::detail::FaceVertexMesh::Triangle triangle;
 
-  for (unsigned int i=0; i<mesh.sizeFaces (); ++i)
+  for (size_t i=0; i<mesh.sizeFaces (); ++i)
   {
     Mesh::VertexAroundFaceCirculator circ = mesh.getVertexAroundFaceCirculator (Mesh::FaceIndex (i));
     triangle.first  = (circ++).getTargetIndex ().get ();
@@ -108,15 +105,12 @@ pcl::ihs::detail::FaceVertexMesh::FaceVertexMesh (const Mesh& mesh, const Eigen:
 
 pcl::ihs::OpenGLViewer::OpenGLViewer (QWidget* parent)
   : QGLWidget            (parent),
-    mutex_vis_           (),
     timer_vis_           (new QTimer (this)),
     colormap_            (Colormap::Constant (255)),
     vis_conf_norm_       (1),
-    drawn_meshes_        (),
     mesh_representation_ (MR_POINTS),
     coloring_            (COL_RGB),
     draw_box_            (false),
-    box_coefficients_    (),
     scaling_factor_      (1.),
     R_cam_               (1., 0., 0., 0.),
     t_cam_               (0., 0., 0.),
@@ -537,9 +531,9 @@ pcl::ihs::OpenGLViewer::addMesh (const CloudXYZRGBNormalConstPtr& cloud, const s
       const PointXYZRGBNormal& pt_2 = cloud->operator [] (ind_o_2);
       const PointXYZRGBNormal& pt_3 = cloud->operator [] (ind_o_3);
 
-      if (!boost::math::isnan (pt_1.x) && !boost::math::isnan (pt_3.x))
+      if (!std::isnan (pt_1.x) && !std::isnan (pt_3.x))
       {
-        if (!boost::math::isnan (pt_2.x)) // 1-2-3 is valid
+        if (!std::isnan (pt_2.x)) // 1-2-3 is valid
         {
           if (std::abs (pt_1.z - pt_2.z) < 1 &&
               std::abs (pt_1.z - pt_3.z) < 1 &&
@@ -549,10 +543,10 @@ pcl::ihs::OpenGLViewer::addMesh (const CloudXYZRGBNormalConstPtr& cloud, const s
             ind_v_2 = addVertex (pt_2, vertices, indices [ind_o_2]);
             ind_v_3 = addVertex (pt_3, vertices, indices [ind_o_3]);
 
-            triangles.push_back (FaceVertexMesh::Triangle (ind_v_1, ind_v_2, ind_v_3));
+            triangles.emplace_back(ind_v_1, ind_v_2, ind_v_3);
           }
         }
-        if (!boost::math::isnan (pt_0.x)) // 0-1-3 is valid
+        if (!std::isnan (pt_0.x)) // 0-1-3 is valid
         {
           if (std::abs (pt_0.z - pt_1.z) < 1 &&
               std::abs (pt_0.z - pt_3.z) < 1 &&
@@ -562,7 +556,7 @@ pcl::ihs::OpenGLViewer::addMesh (const CloudXYZRGBNormalConstPtr& cloud, const s
             ind_v_3 = addVertex (pt_3, vertices, indices [ind_o_3]);
             ind_v_0 = addVertex (pt_0, vertices, indices [ind_o_0]);
 
-            triangles.push_back (FaceVertexMesh::Triangle (ind_v_1, ind_v_3, ind_v_0));
+            triangles.emplace_back(ind_v_1, ind_v_3, ind_v_0);
           }
         }
       }
@@ -932,7 +926,7 @@ pcl::ihs::OpenGLViewer::drawMeshes ()
         }
         case COL_VISCONF:
         {
-          for (unsigned int i=0; i<mesh.vertices.size (); ++i)
+          for (size_t i=0; i<mesh.vertices.size (); ++i)
           {
             const unsigned int n = pcl::ihs::countDirections (mesh.vertices [i].directions);
             const unsigned int index = static_cast <unsigned int> (

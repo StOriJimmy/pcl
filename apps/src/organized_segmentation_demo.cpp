@@ -13,7 +13,7 @@
 
 void
 displayPlanarRegions (std::vector<pcl::PlanarRegion<PointT>, Eigen::aligned_allocator<pcl::PlanarRegion<PointT> > > &regions, 
-                      boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer)
+                      pcl::visualization::PCLVisualizer::Ptr viewer)
 {
   char name[1024];
   unsigned char red [6] = {255,   0,   0, 255, 255,   0};
@@ -44,7 +44,7 @@ displayPlanarRegions (std::vector<pcl::PlanarRegion<PointT>, Eigen::aligned_allo
 
 void
 displayEuclideanClusters (const pcl::PointCloud<PointT>::CloudVectorType &clusters, 
-                          boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer)
+                          pcl::visualization::PCLVisualizer::Ptr viewer)
 {
   char name[1024];
   unsigned char red [6] = {255,   0,   0, 255, 255,   0};
@@ -54,16 +54,17 @@ displayEuclideanClusters (const pcl::PointCloud<PointT>::CloudVectorType &cluste
   for (size_t i = 0; i < clusters.size (); i++)
   {
     sprintf (name, "cluster_%d" , int (i));
-    pcl::visualization::PointCloudColorHandlerCustom<PointT> color0(boost::make_shared<pcl::PointCloud<PointT> >(clusters[i]),red[i%6],grn[i%6],blu[i%6]);
-    if (!viewer->updatePointCloud (boost::make_shared<pcl::PointCloud<PointT> >(clusters[i]),color0,name))
-      viewer->addPointCloud (boost::make_shared<pcl::PointCloud<PointT> >(clusters[i]),color0,name);
+    pcl::PointCloud<PointT>::ConstPtr cluster_cloud (new pcl::PointCloud<PointT> (clusters[i]));
+    pcl::visualization::PointCloudColorHandlerCustom<PointT> color0(cluster_cloud,red[i%6],grn[i%6],blu[i%6]);
+    if (!viewer->updatePointCloud (cluster_cloud,color0,name))
+      viewer->addPointCloud (cluster_cloud,color0,name);
     viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 5, name);
     viewer->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_OPACITY, 0.3, name);
   }
 }
 
 void
-displayCurvature (pcl::PointCloud<PointT>& cloud, pcl::PointCloud<pcl::Normal>& normals, boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer)
+displayCurvature (pcl::PointCloud<PointT>& cloud, pcl::PointCloud<pcl::Normal>& normals, pcl::visualization::PCLVisualizer::Ptr viewer)
 {
   pcl::PointCloud<pcl::PointXYZRGBA> curvature_cloud = cloud;
   for (size_t i  = 0; i < cloud.points.size (); i++)
@@ -82,13 +83,12 @@ displayCurvature (pcl::PointCloud<PointT>& cloud, pcl::PointCloud<pcl::Normal>& 
     }
   }
   
-  if (!viewer->updatePointCloud (boost::make_shared<pcl::PointCloud<pcl::PointXYZRGBA> >(curvature_cloud), "curvature"))
-    viewer->addPointCloud (boost::make_shared<pcl::PointCloud<pcl::PointXYZRGBA> >(curvature_cloud), "curvature");
-  
+  if (!viewer->updatePointCloud (curvature_cloud.makeShared (), "curvature"))
+    viewer->addPointCloud (curvature_cloud.makeShared (), "curvature");
 }
 
 void
-displayDistanceMap (pcl::PointCloud<PointT>& cloud, float* distance_map, boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer)
+displayDistanceMap (pcl::PointCloud<PointT>& cloud, float* distance_map, pcl::visualization::PCLVisualizer::Ptr viewer)
 {
   pcl::PointCloud<pcl::PointXYZRGBA> distance_map_cloud = cloud;
   for (size_t i  = 0; i < cloud.points.size (); i++)
@@ -107,12 +107,12 @@ displayDistanceMap (pcl::PointCloud<PointT>& cloud, float* distance_map, boost::
     }
   }
   
-  if (!viewer->updatePointCloud (boost::make_shared<pcl::PointCloud<pcl::PointXYZRGBA> >(distance_map_cloud), "distance_map"))
-    viewer->addPointCloud (boost::make_shared<pcl::PointCloud<pcl::PointXYZRGBA> >(distance_map_cloud), "distance_map");
+  if (!viewer->updatePointCloud (distance_map_cloud.makeShared (), "distance_map"))
+    viewer->addPointCloud (distance_map_cloud.makeShared (), "distance_map");
 }
 
 void
-removePreviousDataFromScreen (size_t prev_models_size, size_t prev_clusters_size, boost::shared_ptr<pcl::visualization::PCLVisualizer> viewer)
+removePreviousDataFromScreen (size_t prev_models_size, size_t prev_clusters_size, pcl::visualization::PCLVisualizer::Ptr viewer)
 {
   char name[1024];
   for (size_t i = 0; i < prev_models_size; i++)
@@ -138,13 +138,13 @@ compareClusterToRegion (pcl::PlanarRegion<PointT>& region, pcl::PointCloud<Point
   pcl::PointCloud<PointT> poly;
   poly.points = region.getContour ();
   
-  for (size_t i = 0; i < cluster.points.size (); i++)
+  for (const auto &point : cluster.points)
   {
-    double ptp_dist = fabs (model[0] * cluster.points[i].x +
-                            model[1] * cluster.points[i].y +
-                            model[2] * cluster.points[i].z +
+    double ptp_dist = fabs (model[0] * point.x +
+                            model[1] * point.y +
+                            model[2] * point.z +
                             model[3]);
-    bool in_poly = pcl::isPointIn2DPolygon<PointT> (cluster.points[i], poly);
+    bool in_poly = pcl::isPointIn2DPolygon<PointT> (point, poly);
     if (in_poly && ptp_dist < 0.02)
       return true;
   }
@@ -279,7 +279,7 @@ OrganizedSegmentationDemo::cloud_cb (const CloudConstPtr& cloud)
   ne.setInputCloud (cloud);
   ne.compute (*normal_cloud);
   float* distance_map = ne.getDistanceMap ();
-  boost::shared_ptr<pcl::EdgeAwarePlaneComparator<PointT,pcl::Normal> > eapc = boost::dynamic_pointer_cast<pcl::EdgeAwarePlaneComparator<PointT,pcl::Normal> >(edge_aware_comparator_);
+  pcl::EdgeAwarePlaneComparator<PointT, pcl::Normal>::Ptr eapc = boost::dynamic_pointer_cast<pcl::EdgeAwarePlaneComparator<PointT, pcl::Normal> >(edge_aware_comparator_);
   eapc->setDistanceMap (distance_map);
   eapc->setDistanceThreshold (0.01f, false);
 
@@ -307,13 +307,13 @@ OrganizedSegmentationDemo::cloud_cb (const CloudConstPtr& cloud)
   //Segment Objects
   pcl::PointCloud<PointT>::CloudVectorType clusters;
 
-  if (use_clustering_ && regions.size () > 0)
+  if (use_clustering_ && !regions.empty ())
   {
-    boost::shared_ptr<std::set<uint32_t> > plane_labels = boost::make_shared<std::set<uint32_t> > ();
+    pcl::EuclideanClusterComparator<PointT, pcl::Label>::ExcludeLabelSetPtr plane_labels (new pcl::EuclideanClusterComparator<PointT, pcl::Label>::ExcludeLabelSet);
     for (size_t i = 0; i < label_indices.size (); ++i)
       if (label_indices[i].indices.size () > 10000)
         plane_labels->insert (i);
-    
+
     euclidean_cluster_comparator_->setInputCloud (cloud);
     euclidean_cluster_comparator_->setLabels (labels);
     euclidean_cluster_comparator_->setExcludeLabels (plane_labels);
@@ -325,12 +325,12 @@ OrganizedSegmentationDemo::cloud_cb (const CloudConstPtr& cloud)
     euclidean_segmentation.setInputCloud (cloud);
     euclidean_segmentation.segment (euclidean_labels, euclidean_label_indices);
     
-    for (size_t i = 0; i < euclidean_label_indices.size (); i++)
+    for (const auto &euclidean_label_index : euclidean_label_indices)
     {
-      if (euclidean_label_indices[i].indices.size () > 1000)
+      if (euclidean_label_index.indices.size () > 1000)
       {
         pcl::PointCloud<PointT> cluster;
-        pcl::copyPointCloud (*cloud,euclidean_label_indices[i].indices,cluster);
+        pcl::copyPointCloud (*cloud, euclidean_label_index.indices,cluster);
         clusters.push_back (cluster);
       }    
     }
@@ -357,9 +357,9 @@ OrganizedSegmentationDemo::timeoutSlot ()
     if (capture_ && data_modified_)
     {
       removePreviousDataFromScreen (previous_data_size_, previous_clusters_size_, vis_);
-      if (!vis_->updatePointCloud (boost::make_shared<pcl::PointCloud<PointT> >(prev_cloud_), "cloud"))
+      if (!vis_->updatePointCloud (prev_cloud_.makeShared (), "cloud"))
       {
-        vis_->addPointCloud (boost::make_shared<pcl::PointCloud<PointT> >(prev_cloud_), "cloud");
+        vis_->addPointCloud (prev_cloud_.makeShared (), "cloud");
         vis_->resetCameraViewpoint ("cloud");
       }
 
@@ -378,7 +378,7 @@ OrganizedSegmentationDemo::timeoutSlot ()
       if (display_normals_)
       {
         vis_->removePointCloud ("normals");
-        vis_->addPointCloudNormals<PointT,pcl::Normal>(boost::make_shared<pcl::PointCloud<PointT> >(prev_cloud_), boost::make_shared<pcl::PointCloud<pcl::Normal> >(prev_normals_), 10, 0.05f, "normals");
+        vis_->addPointCloudNormals<PointT,pcl::Normal>(prev_cloud_.makeShared(), prev_normals_.makeShared (), 10, 0.05f, "normals");
         vis_->setPointCloudRenderingProperties (pcl::visualization::PCL_VISUALIZER_OPACITY, 0.5, "normals");
       }
       else
@@ -469,5 +469,5 @@ main (int argc, char ** argv)
   
   OrganizedSegmentationDemo seg_demo (grabber);
   seg_demo.show();
-  return (app.exec ());
+  return (QApplication::exec ());
 }

@@ -37,8 +37,7 @@
  *
  */
 
-#ifndef PCL_FILTERS_VOXEL_GRID_MAP_H_
-#define PCL_FILTERS_VOXEL_GRID_MAP_H_
+#pragma once
 
 #include <pcl/filters/boost.h>
 #include <pcl/filters/filter.h>
@@ -198,7 +197,6 @@ namespace pcl
         inverse_leaf_size_ (Eigen::Array4f::Zero ()),
         downsample_all_data_ (true),
         save_leaf_layout_ (false),
-        leaf_layout_ (),
         min_b_ (Eigen::Vector4i::Zero ()),
         max_b_ (Eigen::Vector4i::Zero ()),
         div_b_ (Eigen::Vector4i::Zero ()),
@@ -213,7 +211,7 @@ namespace pcl
       }
 
       /** \brief Destructor. */
-      virtual ~VoxelGrid ()
+      ~VoxelGrid ()
       {
       }
 
@@ -339,7 +337,7 @@ namespace pcl
         Eigen::Array4i diff2min = min_b_ - ijk;
         Eigen::Array4i diff2max = max_b_ - ijk;
         std::vector<int> neighbors (relative_coordinates.cols());
-        for (int ni = 0; ni < relative_coordinates.cols (); ni++)
+        for (Eigen::Index ni = 0; ni < relative_coordinates.cols (); ni++)
         {
           Eigen::Vector4i displacement = (Eigen::Vector4i() << relative_coordinates.col(ni), 0).finished();
           // checking if the specified cell is in the grid
@@ -493,7 +491,7 @@ namespace pcl
         * \param[out] output the resultant point cloud message
         */
       void
-      applyFilter (PointCloud &output);
+      applyFilter (PointCloud &output) override;
   };
 
   /** \brief VoxelGrid assembles a local 3D grid over a given PointCloud, and downsamples + filters the data.
@@ -525,7 +523,6 @@ namespace pcl
         inverse_leaf_size_ (Eigen::Array4f::Zero ()),
         downsample_all_data_ (true),
         save_leaf_layout_ (false),
-        leaf_layout_ (),
         min_b_ (Eigen::Vector4i::Zero ()),
         max_b_ (Eigen::Vector4i::Zero ()),
         div_b_ (Eigen::Vector4i::Zero ()),
@@ -540,7 +537,7 @@ namespace pcl
       }
 
       /** \brief Destructor. */
-      virtual ~VoxelGrid ()
+      ~VoxelGrid ()
       {
       }
 
@@ -669,7 +666,7 @@ namespace pcl
         Eigen::Array4i diff2min = min_b_ - ijk;
         Eigen::Array4i diff2max = max_b_ - ijk;
         std::vector<int> neighbors (relative_coordinates.cols());
-        for (int ni = 0; ni < relative_coordinates.cols (); ni++)
+        for (Eigen::Index ni = 0; ni < relative_coordinates.cols (); ni++)
         {
           Eigen::Vector4i displacement = (Eigen::Vector4i() << relative_coordinates.col(ni), 0).finished();
           // checking if the specified cell is in the grid
@@ -695,8 +692,8 @@ namespace pcl
         Eigen::Vector4i ijk (static_cast<int> (floorf (x * inverse_leaf_size_[0])), static_cast<int> (floorf (y * inverse_leaf_size_[1])), static_cast<int> (floorf (z * inverse_leaf_size_[2])), 0);
         std::vector<int> neighbors;
         neighbors.reserve (relative_coordinates.size ());
-        for (std::vector<Eigen::Vector3i, Eigen::aligned_allocator<Eigen::Vector3i> >::const_iterator it = relative_coordinates.begin (); it != relative_coordinates.end (); it++)
-          neighbors.push_back (leaf_layout_[(ijk + (Eigen::Vector4i() << *it, 0).finished() - min_b_).dot (divb_mul_)]);
+        for (const auto &relative_coordinate : relative_coordinates)
+          neighbors.push_back (leaf_layout_[(ijk + (Eigen::Vector4i() << relative_coordinate, 0).finished() - min_b_).dot (divb_mul_)]);
         return (neighbors);
       }
 
@@ -846,12 +843,10 @@ namespace pcl
         * \param[out] output the resultant point cloud
         */
       void
-      applyFilter (PCLPointCloud2 &output);
+      applyFilter (PCLPointCloud2 &output) override;
   };
 }
 
 #ifdef PCL_NO_PRECOMPILE
 #include <pcl/filters/impl/voxel_grid.hpp>
 #endif
-
-#endif  //#ifndef PCL_FILTERS_VOXEL_GRID_MAP_H_

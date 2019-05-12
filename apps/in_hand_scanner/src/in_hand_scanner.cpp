@@ -44,9 +44,7 @@
 #include <QtCore>
 #include <QKeyEvent>
 #include <QPainter>
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 0, 0))
-#include <QtConcurrent/QtConcurrent>
-#endif
+#include <QtConcurrent>
 
 #include <pcl/exceptions.h>
 #include <pcl/common/time.h>
@@ -65,14 +63,9 @@
 
 pcl::ihs::InHandScanner::InHandScanner (Base* parent)
   : Base                   (parent),
-    mutex_                 (),
-    computation_fps_       (),
-    visualization_fps_     (),
     running_mode_          (RM_UNPROCESSED),
     iteration_             (0),
-    grabber_               (),
     starting_grabber_      (false),
-    new_data_connection_   (),
     input_data_processing_ (new InputDataProcessing ()),
     icp_                   (new ICP ()),
     transformation_        (Eigen::Matrix4f::Identity ()),

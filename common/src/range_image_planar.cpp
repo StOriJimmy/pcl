@@ -43,7 +43,7 @@ using std::cerr;
 namespace pcl 
 {
   /////////////////////////////////////////////////////////////////////////
-  RangeImagePlanar::RangeImagePlanar () : RangeImage (), focal_length_x_ (0.0f), focal_length_y_ (0.0f),
+  RangeImagePlanar::RangeImagePlanar () : focal_length_x_ (0.0f), focal_length_y_ (0.0f),
                                           focal_length_x_reciprocal_ (0.0f), focal_length_y_reciprocal_ (0.0f),
                                           center_x_ (0.0f), center_y_ (0.0f)
   {
@@ -143,7 +143,7 @@ namespace pcl
       {
         PointWithRange& point = getPointNoCheck (x, y);
         float depth = depth_image[ (y*skip)*di_width + x*skip];
-        if (depth <= 0.0f || !pcl_isfinite (depth))
+        if (depth <= 0.0f || !std::isfinite (depth))
         {
           point = unobserved_point;
           continue;
@@ -189,7 +189,7 @@ namespace pcl
       {
         PointWithRange& point = getPointNoCheck (x, y);
         float depth = depth_image[ (y*skip)*di_width + x*skip] * 0.001f;
-        if (depth <= 0.0f || !pcl_isfinite (depth))
+        if (depth <= 0.0f || !std::isfinite (depth))
         {
           point = unobserved_point;
           continue;

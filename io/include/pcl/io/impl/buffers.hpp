@@ -54,14 +54,14 @@ template <>
 struct buffer_traits <float>
 {
   static float invalid () { return std::numeric_limits<float>::quiet_NaN (); };
-  static bool is_invalid (float value) { return pcl_isnan (value); };
+  static bool is_invalid (float value) { return std::isnan (value); };
 };
 
 template <>
 struct buffer_traits <double>
 {
   static double invalid () { return std::numeric_limits<double>::quiet_NaN (); };
-  static bool is_invalid (double value) { return pcl_isnan (value); };
+  static bool is_invalid (double value) { return std::isnan (value); };
 };
 
 template <typename T>
@@ -98,7 +98,7 @@ template <typename T> void
 pcl::io::SingleBuffer<T>::push (std::vector<T>& data)
 {
   assert (data.size () == size_);
-  boost::mutex::scoped_lock lock (data_mutex_);
+  std::lock_guard<std::mutex> lock (data_mutex_);
   data_.swap (data);
   data.clear ();
 }
@@ -146,7 +146,7 @@ template <typename T> void
 pcl::io::MedianBuffer<T>::push (std::vector<T>& data)
 {
   assert (data.size () == size_);
-  boost::mutex::scoped_lock lock (data_mutex_);
+  std::lock_guard<std::mutex> lock (data_mutex_);
 
   if (++data_current_idx_ >= window_size_)
     data_current_idx_ = 0;
@@ -258,7 +258,7 @@ template <typename T> void
 pcl::io::AverageBuffer<T>::push (std::vector<T>& data)
 {
   assert (data.size () == size_);
-  boost::mutex::scoped_lock lock (data_mutex_);
+  std::lock_guard<std::mutex> lock (data_mutex_);
 
   if (++data_current_idx_ >= window_size_)
     data_current_idx_ = 0;

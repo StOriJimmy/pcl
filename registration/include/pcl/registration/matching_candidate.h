@@ -35,8 +35,7 @@
  *
  */
 
-#ifndef PCL_REGISTRATION_MATCHING_CANDIDATE_H_
-#define PCL_REGISTRATION_MATCHING_CANDIDATE_H_
+#pragma once
 
 #include <pcl/registration/registration.h>
 #include <pcl/common/common.h>
@@ -57,7 +56,6 @@ namespace pcl
       /** \brief Constructor. */
       MatchingCandidate () :
         fitness_score (FLT_MAX),
-        correspondences (),
         transformation (Eigen::Matrix4f::Identity ())
       {};
 
@@ -99,6 +97,3 @@ namespace pcl
 
   };  // namespace registration
 }; // namespace pcl
-
-
-#endif // PCL_REGISTRATION_MATCHING_CANDIDATE_H_

@@ -35,8 +35,7 @@
  *
  */
 
-#ifndef PCL_VOXEL_GRID_COVARIANCE_H_
-#define PCL_VOXEL_GRID_COVARIANCE_H_
+#pragma once
 
 #include <pcl/filters/boost.h>
 #include <pcl/filters/voxel_grid.h>
@@ -98,7 +97,6 @@ namespace pcl
         Leaf () :
           nr_points (0),
           mean_ (Eigen::Vector3d::Zero ()),
-          centroid (),
           cov_ (Eigen::Matrix3d::Identity ()),
           icov_ (Eigen::Matrix3d::Zero ()),
           evecs_ (Eigen::Matrix3d::Identity ()),
@@ -204,7 +202,6 @@ namespace pcl
         min_covar_eigvalue_mult_ (0.01),
         leaves_ (),
         voxel_centroids_ (),
-        voxel_centroids_leaf_indices_ (),
         kdtree_ ()
       {
         downsample_all_data_ = false;
@@ -271,7 +268,7 @@ namespace pcl
 
         voxel_centroids_ = PointCloudPtr (new PointCloud (output));
 
-        if (searchable_ && voxel_centroids_->size() > 0)
+        if (searchable_ && !voxel_centroids_->empty ())
         {
           // Initiates kdtree of the centroids of voxels containing a sufficient number of points
           kdtree_.setInputCloud (voxel_centroids_);
@@ -288,7 +285,7 @@ namespace pcl
         voxel_centroids_ = PointCloudPtr (new PointCloud);
         applyFilter (*voxel_centroids_);
 
-        if (searchable_ && voxel_centroids_->size() > 0)
+        if (searchable_ && !voxel_centroids_->empty ())
         {
           // Initiates kdtree of the centroids of voxels containing a sufficient number of points
           kdtree_.setInputCloud (voxel_centroids_);
@@ -309,7 +306,7 @@ namespace pcl
           return ret;
         }
         else
-          return NULL;
+          return nullptr;
       }
 
       /** \brief Get the voxel containing point p.
@@ -336,7 +333,7 @@ namespace pcl
           return ret;
         }
         else
-          return NULL;
+          return nullptr;
       }
 
       /** \brief Get the voxel containing point p.
@@ -363,7 +360,7 @@ namespace pcl
           return ret;
         }
         else
-          return NULL;
+          return nullptr;
 
       }
 
@@ -429,9 +426,9 @@ namespace pcl
 
         // Find leaves corresponding to neighbors
         k_leaves.reserve (k);
-        for (std::vector<int>::iterator iter = k_indices.begin (); iter != k_indices.end (); iter++)
+        for (const int &k_index : k_indices)
         {
-          k_leaves.push_back (&leaves_[voxel_centroids_leaf_indices_[*iter]]);
+          k_leaves.push_back (&leaves_[voxel_centroids_leaf_indices_[k_index]]);
         }
         return k;
       }
@@ -483,9 +480,9 @@ namespace pcl
 
         // Find leaves corresponding to neighbors
         k_leaves.reserve (k);
-        for (std::vector<int>::iterator iter = k_indices.begin (); iter != k_indices.end (); iter++)
+        for (const int &k_index : k_indices)
         {
-          k_leaves.push_back (&leaves_[voxel_centroids_leaf_indices_[*iter]]);
+          k_leaves.push_back (&leaves_[voxel_centroids_leaf_indices_[k_index]]);
         }
         return k;
       }
@@ -515,7 +512,7 @@ namespace pcl
       /** \brief Filter cloud and initializes voxel structure.
        * \param[out] output cloud containing centroids of voxels containing a sufficient number of points
        */
-      void applyFilter (PointCloud &output);
+      void applyFilter (PointCloud &output) override;
 
       /** \brief Flag to determine if voxel structure is searchable. */
       bool searchable_;
@@ -543,5 +540,3 @@ namespace pcl
 #ifdef PCL_NO_PRECOMPILE
 #include <pcl/filters/impl/voxel_grid_covariance.hpp>
 #endif
-
-#endif  //#ifndef PCL_VOXEL_GRID_COVARIANCE_H_

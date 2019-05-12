@@ -36,9 +36,7 @@
  *  POSSIBILITY OF SUCH DAMAGE.
  */
 
-
-#ifndef PCL_REGISTRATION_TRANSFORMATION_ESTIMATION_POINT_TO_PLANE_WEIGHTED_H_
-#define PCL_REGISTRATION_TRANSFORMATION_ESTIMATION_POINT_TO_PLANE_WEIGHTED_H_
+#pragma once
 
 #include <pcl/registration/transformation_estimation_point_to_plane.h>
 #include <pcl/registration/warp_point_rigid.h>
@@ -180,7 +178,7 @@ namespace pcl
           * \param[in] warp_fcn a shared pointer to an object that warps points
           */
         void
-        setWarpFunction (const boost::shared_ptr<WarpPointRigid<PointSource, PointTarget, MatScalar> > &warp_fcn)
+        setWarpFunction (const typename WarpPointRigid<PointSource, PointTarget, MatScalar>::Ptr &warp_fcn)
         { warp_point_ = warp_fcn; }
 
       protected:
@@ -200,7 +198,7 @@ namespace pcl
         mutable const std::vector<int> *tmp_idx_tgt_;
 
         /** \brief The parameterized function used to warp the source to the target. */
-        boost::shared_ptr<pcl::registration::WarpPointRigid<PointSource, PointTarget, MatScalar> > warp_point_;
+        typename pcl::registration::WarpPointRigid<PointSource, PointTarget, MatScalar>::Ptr warp_point_;
         
         /** Base functor all the models that need non linear optimization must
           * define their own one and implement operator() (const Eigen::VectorXd& x, Eigen::VectorXd& fvec)
@@ -336,6 +334,3 @@ namespace pcl
 }
 
 #include <pcl/registration/impl/transformation_estimation_point_to_plane_weighted.hpp>
-
-#endif /* PCL_REGISTRATION_TRANSFORMATION_ESTIMATION_POINT_TO_PLANE_WEIGHTED_H_ */
-

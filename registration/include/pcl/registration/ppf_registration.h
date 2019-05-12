@@ -38,9 +38,7 @@
  *
  */
 
-
-#ifndef PCL_PPF_REGISTRATION_H_
-#define PCL_PPF_REGISTRATION_H_
+#pragma once
 
 #include <pcl/registration/boost.h>
 #include <pcl/registration/registration.h>
@@ -77,8 +75,7 @@ namespace pcl
        */
       PPFHashMapSearch (float angle_discretization_step = 12.0f / 180.0f * static_cast<float> (M_PI),
                         float distance_discretization_step = 0.01f)
-        : alpha_m_ ()
-        , feature_hash_map_ (new FeatureHashMapType)
+        : feature_hash_map_ (new FeatureHashMapType)
         , internals_initialized_ (false)
         , angle_discretization_step_ (angle_discretization_step)
         , distance_discretization_step_ (distance_discretization_step)
@@ -180,7 +177,6 @@ namespace pcl
       /** \brief Empty constructor that initializes all the parameters of the algorithm with default values */
       PPFRegistration ()
       :  Registration<PointSource, PointTarget> (),
-         search_method_ (),
          scene_reference_point_sampling_rate_ (5),
          clustering_position_diff_threshold_ (0.01f),
          clustering_rotation_diff_threshold_ (20.0f / 180.0f * static_cast<float> (M_PI))
@@ -238,13 +234,13 @@ namespace pcl
        * \param cloud the input point cloud target
        */
       void
-      setInputTarget (const PointCloudTargetConstPtr &cloud);
+      setInputTarget (const PointCloudTargetConstPtr &cloud) override;
 
 
     private:
       /** \brief Method that calculates the transformation between the input_ and target_ point clouds, based on the PPF features */
       void
-      computeTransformation (PointCloudSource &output, const Eigen::Matrix4f& guess);
+      computeTransformation (PointCloudSource &output, const Eigen::Matrix4f& guess) override;
 
 
       /** \brief the search method that is going to be used to find matching feature pairs */
@@ -287,5 +283,3 @@ namespace pcl
 }
 
 #include <pcl/registration/impl/ppf_registration.hpp>
-
-#endif // PCL_PPF_REGISTRATION_H_

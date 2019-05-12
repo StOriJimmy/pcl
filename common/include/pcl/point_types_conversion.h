@@ -36,8 +36,7 @@
  * $Id$
  */
 
-#ifndef PCL_TYPE_CONVERSIONS_H
-#define PCL_TYPE_CONVERSIONS_H
+#pragma once
 
 #include <limits>
 
@@ -46,10 +45,10 @@
 
 namespace pcl
 {
-  // r,g,b, i values are from 0 to 1
+  // r,g,b, i values are from 0 to 255
   // h = [0,360]
   // s, v values are from 0 to 1
-  // if s = 0 > h = -1 (undefined)
+  // if s = 0 => h = 0
 
   /** \brief Convert a XYZRGB point type to a XYZI
     * \param[in] in the input XYZRGB point 
@@ -153,7 +152,7 @@ namespace pcl
     if (max == 0) // division by zero
     {
       out.s = 0.f;
-      out.h = 0.f; // h = -1.f;
+      out.h = 0.f;
       return;
     }
 
@@ -251,10 +250,10 @@ namespace pcl
   {
     out.width   = in.width;
     out.height  = in.height;
-    for (size_t i = 0; i < in.points.size (); i++)
+    for (const auto &point : in.points)
     {
       Intensity p;
-      PointRGBtoI (in.points[i], p);
+      PointRGBtoI (point, p);
       out.points.push_back (p);
     }
   }
@@ -269,10 +268,10 @@ namespace pcl
   {
     out.width   = in.width;
     out.height  = in.height;
-    for (size_t i = 0; i < in.points.size (); i++)
+    for (const auto &point : in.points)
     {
       Intensity8u p;
-      PointRGBtoI (in.points[i], p);
+      PointRGBtoI (point, p);
       out.points.push_back (p);
     }
   }
@@ -287,10 +286,10 @@ namespace pcl
   {
     out.width   = in.width;
     out.height  = in.height;
-    for (size_t i = 0; i < in.points.size (); i++)
+    for (const auto &point : in.points)
     {
       Intensity32u p;
-      PointRGBtoI (in.points[i], p);
+      PointRGBtoI (point, p);
       out.points.push_back (p);
     }
   }
@@ -305,10 +304,10 @@ namespace pcl
   {
     out.width   = in.width;
     out.height  = in.height;
-    for (size_t i = 0; i < in.points.size (); i++)
+    for (const auto &point : in.points)
     {
       PointXYZHSV p;
-      PointXYZRGBtoXYZHSV (in.points[i], p);
+      PointXYZRGBtoXYZHSV (point, p);
       out.points.push_back (p);
     }
   }
@@ -323,10 +322,10 @@ namespace pcl
   {
     out.width   = in.width;
     out.height  = in.height;
-    for (size_t i = 0; i < in.points.size (); i++)
+    for (const auto &point : in.points)
     {
       PointXYZHSV p;
-      PointXYZRGBAtoXYZHSV (in.points[i], p);
+      PointXYZRGBAtoXYZHSV (point, p);
       out.points.push_back (p);
     }
   }
@@ -341,10 +340,10 @@ namespace pcl
   {
     out.width   = in.width;
     out.height  = in.height;
-    for (size_t i = 0; i < in.points.size (); i++)
+    for (const auto &point : in.points)
     {
       PointXYZI p;
-      PointXYZRGBtoXYZI (in.points[i], p);
+      PointXYZRGBtoXYZI (point, p);
       out.points.push_back (p);
     }
   }
@@ -394,6 +393,3 @@ namespace pcl
     out.height = height_;
   }
 }
-
-#endif //#ifndef PCL_TYPE_CONVERSIONS_H
-

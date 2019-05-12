@@ -37,12 +37,15 @@
  *  $Id: octree_disk_container.h 6927M 2012-08-24 13:26:40Z (local) $
  */
 
-#ifndef PCL_OUTOFCORE_OCTREE_DISK_CONTAINER_H_
-#define PCL_OUTOFCORE_OCTREE_DISK_CONTAINER_H_
+#pragma once
 
 // C++
+#include <mutex>
 #include <vector>
 #include <string>
+
+// Boost
+#include <boost/uuid/random_generator.hpp>
 
 #include <pcl/outofcore/boost.h>
 #include <pcl/outofcore/octree_abstract_node_container.h>
@@ -96,7 +99,7 @@ namespace pcl
         /** \brief provides random access to points based on a linear index
          */
         inline PointT
-        operator[] (uint64_t idx) const;
+        operator[] (uint64_t idx) const override;
 
         /** \brief Adds a single point to the buffer to be written to disk when the buffer grows sufficiently large, the object is destroyed, or the write buffer is manually flushed */
         inline void
@@ -111,7 +114,7 @@ namespace pcl
         insertRange (const pcl::PCLPointCloud2::Ptr &input_cloud);
 
         void
-        insertRange (const PointT* const * start, const uint64_t count);
+        insertRange (const PointT* const * start, const uint64_t count) override;
     
         /** \brief This is the primary method for serialization of
          * blocks of point data. This is called by the outofcore
@@ -122,7 +125,7 @@ namespace pcl
          * \param[in] count offset from start of the last point to insert
          */
         void
-        insertRange (const PointT* start, const uint64_t count);
+        insertRange (const PointT* start, const uint64_t count) override;
 
         /** \brief Reads \b count points into memory from the disk container
          *
@@ -133,7 +136,7 @@ namespace pcl
          * \param[out] dst std::vector as destination for points read from disk into memory
          */
         void
-        readRange (const uint64_t start, const uint64_t count, AlignedPointTVector &dst);
+        readRange (const uint64_t start, const uint64_t count, AlignedPointTVector &dst) override;
 
         void
         readRange (const uint64_t, const uint64_t, pcl::PCLPointCloud2::Ptr &dst);
@@ -156,7 +159,7 @@ namespace pcl
          */
         void
         readRangeSubSample (const uint64_t start, const uint64_t count, const double percent,
-                            AlignedPointTVector &dst);
+                            AlignedPointTVector &dst) override;
 
         /** \brief Use bernoulli trials to select points. All points selected will be unique.
          *
@@ -174,7 +177,7 @@ namespace pcl
         /** \brief Returns the total number of points for which this container is responsible, \c filelen_ + points in \c writebuff_ that have not yet been flushed to the disk
          */
         uint64_t
-        size () const
+        size () const override
         {
           return (filelen_ + writebuff_.size ());
         }
@@ -182,7 +185,7 @@ namespace pcl
         /** \brief STL-like empty test
          * \return true if container has no data on disk or waiting to be written in \c writebuff_ */
         inline bool
-        empty () const
+        empty () const override
         {
           return ((filelen_ == 0) && writebuff_.empty ());
         }
@@ -198,17 +201,17 @@ namespace pcl
         inline std::string&
         path ()
         {
-          return (*disk_storage_filename_);
+          return (disk_storage_filename_);
         }
 
         inline void
-        clear ()
+        clear () override
         {
           //clear elements that have not yet been written to disk
           writebuff_.clear ();
           //remove the binary data in the directory
-          PCL_DEBUG ("[Octree Disk Container] Removing the point data from disk, in file %s\n",disk_storage_filename_->c_str ());
-          boost::filesystem::remove (boost::filesystem::path (disk_storage_filename_->c_str ()));
+          PCL_DEBUG ("[Octree Disk Container] Removing the point data from disk, in file %s\n", disk_storage_filename_.c_str ());
+          boost::filesystem::remove (boost::filesystem::path (disk_storage_filename_.c_str ()));
           //reset the size-of-file counter
           filelen_ = 0;
         }
@@ -218,13 +221,13 @@ namespace pcl
          * \param[in] path
          */
         void
-        convertToXYZ (const boost::filesystem::path &path)
+        convertToXYZ (const boost::filesystem::path &path) override
         {
-          if (boost::filesystem::exists (*disk_storage_filename_))
+          if (boost::filesystem::exists (disk_storage_filename_))
           {
-            FILE* fxyz = fopen (path.string ().c_str (), "w");
+            FILE* fxyz = fopen (path.string ().c_str (), "we");
 
-            FILE* f = fopen (disk_storage_filename_->c_str (), "rb");
+            FILE* f = fopen (disk_storage_filename_.c_str (), "rbe");
             assert (f != NULL);
 
             uint64_t num = size ();
@@ -280,7 +283,7 @@ namespace pcl
         flushWritebuff (const bool force_cache_dealloc);
     
         /** \brief Name of the storage file on disk (i.e., the PCD file) */
-        boost::shared_ptr<std::string> disk_storage_filename_;
+        std::string disk_storage_filename_;
 
         //--- possibly deprecated parameter variables --//
 
@@ -294,12 +297,10 @@ namespace pcl
 
         static const uint64_t WRITE_BUFF_MAX_;
 
-        static boost::mutex rng_mutex_;
+        static std::mutex rng_mutex_;
         static boost::mt19937 rand_gen_;
         static boost::uuids::basic_random_generator<boost::mt19937> uuid_gen_;
 
     };
   } //namespace outofcore
 } //namespace pcl
-
-#endif //PCL_OUTOFCORE_OCTREE_DISK_CONTAINER_H_

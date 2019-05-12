@@ -35,8 +35,7 @@
  *
  */
 
-#ifndef PCL_SEGMENTATION_LCCP_SEGMENTATION_H_
-#define PCL_SEGMENTATION_LCCP_SEGMENTATION_H_
+#pragma once
 
 #include <pcl/pcl_base.h>
 #include <pcl/point_types.h>
@@ -82,7 +81,7 @@ namespace pcl
     public:
 
       // Adjacency list with nodes holding labels (uint32_t) and edges holding EdgeProperties.
-      typedef typename boost::adjacency_list<boost::setS, boost::setS, boost::undirectedS, uint32_t, EdgeProperties> SupervoxelAdjacencyList;
+      typedef boost::adjacency_list<boost::setS, boost::setS, boost::undirectedS, uint32_t, EdgeProperties> SupervoxelAdjacencyList;
       typedef typename boost::graph_traits<SupervoxelAdjacencyList>::vertex_iterator VertexIterator;
       typedef typename boost::graph_traits<SupervoxelAdjacencyList>::adjacency_iterator AdjacencyIterator;
 
@@ -354,5 +353,3 @@ namespace pcl
 #ifdef PCL_NO_PRECOMPILE
 #include <pcl/segmentation/impl/lccp_segmentation.hpp>
 #endif
-
-#endif // PCL_SEGMENTATION_LCCP_SEGMENTATION_H_

@@ -37,8 +37,7 @@
  *
  */
 
-#ifndef PCL_SURFACE_TEXTURE_MAPPING_H_
-#define PCL_SURFACE_TEXTURE_MAPPING_H_
+#pragma once
 
 #include <pcl/surface/reconstruction.h>
 #include <pcl/common/transforms.h>
@@ -62,8 +61,8 @@ namespace pcl
       */
     struct Camera
     {
-      Camera () : pose (), focal_length (), focal_length_w (-1), focal_length_h (-1),
-        center_w (-1), center_h (-1), height (), width (), texture_file () {}
+      Camera () : focal_length (), focal_length_w (-1), focal_length_h (-1),
+        center_w (-1), center_h (-1), height (), width () {}
       Eigen::Affine3f pose;
       double focal_length;
       double focal_length_w;  // optional
@@ -115,7 +114,7 @@ namespace pcl
 
       /** \brief Constructor. */
       TextureMapping () :
-        f_ (), vector_field_ (), tex_files_ (), tex_material_ ()
+        f_ ()
       {
       }
 
@@ -143,7 +142,7 @@ namespace pcl
       {
         vector_field_ = Eigen::Vector3f (x, y, z);
         // normalize vector field
-        vector_field_ = vector_field_ / std::sqrt (vector_field_.dot (vector_field_));
+        vector_field_ /= std::sqrt (vector_field_.dot (vector_field_));
       }
 
       /** \brief Set texture files
@@ -422,6 +421,3 @@ namespace pcl
       EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   };
 }
-
-#endif /* TEXTURE_MAPPING_H_ */
-

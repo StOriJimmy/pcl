@@ -38,8 +38,7 @@
  *
  */
 
-#ifndef PCL_FEATURES_OURCVFH_H_
-#define PCL_FEATURES_OURCVFH_H_
+#pragma once
 
 #include <pcl/features/feature.h>
 #include <pcl/search/pcl_search.h>
@@ -78,8 +77,7 @@ namespace pcl
       /** \brief Empty constructor. */
       OURCVFHEstimation () :
         vpx_ (0), vpy_ (0), vpz_ (0), leaf_size_ (0.005f), normalize_bins_ (false), curv_threshold_ (0.03f), cluster_tolerance_ (leaf_size_ * 3),
-            eps_angle_threshold_ (0.125f), min_points_ (50), radius_normals_ (leaf_size_ * 3), centroids_dominant_orientations_ (),
-            dominant_normals_ ()
+            eps_angle_threshold_ (0.125f), min_points_ (50), radius_normals_ (leaf_size_ * 3)
       {
         search_radius_ = 0;
         k_ = 1;
@@ -372,7 +370,7 @@ namespace pcl
        * feature estimates
        */
       void
-      computeFeature (PointCloudOut &output);
+      computeFeature (PointCloudOut &output) override;
 
       /** \brief Region growing method using Euclidean distances and neighbors normals to 
        * add points to a region.
@@ -408,5 +406,3 @@ namespace pcl
 #ifdef PCL_NO_PRECOMPILE
 #include <pcl/features/impl/our_cvfh.hpp>
 #endif
-
-#endif  //#ifndef PCL_FEATURES_VFH_H_
