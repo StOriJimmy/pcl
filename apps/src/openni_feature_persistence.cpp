@@ -35,8 +35,6 @@
  *
  */
 
-#include <thread>
-
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/io/openni_grabber.h>
@@ -45,12 +43,14 @@
 #include <pcl/console/parse.h>
 #include <pcl/common/time.h>
 #include <pcl/visualization/cloud_viewer.h>
-
 #include <pcl/features/multiscale_feature_persistence.h>
 #include <pcl/features/fpfh_omp.h>
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/filters/extract_indices.h>
 #include <pcl/features/normal_3d_omp.h>
+
+#include <mutex>
+#include <thread>
 
 using namespace std::chrono_literals;
 
@@ -119,7 +119,7 @@ class OpenNIFeaturePersistence
     void
     cloud_cb (const CloudConstPtr& cloud)
     {
-      boost::mutex::scoped_lock lock (mtx_);
+      std::lock_guard<std::mutex> lock (mtx_);
       //lock while we set our cloud;
       FPS_CALC ("computation");
 
@@ -158,7 +158,7 @@ class OpenNIFeaturePersistence
     void
     viz_cb (pcl::visualization::PCLVisualizer& viz)
     {
-      boost::mutex::scoped_lock lock (mtx_);
+      std::lock_guard<std::mutex> lock (mtx_);
       if (!cloud_)
       {
         std::this_thread::sleep_for(1s);
@@ -190,7 +190,7 @@ class OpenNIFeaturePersistence
     {
       pcl::Grabber* interface = new pcl::OpenNIGrabber (device_id_);
 
-      boost::function<void (const CloudConstPtr&)> f = boost::bind (&OpenNIFeaturePersistence::cloud_cb, this, _1);
+      std::function<void (const CloudConstPtr&)> f = boost::bind (&OpenNIFeaturePersistence::cloud_cb, this, _1);
       boost::signals2::connection c = interface->registerCallback (f);
 
       viewer.runOnVisualizationThread (boost::bind(&OpenNIFeaturePersistence::viz_cb, this, _1), "viz_cb");
@@ -214,7 +214,7 @@ class OpenNIFeaturePersistence
 
     pcl::visualization::CloudViewer viewer;
     std::string device_id_;
-    boost::mutex mtx_;
+    std::mutex mtx_;
     // Data
     CloudPtr feature_locations_, cloud_subsampled_;
     pcl::PointCloud<pcl::Normal>::Ptr normals_;

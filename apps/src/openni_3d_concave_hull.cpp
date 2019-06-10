@@ -33,8 +33,6 @@
  *	
  */
 
-#include <thread>
-
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/io/openni_grabber.h>
@@ -45,6 +43,9 @@
 #include <pcl/console/parse.h>
 #include <pcl/common/time.h>
 #include <pcl/visualization/cloud_viewer.h>
+
+#include <mutex>
+#include <thread>
 
 using namespace pcl;
 using namespace pcl::visualization;
@@ -85,7 +86,7 @@ class OpenNI3DConcaveHull
     void 
     cloud_cb (const CloudConstPtr& cloud)
     {
-      boost::mutex::scoped_lock lock (mtx_);
+      std::lock_guard<std::mutex> lock (mtx_);
       FPS_CALC ("computation");
 
       cloud_pass_.reset (new Cloud);
@@ -114,7 +115,7 @@ class OpenNI3DConcaveHull
       }
 
       {
-        boost::mutex::scoped_lock lock (mtx_);
+        std::lock_guard<std::mutex> lock (mtx_);
         FPS_CALC ("visualization");
         CloudPtr temp_cloud;
         temp_cloud.swap (cloud_pass_);
@@ -139,7 +140,7 @@ class OpenNI3DConcaveHull
     {
       pcl::Grabber* interface = new pcl::OpenNIGrabber (device_id_);
 
-      boost::function<void (const CloudConstPtr&)> f = boost::bind (&OpenNI3DConcaveHull::cloud_cb, this, _1);
+      std::function<void (const CloudConstPtr&)> f = boost::bind (&OpenNI3DConcaveHull::cloud_cb, this, _1);
       boost::signals2::connection c = interface->registerCallback (f);
      
       viewer.runOnVisualizationThread (boost::bind(&OpenNI3DConcaveHull::viz_cb, this, _1), "viz_cb");
@@ -158,7 +159,7 @@ class OpenNI3DConcaveHull
     pcl::visualization::CloudViewer viewer;
 
     std::string device_id_;
-    boost::mutex mtx_;
+    std::mutex mtx_;
     // Data
     CloudConstPtr cloud_;
     CloudPtr cloud_pass_, cloud_hull_;

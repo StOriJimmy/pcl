@@ -44,6 +44,8 @@
 #include <pcl/console/print.h>
 #include <pcl/console/parse.h>
 
+#include <mutex>
+
 #define SHOW_FPS 1
 #if SHOW_FPS
 #define FPS_CALC(_WHAT_) \
@@ -119,7 +121,7 @@ class OpenNIViewer
     cloud_callback (const CloudConstPtr& cloud)
     {
       FPS_CALC ("cloud callback");
-      boost::mutex::scoped_lock lock (cloud_mutex_);
+      std::lock_guard<std::mutex> lock (cloud_mutex_);
       cloud_ = cloud;
     }
 
@@ -127,7 +129,7 @@ class OpenNIViewer
     image_callback (const boost::shared_ptr<openni_wrapper::Image>& image)
     {
       FPS_CALC ("image callback");
-      boost::mutex::scoped_lock lock (image_mutex_);
+      std::lock_guard<std::mutex> lock (image_mutex_);
       image_ = image;
       
       if (image->getEncoding () != openni_wrapper::Image::RGB)
@@ -172,7 +174,7 @@ class OpenNIViewer
     {
       cloud_viewer_->registerMouseCallback (&OpenNIViewer::mouse_callback, *this);
       cloud_viewer_->registerKeyboardCallback(&OpenNIViewer::keyboard_callback, *this);
-      boost::function<void (const CloudConstPtr&) > cloud_cb = boost::bind (&OpenNIViewer::cloud_callback, this, _1);
+      std::function<void (const CloudConstPtr&) > cloud_cb = boost::bind (&OpenNIViewer::cloud_callback, this, _1);
       boost::signals2::connection cloud_connection = grabber_.registerCallback (cloud_cb);
       
       boost::signals2::connection image_connection;
@@ -181,7 +183,7 @@ class OpenNIViewer
         image_viewer_.reset (new pcl::visualization::ImageViewer ("PCL OpenNI image"));
         image_viewer_->registerMouseCallback (&OpenNIViewer::mouse_callback, *this);
         image_viewer_->registerKeyboardCallback(&OpenNIViewer::keyboard_callback, *this);
-        boost::function<void (const boost::shared_ptr<openni_wrapper::Image>&) > image_cb = boost::bind (&OpenNIViewer::image_callback, this, _1);
+        std::function<void (const boost::shared_ptr<openni_wrapper::Image>&) > image_cb = boost::bind (&OpenNIViewer::image_callback, this, _1);
         image_connection = grabber_.registerCallback (image_cb);
       }
       
@@ -257,8 +259,8 @@ class OpenNIViewer
     pcl::visualization::ImageViewer::Ptr image_viewer_;
     
     pcl::Grabber& grabber_;
-    boost::mutex cloud_mutex_;
-    boost::mutex image_mutex_;
+    std::mutex cloud_mutex_;
+    std::mutex image_mutex_;
     
     CloudConstPtr cloud_;
     boost::shared_ptr<openni_wrapper::Image> image_;

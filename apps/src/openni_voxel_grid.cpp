@@ -43,6 +43,9 @@
 #include <pcl/console/parse.h>
 #include <pcl/common/time.h>
 
+#include <mutex>
+
+
 #define FPS_CALC(_WHAT_) \
 do \
 { \
@@ -88,7 +91,7 @@ class OpenNIVoxelGrid
     set (const CloudConstPtr& cloud)
     {
       //lock while we set our cloud;
-      boost::mutex::scoped_lock lock (mtx_);
+      std::lock_guard<std::mutex> lock (mtx_);
       cloud_  = cloud;
     }
 
@@ -96,7 +99,7 @@ class OpenNIVoxelGrid
     get ()
     {
       //lock while we swap our cloud and reset it.
-      boost::mutex::scoped_lock lock (mtx_);
+      std::lock_guard<std::mutex> lock (mtx_);
       CloudPtr temp_cloud (new Cloud);
      
       grid_.setInputCloud (cloud_);
@@ -110,7 +113,7 @@ class OpenNIVoxelGrid
     {
       pcl::Grabber* interface = new pcl::OpenNIGrabber (device_id_);
 
-      boost::function<void (const CloudConstPtr&)> f = boost::bind (&OpenNIVoxelGrid::cloud_cb_, this, _1);
+      std::function<void (const CloudConstPtr&)> f = boost::bind (&OpenNIVoxelGrid::cloud_cb_, this, _1);
       boost::signals2::connection c = interface->registerCallback (f);
       
       interface->start ();
@@ -131,7 +134,7 @@ class OpenNIVoxelGrid
     pcl::VoxelGrid<PointType> grid_;
     pcl::visualization::CloudViewer viewer;
     std::string device_id_;
-    boost::mutex mtx_;
+    std::mutex mtx_;
     CloudConstPtr cloud_;
 };
 

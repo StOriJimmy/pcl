@@ -39,12 +39,15 @@
 #include <pcl/io/openni_grabber.h>
 #include <pcl/io/openni_camera/openni_driver.h>
 #include <pcl/console/parse.h>
-#include <vector>
-#include <string>
-
 #include <pcl/visualization/vtk.h>
 #include <pcl/visualization/pcl_visualizer.h>
+
 #include "boost.h"
+
+#include <mutex>
+#include <string>
+#include <vector>
+
 
 #define SHOW_FPS 1
 #if SHOW_FPS
@@ -93,7 +96,7 @@ class SimpleOpenNIViewer
                     const openni_wrapper::DepthImage::Ptr &depth_image, float)
     {
       FPS_CALC ("image callback");
-      boost::mutex::scoped_lock lock (image_mutex_);
+      std::lock_guard<std::mutex> lock (image_mutex_);
       image_ = image;
       depth_image_ = depth_image;
     }
@@ -101,7 +104,7 @@ class SimpleOpenNIViewer
     void
     run ()
     {
-      boost::function<void (const openni_wrapper::Image::Ptr&, const openni_wrapper::DepthImage::Ptr&, float) > image_cb = boost::bind (&SimpleOpenNIViewer::image_callback, this, _1, _2, _3);
+      std::function<void (const openni_wrapper::Image::Ptr&, const openni_wrapper::DepthImage::Ptr&, float) > image_cb = boost::bind (&SimpleOpenNIViewer::image_callback, this, _1, _2, _3);
       boost::signals2::connection image_connection = grabber_.registerCallback (image_cb);
       
       grabber_.start ();
@@ -112,7 +115,7 @@ class SimpleOpenNIViewer
        
       while (true)
       {
-        boost::mutex::scoped_lock lock (image_mutex_);
+        std::lock_guard<std::mutex> lock (image_mutex_);
 
         std::string time = boost::posix_time::to_iso_string (boost::posix_time::microsec_clock::local_time ());
         if (image_)
@@ -177,7 +180,7 @@ class SimpleOpenNIViewer
     }
 
     pcl::OpenNIGrabber& grabber_;
-    boost::mutex image_mutex_;
+    std::mutex image_mutex_;
     openni_wrapper::Image::Ptr image_;
     openni_wrapper::DepthImage::Ptr depth_image_;
     vtkSmartPointer<vtkImageImport> importer_, depth_importer_;

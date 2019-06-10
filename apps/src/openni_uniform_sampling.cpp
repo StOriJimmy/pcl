@@ -33,8 +33,6 @@
  *	
  */
 
-#include <thread>
-
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/io/openni_grabber.h>
@@ -43,6 +41,9 @@
 #include <pcl/filters/uniform_sampling.h>
 #include <pcl/console/parse.h>
 #include <pcl/common/time.h>
+
+#include <mutex>
+#include <thread>
 
 using namespace std::chrono_literals;
 
@@ -80,7 +81,7 @@ class OpenNIUniformSampling
     void 
     cloud_cb_ (const CloudConstPtr& cloud)
     {
-      boost::mutex::scoped_lock lock (mtx_);
+      std::lock_guard<std::mutex> lock (mtx_);
       FPS_CALC ("computation");
 
       cloud_.reset (new Cloud);
@@ -97,7 +98,7 @@ class OpenNIUniformSampling
     void
     viz_cb (pcl::visualization::PCLVisualizer& viz)
     {
-      boost::mutex::scoped_lock lock (mtx_);
+      std::lock_guard<std::mutex> lock (mtx_);
       if (!keypoints_ && !cloud_)
       {
         std::this_thread::sleep_for(1s);
@@ -122,7 +123,7 @@ class OpenNIUniformSampling
     {
       pcl::Grabber* interface = new pcl::OpenNIGrabber (device_id_);
 
-      boost::function<void (const CloudConstPtr&)> f = boost::bind (&OpenNIUniformSampling::cloud_cb_, this, _1);
+      std::function<void (const CloudConstPtr&)> f = boost::bind (&OpenNIUniformSampling::cloud_cb_, this, _1);
       boost::signals2::connection c = interface->registerCallback (f);
       viewer.runOnVisualizationThread (boost::bind(&OpenNIUniformSampling::viz_cb, this, _1), "viz_cb");
       
@@ -139,7 +140,7 @@ class OpenNIUniformSampling
     pcl::UniformSampling<pcl::PointXYZRGBA> pass_;
     pcl::visualization::CloudViewer viewer;
     std::string device_id_;
-    boost::mutex mtx_;
+    std::mutex mtx_;
     CloudPtr cloud_;
     pcl::PointCloud<pcl::PointXYZ>::Ptr keypoints_;
 };

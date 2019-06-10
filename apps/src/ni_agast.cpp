@@ -39,8 +39,6 @@
 
 #define SHOW_FPS 1
 
-#include <thread>
-
 #include <pcl/apps/timer.h>
 #include <pcl/common/common.h>
 #include <pcl/common/angles.h>
@@ -53,6 +51,9 @@
 #include <pcl/visualization/image_viewer.h>
 #include <pcl/console/print.h>
 #include <pcl/console/parse.h>
+
+#include <mutex>
+#include <thread>
 
 using namespace pcl;
 using namespace std;
@@ -84,7 +85,7 @@ class AGASTDemo
     cloud_callback (const CloudConstPtr& cloud)
     {
       FPS_CALC ("cloud callback");
-      boost::mutex::scoped_lock lock (cloud_mutex_);
+      std::lock_guard<std::mutex> lock (cloud_mutex_);
 
       // Compute AGAST keypoints 
       AgastKeypoint2D<PointT> agast;
@@ -192,7 +193,7 @@ class AGASTDemo
     void
     init ()
     {
-      boost::function<void (const CloudConstPtr&) > cloud_cb = boost::bind (&AGASTDemo::cloud_callback, this, _1);
+      std::function<void (const CloudConstPtr&) > cloud_cb = boost::bind (&AGASTDemo::cloud_callback, this, _1);
       cloud_connection = grabber_.registerCallback (cloud_cb);      
     }
 
@@ -323,7 +324,7 @@ class AGASTDemo
     
     visualization::PCLVisualizer cloud_viewer_;
     Grabber& grabber_;
-    boost::mutex cloud_mutex_;
+    std::mutex cloud_mutex_;
     CloudConstPtr cloud_;
     
     visualization::ImageViewer image_viewer_;

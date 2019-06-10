@@ -42,6 +42,8 @@
 #include <pcl/common/time.h>
 #include <pcl/surface/mls.h>
 
+#include <mutex>
+
 #define FPS_CALC(_WHAT_) \
 do \
 { \
@@ -132,7 +134,7 @@ class OpenNISmoothing
     {
       pcl::Grabber* interface = new pcl::OpenNIGrabber (device_id_);
 
-      boost::function<void (const CloudConstPtr&)> f = boost::bind (&OpenNISmoothing::cloud_cb_, this, _1);
+      std::function<void (const CloudConstPtr&)> f = boost::bind (&OpenNISmoothing::cloud_cb_, this, _1);
       boost::signals2::connection c = interface->registerCallback (f);
 
       viewer.registerKeyboardCallback (keyboardEventOccurred, reinterpret_cast<void*> (&stop_computing_));
@@ -161,7 +163,7 @@ class OpenNISmoothing
     pcl::MovingLeastSquares<PointType, PointType> smoother_;
     pcl::visualization::PCLVisualizer viewer;
     std::string device_id_;
-    boost::mutex mtx_;
+    std::mutex mtx_;
     CloudConstPtr cloud_;
     CloudPtr cloud_smoothed_;
     int viewport_input_, viewport_smoothed_;

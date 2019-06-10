@@ -33,8 +33,6 @@
  *
  */
 
-#include <thread>
-
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/io/openni_grabber.h>
@@ -44,6 +42,9 @@
 #include <pcl/console/parse.h>
 #include <pcl/common/time.h>
 #include <pcl/visualization/cloud_viewer.h>
+
+#include <mutex>
+#include <thread>
 
 using namespace std::chrono_literals;
 
@@ -85,7 +86,7 @@ class OpenNIIntegralImageNormalEstimation
     void
     cloud_cb (const CloudConstPtr& cloud)
     {
-      boost::mutex::scoped_lock lock (mtx_);
+      std::lock_guard<std::mutex> lock (mtx_);
       //lock while we set our cloud;
       //FPS_CALC ("computation");
       // Estimate surface normals
@@ -135,7 +136,7 @@ class OpenNIIntegralImageNormalEstimation
     void
     keyboard_callback (const pcl::visualization::KeyboardEvent& event, void*)
     {
-      boost::mutex::scoped_lock lock (mtx_);
+      std::lock_guard<std::mutex> lock (mtx_);
       switch (event.getKeyCode ())
       {
         case '1':
@@ -162,7 +163,7 @@ class OpenNIIntegralImageNormalEstimation
     {
       pcl::Grabber* interface = new pcl::OpenNIGrabber (device_id_);
 
-      boost::function<void (const CloudConstPtr&)> f = boost::bind (&OpenNIIntegralImageNormalEstimation::cloud_cb, this, _1);
+      std::function<void (const CloudConstPtr&)> f = boost::bind (&OpenNIIntegralImageNormalEstimation::cloud_cb, this, _1);
       boost::signals2::connection c = interface->registerCallback (f);
 
       viewer.runOnVisualizationThread (boost::bind(&OpenNIIntegralImageNormalEstimation::viz_cb, this, _1), "viz_cb");
@@ -180,7 +181,7 @@ class OpenNIIntegralImageNormalEstimation
     pcl::IntegralImageNormalEstimation<PointType, pcl::Normal> ne_;
     pcl::visualization::CloudViewer viewer;
     std::string device_id_;
-    boost::mutex mtx_;
+    std::mutex mtx_;
     // Data
     pcl::PointCloud<pcl::Normal>::Ptr normals_;
     CloudConstPtr cloud_;

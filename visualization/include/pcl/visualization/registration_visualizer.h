@@ -41,6 +41,7 @@
 #include <pcl/registration/registration.h>
 #include <pcl/visualization/pcl_visualizer.h>
 
+#include <mutex>
 #include <thread>
 
 namespace pcl
@@ -169,7 +170,7 @@ namespace pcl
       std::string registration_method_name_;
 
       /** \brief Callback function linked to pcl::Registration::update_visualizer_ */
-      boost::function<void
+      std::function<void
       (const pcl::PointCloud<PointSource> &cloud_src, const std::vector<int> &indices_src, const pcl::PointCloud<
           PointTarget> &cloud_tgt, const std::vector<int> &indices_tgt)> update_visualizer_;
 
@@ -183,7 +184,7 @@ namespace pcl
       pcl::PointCloud<PointTarget> cloud_target_;
 
       /** \brief The mutex used for the synchronization of updating and rendering of the local buffers. */
-      boost::mutex visualizer_updating_mutex_;
+      std::mutex visualizer_updating_mutex_;
 
       /** \brief The local buffer for intermediate point cloud obtained during registration process. */
       pcl::PointCloud<PointSource> cloud_intermediate_;

@@ -33,8 +33,6 @@
  *	
  */
 
-#include <thread>
-
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/io/openni_grabber.h>
@@ -44,6 +42,9 @@
 #include <pcl/console/parse.h>
 #include <pcl/common/time.h>
 #include <pcl/visualization/cloud_viewer.h>
+
+#include <mutex>
+#include <thread>
 
 using namespace pcl;
 using namespace pcl::visualization;
@@ -94,7 +95,7 @@ class OpenNIFastMesh
 
       // Lock and copy
       {
-        boost::mutex::scoped_lock lock (mtx_);
+        std::lock_guard<std::mutex> lock (mtx_);
         vertices_ = std::move (temp_verts);
         cloud_ = cloud;//reset (new Cloud (*cloud));
       }
@@ -105,7 +106,7 @@ class OpenNIFastMesh
     {
       pcl::Grabber* interface = new pcl::OpenNIGrabber (device_id_);
 
-      boost::function<void (const CloudConstPtr&)> f = boost::bind (&OpenNIFastMesh::cloud_cb, this, _1);
+      std::function<void (const CloudConstPtr&)> f = boost::bind (&OpenNIFastMesh::cloud_cb, this, _1);
       boost::signals2::connection c = interface->registerCallback (f);
      
       view.reset (new pcl::visualization::PCLVisualizer (argc, argv, "PCL OpenNI Mesh Viewer"));
@@ -142,7 +143,7 @@ class OpenNIFastMesh
 
     pcl::OrganizedFastMesh<PointType> ofm;
     std::string device_id_;
-    boost::mutex mtx_;
+    std::mutex mtx_;
     // Data
     CloudConstPtr cloud_;
     std::vector<pcl::Vertices> vertices_;

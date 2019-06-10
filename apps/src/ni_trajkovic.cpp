@@ -39,8 +39,6 @@
 
 #define SHOW_FPS 1
 
-#include <thread>
-
 #include <pcl/apps/timer.h>
 #include <pcl/common/common.h>
 #include <pcl/io/openni_grabber.h>
@@ -50,6 +48,9 @@
 #include <pcl/visualization/image_viewer.h>
 #include <pcl/console/print.h>
 #include <pcl/console/parse.h>
+
+#include <mutex>
+#include <thread>
 
 using namespace std::chrono_literals;
 using namespace pcl;
@@ -77,7 +78,7 @@ class TrajkovicDemo
     cloud_callback_3d (const CloudConstPtr& cloud)
     {
       FPS_CALC ("cloud callback");
-      boost::mutex::scoped_lock lock (cloud_mutex_);
+      std::lock_guard<std::mutex> lock (cloud_mutex_);
       cloud_ = cloud;
 
       // Compute TRAJKOVIC keypoints 3D
@@ -94,7 +95,7 @@ class TrajkovicDemo
     cloud_callback_2d (const CloudConstPtr& cloud)
     {
       FPS_CALC ("cloud callback");
-      boost::mutex::scoped_lock lock (cloud_mutex_);
+      std::lock_guard<std::mutex> lock (cloud_mutex_);
       cloud_ = cloud;
 
       // Compute TRAJKOVIC keypoints 2D
@@ -110,7 +111,7 @@ class TrajkovicDemo
     void
     init ()
     {
-      boost::function<void (const CloudConstPtr&) > cloud_cb;
+      std::function<void (const CloudConstPtr&) > cloud_cb;
       if (enable_3d_)
         cloud_cb = boost::bind (&TrajkovicDemo::cloud_callback_3d, this, _1);
       else
@@ -205,7 +206,7 @@ class TrajkovicDemo
 
     visualization::PCLVisualizer cloud_viewer_;
     Grabber& grabber_;
-    boost::mutex cloud_mutex_;
+    std::mutex cloud_mutex_;
     CloudConstPtr cloud_;
 
     visualization::ImageViewer image_viewer_;
