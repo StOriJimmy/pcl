@@ -107,8 +107,8 @@ template <typename PointType>
 class OpenNIViewer
 {
   public:
-    typedef pcl::PointCloud<PointType> Cloud;
-    typedef typename Cloud::ConstPtr CloudConstPtr;
+    using Cloud = pcl::PointCloud<PointType>;
+    using CloudConstPtr = typename Cloud::ConstPtr;
 
     OpenNIViewer (pcl::Grabber& grabber)
       : grabber_ (grabber)
@@ -206,14 +206,14 @@ class OpenNIViewer
     void
     run ()
     {
-      std::function<void (const CloudConstPtr&) > cloud_cb = boost::bind (&OpenNIViewer::cloud_callback, this, _1);
+      std::function<void (const CloudConstPtr&) > cloud_cb = [this] (const CloudConstPtr& cloud) { cloud_callback (cloud); };
       boost::signals2::connection cloud_connection = grabber_.registerCallback (cloud_cb);
 
       boost::signals2::connection image_connection;
       if (grabber_.providesCallback<void (const openni_wrapper::Image::Ptr&)>())
       {
         image_viewer_.reset (new pcl::visualization::ImageViewer ("Pyramidal KLT Tracker"));
-        std::function<void (const openni_wrapper::Image::Ptr&) > image_cb = boost::bind (&OpenNIViewer::image_callback, this, _1);
+        std::function<void (const openni_wrapper::Image::Ptr&) > image_cb = [this] (const openni_wrapper::Image::Ptr& img) { image_callback (img); };
         image_connection = grabber_.registerCallback (image_cb);
       }
 
@@ -330,7 +330,7 @@ main (int argc, char** argv)
       printHelp(argc, argv);
       return 0;
     }
-    else if (device_id == "-l")
+    if (device_id == "-l")
     {
       if (argc >= 3)
       {

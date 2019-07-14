@@ -52,7 +52,7 @@ using namespace std::chrono_literals;
 
 struct PointCloudBuffers
 {
-  typedef boost::shared_ptr<PointCloudBuffers> Ptr;
+  using Ptr = boost::shared_ptr<PointCloudBuffers>;
   std::vector<short> points;
   std::vector<unsigned char> rgb;
 };
@@ -110,9 +110,9 @@ class PCLMobileServer
 {
   public:
 
-    typedef pcl::PointCloud<PointType> Cloud;
-    typedef typename Cloud::Ptr CloudPtr;
-    typedef typename Cloud::ConstPtr CloudConstPtr;
+    using Cloud = pcl::PointCloud<PointType>;
+    using CloudPtr = typename Cloud::Ptr;
+    using CloudConstPtr = typename Cloud::ConstPtr;
 
     PCLMobileServer (const std::string& device_id = "", int port = 11111,
                      float leaf_size_x = 0.01, float leaf_size_y = 0.01, float leaf_size_z = 0.01)
@@ -156,7 +156,7 @@ class PCLMobileServer
     run ()
     {
       pcl::OpenNIGrabber grabber (device_id_);
-      std::function<void (const CloudConstPtr&)> handler_function = boost::bind (&PCLMobileServer::handleIncomingCloud, this, _1);
+      std::function<void (const CloudConstPtr&)> handler_function = [this] (const CloudConstPtr& cloud) { handleIncomingCloud (cloud); };
       grabber.registerCallback (handler_function);
       grabber.start ();
 

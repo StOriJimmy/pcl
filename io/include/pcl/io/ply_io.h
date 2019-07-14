@@ -39,6 +39,7 @@
 
 #pragma once
 
+#include <pcl/pcl_macros.h>
 #include <pcl/io/boost.h>
 #include <pcl/io/file_io.h>
 #include <pcl/io/ply/ply_parser.h>
@@ -527,7 +528,7 @@ namespace pcl
       //face element artifact
       std::vector<pcl::Vertices> *polygons_;
     public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+      PCL_MAKE_ALIGNED_OPERATOR_NEW
       
     private:
       // RGB values stored by vertexColorCallback()
@@ -633,8 +634,7 @@ namespace pcl
       {
         if (binary)
           return (this->writeBinary (file_name, cloud, origin, orientation, true));
-        else
-          return (this->writeASCII (file_name, cloud, origin, orientation, 8, true));
+        return (this->writeASCII (file_name, cloud, origin, orientation, 8, true));
       }
 
       /** \brief Save point cloud data to a PLY file containing n-D points
@@ -656,8 +656,7 @@ namespace pcl
       {
         if (binary)
           return (this->writeBinary (file_name, cloud, origin, orientation, use_camera));
-        else
-          return (this->writeASCII (file_name, cloud, origin, orientation, 8, use_camera));
+        return (this->writeASCII (file_name, cloud, origin, orientation, 8, use_camera));
       }
 
       /** \brief Save point cloud data to a PLY file containing n-D points

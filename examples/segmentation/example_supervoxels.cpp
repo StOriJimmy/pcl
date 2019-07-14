@@ -18,14 +18,14 @@
 using namespace std::chrono_literals;
 
 // Types
-typedef pcl::PointXYZRGBA PointT;
-typedef pcl::PointCloud<PointT> PointCloudT;
-typedef pcl::PointNormal PointNT;
-typedef pcl::PointCloud<PointNT> PointNCloudT;
-typedef pcl::PointXYZL PointLT;
-typedef pcl::PointCloud<PointLT> PointLCloudT;
-typedef pcl::Normal NormalT;
-typedef pcl::PointCloud<NormalT> NormalCloudT;
+using PointT = pcl::PointXYZRGBA;
+using PointCloudT = pcl::PointCloud<PointT>;
+using PointNT = pcl::PointNormal;
+using PointNCloudT = pcl::PointCloud<PointNT>;
+using PointLT = pcl::PointXYZL;
+using PointLCloudT = pcl::PointCloud<PointLT>;
+using NormalT = pcl::Normal;
+using NormalCloudT = pcl::PointCloud<NormalT>;
 
 bool show_voxel_centroids = true;
 bool show_supervoxels = true;
@@ -116,10 +116,8 @@ main (int argc, char ** argv)
     {
       std::cout << "No cloud specified!\n";
       return (1);
-    }else
-    {
-      pcl::console::parse (argc,argv,"-p",pcd_path);
     }
+    pcl::console::parse (argc,argv,"-p",pcd_path);
   }
   
   bool disable_transform = pcl::console::find_switch (argc, argv, "--NT");
@@ -335,7 +333,7 @@ main (int argc, char ** argv)
   }
   
   std::cout << "Constructing Boost Graph Library Adjacency List...\n";
-  typedef boost::adjacency_list<boost::setS, boost::setS, boost::undirectedS, uint32_t, float> VoxelAdjacencyList;
+  using VoxelAdjacencyList = boost::adjacency_list<boost::setS, boost::setS, boost::undirectedS, uint32_t, float>;
   VoxelAdjacencyList supervoxel_adjacency_list;
   super.getSupervoxelAdjacencyList (supervoxel_adjacency_list);
 

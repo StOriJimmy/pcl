@@ -43,6 +43,7 @@
 #include <pcl/io/openni2_grabber.h>
 #include <pcl/io/openni2/openni2_device_manager.h>
 #include <pcl/io/openni2/openni2_metadata_wrapper.h>
+#include <pcl/io/openni2/openni2_device.h>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/common/time.h>
@@ -56,7 +57,7 @@ using namespace pcl::io::openni2;
 namespace
 {
   // Treat color as chars, float32, or uint32
-  typedef union
+  union RGBValue
   {
     struct
     {
@@ -67,7 +68,7 @@ namespace
     };
     float float_value;
     uint32_t long_value;
-  } RGBValue;
+  };
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -107,7 +108,13 @@ pcl::io::OpenNI2Grabber::OpenNI2Grabber (const std::string& device_id, const Mod
   point_cloud_signal_    = createSignal<sig_cb_openni_point_cloud> ();
   point_cloud_i_signal_  = createSignal<sig_cb_openni_point_cloud_i> ();
   ir_depth_image_signal_ = createSignal<sig_cb_openni_ir_depth_image> ();
-  ir_sync_.addCallback (boost::bind (&OpenNI2Grabber::irDepthImageCallback, this, _1, _2));
+  ir_sync_.addCallback ([this] (const IRImage::Ptr& ir_image,
+                                const DepthImage::Ptr& depth_image,
+                                unsigned long,
+                                unsigned long)
+  {
+    irDepthImageCallback (ir_image, depth_image);
+  });
 
   if (device_->hasColorSensor ())
   {
@@ -116,13 +123,19 @@ pcl::io::OpenNI2Grabber::OpenNI2Grabber (const std::string& device_id, const Mod
     image_depth_image_signal_ = createSignal<sig_cb_openni_image_depth_image> ();
     point_cloud_rgb_signal_   = createSignal<sig_cb_openni_point_cloud_rgb> ();
     point_cloud_rgba_signal_  = createSignal<sig_cb_openni_point_cloud_rgba> ();
-    rgb_sync_.addCallback (boost::bind (&OpenNI2Grabber::imageDepthImageCallback, this, _1, _2));
+    rgb_sync_.addCallback ([this] (const Image::Ptr& image,
+                                   const DepthImage::Ptr& depth_image,
+                                   unsigned long,
+                                   unsigned long)
+    {
+      imageDepthImageCallback (image, depth_image);
+    });
   }
 
   // callbacks from the sensor to the grabber
-  device_->setColorCallback (boost::bind (&OpenNI2Grabber::processColorFrame, this, _1));
-  device_->setDepthCallback (boost::bind (&OpenNI2Grabber::processDepthFrame, this, _1));
-  device_->setIRCallback (boost::bind (&OpenNI2Grabber::processIRFrame, this, _1));
+  device_->setColorCallback ([this] (openni::VideoStream& stream) { processColorFrame (stream); });
+  device_->setDepthCallback ([this] (openni::VideoStream& stream) { processDepthFrame (stream); });
+  device_->setIRCallback ([this] (openni::VideoStream& stream) { processIRFrame (stream); });
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -305,7 +318,7 @@ void
 pcl::io::OpenNI2Grabber::setupDevice (const std::string& device_id, const Mode& depth_mode, const Mode& image_mode)
 {
   // Initialize the openni device
-  boost::shared_ptr<OpenNI2DeviceManager> deviceManager = OpenNI2DeviceManager::getInstance ();
+  auto deviceManager = OpenNI2DeviceManager::getInstance ();
 
   try
   {
@@ -343,7 +356,7 @@ pcl::io::OpenNI2Grabber::setupDevice (const std::string& device_id, const Mode& 
     PCL_THROW_EXCEPTION (pcl::IOException, "unknown error occurred");
   }
 
-  typedef pcl::io::openni2::OpenNI2VideoMode VideoMode;
+  using VideoMode = pcl::io::openni2::OpenNI2VideoMode;
 
   VideoMode depth_md;
   // Set the selected output mode
@@ -586,7 +599,7 @@ pcl::io::OpenNI2Grabber::convertToXYZPointCloud (const DepthImage::Ptr& depth_im
 template <typename PointT> typename pcl::PointCloud<PointT>::Ptr
 pcl::io::OpenNI2Grabber::convertToXYZRGBPointCloud (const Image::Ptr &image, const DepthImage::Ptr &depth_image)
 {
-  boost::shared_ptr<pcl::PointCloud<PointT> > cloud (new pcl::PointCloud<PointT>);
+  typename pcl::PointCloud<PointT>::Ptr cloud (new pcl::PointCloud<PointT>);
 
   cloud->header.seq = depth_image->getFrameID ();
   cloud->header.stamp = depth_image->getTimestamp ();
@@ -713,7 +726,7 @@ pcl::io::OpenNI2Grabber::convertToXYZRGBPointCloud (const Image::Ptr &image, con
 pcl::PointCloud<pcl::PointXYZI>::Ptr
 pcl::io::OpenNI2Grabber::convertToXYZIPointCloud (const IRImage::Ptr &ir_image, const DepthImage::Ptr &depth_image)
 {
-  boost::shared_ptr<pcl::PointCloud<pcl::PointXYZI> > cloud (new pcl::PointCloud<pcl::PointXYZI > ());
+  pcl::PointCloud<pcl::PointXYZI>::Ptr cloud (new pcl::PointCloud<pcl::PointXYZI>);
 
   cloud->header.seq = depth_image->getFrameID ();
   cloud->header.stamp = depth_image->getTimestamp ();
@@ -802,7 +815,7 @@ pcl::io::OpenNI2Grabber::convertToXYZIPointCloud (const IRImage::Ptr &ir_image, 
 void
 pcl::io::OpenNI2Grabber::updateModeMaps ()
 {
-  typedef pcl::io::openni2::OpenNI2VideoMode VideoMode;
+  using VideoMode = pcl::io::openni2::OpenNI2VideoMode;
 
 pcl::io::openni2::OpenNI2VideoMode output_mode;
 
@@ -830,10 +843,7 @@ pcl::io::OpenNI2Grabber::mapMode2XnMode (int mode, OpenNI2VideoMode &xnmode) con
     xnmode = it->second;
     return (true);
   }
-  else
-  {
-    return (false);
-  }
+  return (false);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -885,13 +895,13 @@ void pcl::io::OpenNI2Grabber::processColorFrame (openni::VideoStream& stream)
   FrameWrapper::Ptr frameWrapper = boost::make_shared<Openni2FrameWrapper>(frame);
 
   openni::PixelFormat format = frame.getVideoMode ().getPixelFormat ();
-  boost::shared_ptr<Image> image;
+  Image::Ptr image;
 
   // Convert frame to PCL image type, based on pixel format
   if (format == openni::PIXEL_FORMAT_YUV422)
-    image = boost::make_shared<ImageYUV422> (frameWrapper, t_callback);
+    image.reset (new ImageYUV422 (frameWrapper, t_callback));
   else //if (format == PixelFormat::PIXEL_FORMAT_RGB888)
-    image = boost::make_shared<ImageRGB24> (frameWrapper, t_callback);
+    image.reset (new ImageRGB24 (frameWrapper, t_callback));
 
   imageCallback (image, nullptr);
 }
@@ -909,8 +919,7 @@ void pcl::io::OpenNI2Grabber::processDepthFrame (openni::VideoStream& stream)
   pcl::uint64_t no_sample_value = device_->getShadowValue();
   pcl::uint64_t shadow_value = no_sample_value;
   
-  boost::shared_ptr<DepthImage> image  = 
-   boost::make_shared<DepthImage> (frameWrapper, baseline, focalLength, shadow_value, no_sample_value);
+  DepthImage::Ptr image (new DepthImage (frameWrapper, baseline, focalLength, shadow_value, no_sample_value));
 
   depthCallback (image, nullptr);
 }
@@ -923,7 +932,7 @@ void pcl::io::OpenNI2Grabber::processIRFrame (openni::VideoStream& stream)
 
   FrameWrapper::Ptr frameWrapper = boost::make_shared<Openni2FrameWrapper>(frame);
 
-  boost::shared_ptr<IRImage> image = boost::make_shared<IRImage> ( frameWrapper );
+  IRImage::Ptr image (new IRImage (frameWrapper));
 
   irCallback (image, nullptr);
 }

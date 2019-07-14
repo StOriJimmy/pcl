@@ -116,7 +116,7 @@ pcl::recognition::ObjRecRANSAC::recognize (const PointCloudIn& scene, const Poin
 
   // Cluster the hypotheses
   HypothesisOctree grouped_hypotheses;
-  num_hypotheses = this->groupHypotheses (pre_hypotheses, num_hypotheses, transform_space_, grouped_hypotheses);
+  this->groupHypotheses (pre_hypotheses, num_hypotheses, transform_space_, grouped_hypotheses);
   pre_hypotheses.clear ();
 
   // The last graph-based steps in the algorithm
@@ -500,7 +500,7 @@ pcl::recognition::ObjRecRANSAC::buildGraphOfConflictingHypotheses (const BVHH& b
     graph.getNodes ()[lin_id]->setData ((*obj)->getData ());
   }
 
-  typedef pair<int,int> ordered_int_pair;
+  using ordered_int_pair = pair<int,int>;
   // This is one is to make sure that we do not compute the same set intersection twice
   set<ordered_int_pair, bool(*)(const ordered_int_pair&, const ordered_int_pair&)> ordered_hypotheses_ids (aux::compareOrderedPairs<int>);
 

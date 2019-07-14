@@ -62,7 +62,7 @@
 class ply_to_obj_converter
 {
   public:
-    typedef int flags_type;
+    using flags_type = int;
     enum { triangulate = 1 << 0 };
 
     ply_to_obj_converter (flags_type flags = 0);
@@ -161,20 +161,18 @@ ply_to_obj_converter::element_definition_callback (const std::string& element_na
   if (element_name == "vertex") 
   {
     return boost::tuple<std::function<void ()>, std::function<void ()> > (
-      boost::bind (&ply_to_obj_converter::vertex_begin, this),
-      boost::bind (&ply_to_obj_converter::vertex_end, this)
+      [this] { vertex_begin (); },
+      [this] { vertex_end (); }
     );
   }
-  else if (element_name == "face") 
+  if (element_name == "face") 
   {
     return boost::tuple<std::function<void ()>, std::function<void ()> > (
-      boost::bind (&ply_to_obj_converter::face_begin, this),
-      boost::bind (&ply_to_obj_converter::face_end, this)
+      [this] { face_begin (); },
+      [this] { face_end (); }
     );
   }
-  else {
-    return {};
-  }
+  return {};
 }
 
 template <> std::function<void (pcl::io::ply::float32)> 
@@ -182,21 +180,16 @@ ply_to_obj_converter::scalar_property_definition_callback (const std::string& el
 {
   if (element_name == "vertex") {
     if (property_name == "x") {
-      return boost::bind (&ply_to_obj_converter::vertex_x, this, _1);
+      return [this] (pcl::io::ply::float32 x) { vertex_x (x); };
     }
-    else if (property_name == "y") {
-      return boost::bind (&ply_to_obj_converter::vertex_y, this, _1);
+    if (property_name == "y") {
+      return [this] (pcl::io::ply::float32 y) { vertex_y (y); };
     }
-    else if (property_name == "z") {
-      return boost::bind (&ply_to_obj_converter::vertex_z, this, _1);
-    }
-    else {
-      return {};
+    if (property_name == "z") {
+      return [this] (pcl::io::ply::float32 z) { vertex_z (z); };
     }
   }
-  else {
-    return {};
-  }
+  return {};
 }
 
 template <> boost::tuple<std::function<void (pcl::io::ply::uint8)>, std::function<void (pcl::io::ply::int32)>, std::function<void ()> > 
@@ -204,14 +197,12 @@ ply_to_obj_converter::list_property_definition_callback (const std::string& elem
 {
   if ((element_name == "face") && (property_name == "vertex_indices")) {
     return boost::tuple<std::function<void (pcl::io::ply::uint8)>, std::function<void (pcl::io::ply::int32)>, std::function<void ()> > (
-      boost::bind (&ply_to_obj_converter::face_vertex_indices_begin, this, _1),
-      boost::bind (&ply_to_obj_converter::face_vertex_indices_element, this, _1),
-      boost::bind (&ply_to_obj_converter::face_vertex_indices_end, this)
+      [this] (pcl::io::ply::uint8 p){ face_vertex_indices_begin (p); },
+      [this] (pcl::io::ply::int32 vertex_index) { face_vertex_indices_element (vertex_index); },
+      [this] { face_vertex_indices_end (); }
     );
   }
-  else {
-    return {};
-  }
+  return {};
 }
 
 void 
@@ -296,18 +287,24 @@ ply_to_obj_converter::convert (std::istream&, const std::string& istream_filenam
 {
   pcl::io::ply::ply_parser ply_parser;
 
-  ply_parser.info_callback (boost::bind (&ply_to_obj_converter::info_callback, this, boost::ref (istream_filename), _1, _2));
-  ply_parser.warning_callback (boost::bind (&ply_to_obj_converter::warning_callback, this, boost::ref (istream_filename), _1, _2));
-  ply_parser.error_callback (boost::bind (&ply_to_obj_converter::error_callback, this, boost::ref (istream_filename), _1, _2)); 
+  ply_parser.info_callback ([&, this] (std::size_t line_number, const std::string& message) { info_callback (istream_filename, line_number, message); });
+  ply_parser.warning_callback ([&, this] (std::size_t line_number, const std::string& message) { warning_callback (istream_filename, line_number, message); });
+  ply_parser.error_callback ([&, this] (std::size_t line_number, const std::string& message) { error_callback (istream_filename, line_number, message); });
 
-  ply_parser.element_definition_callback (boost::bind (&ply_to_obj_converter::element_definition_callback, this, _1, _2));
+  ply_parser.element_definition_callback ([this] (const std::string& element_name, std::size_t count) { return element_definition_callback (element_name, count); });
 
   pcl::io::ply::ply_parser::scalar_property_definition_callbacks_type scalar_property_definition_callbacks;
-  pcl::io::ply::ply_parser::at<pcl::io::ply::float32> (scalar_property_definition_callbacks) = boost::bind (&ply_to_obj_converter::scalar_property_definition_callback<pcl::io::ply::float32>, this, _1, _2);
+  pcl::io::ply::ply_parser::at<pcl::io::ply::float32> (scalar_property_definition_callbacks) = [this] (const std::string& element_name, const std::string& property_name)
+  {
+    return scalar_property_definition_callback<pcl::io::ply::float32> (element_name, property_name);
+  };
   ply_parser.scalar_property_definition_callbacks (scalar_property_definition_callbacks);
 
   pcl::io::ply::ply_parser::list_property_definition_callbacks_type list_property_definition_callbacks;
-  pcl::io::ply::ply_parser::at<pcl::io::ply::uint8, pcl::io::ply::int32> (list_property_definition_callbacks) = boost::bind (&ply_to_obj_converter::list_property_definition_callback<pcl::io::ply::uint8, pcl::io::ply::int32>, this, _1, _2);
+  pcl::io::ply::ply_parser::at<pcl::io::ply::uint8, pcl::io::ply::int32> (list_property_definition_callbacks) = [this] (const std::string& element_name, const std::string& property_name)
+  {
+    return list_property_definition_callback<pcl::io::ply::uint8, pcl::io::ply::int32> (element_name, property_name);
+  };
   ply_parser.list_property_definition_callbacks (list_property_definition_callbacks);
 
   ostream_ = &ostream;
@@ -374,7 +371,7 @@ int main (int argc, char* argv[])
       return EXIT_SUCCESS;
     }
 
-    else if ((short_opt == 'v') || (std::strcmp (long_opt, "version") == 0)) {
+    if ((short_opt == 'v') || (std::strcmp (long_opt, "version") == 0)) {
       std::cout << "ply2obj \n";
       std::cout << " Point Cloud Library (PCL) - www.pointclouds.org\n";
       std::cout << " Copyright (c) 2007-2012, Ares Lagae\n";
@@ -407,7 +404,7 @@ int main (int argc, char* argv[])
       return EXIT_SUCCESS;
     }
 
-    else if ((short_opt == 'f') || (std::strcmp (long_opt, "flag") == 0)) {
+    if ((short_opt == 'f') || (std::strcmp (long_opt, "flag") == 0)) {
       if (strcmp (opt_arg, "triangulate") == 0) {
         ply_to_obj_converter_flags |= ply_to_obj_converter::triangulate;
       }

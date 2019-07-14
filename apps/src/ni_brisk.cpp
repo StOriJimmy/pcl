@@ -59,16 +59,16 @@ using namespace pcl;
 using namespace std;
 using namespace std::chrono_literals;
 
-typedef PointXYZRGBA PointT;
-typedef PointWithScale KeyPointT;
+using PointT = PointXYZRGBA;
+using KeyPointT = PointWithScale;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class BRISKDemo
 {
   public:
-    typedef PointCloud<PointT> Cloud;
-    typedef Cloud::Ptr CloudPtr;
-    typedef Cloud::ConstPtr CloudConstPtr;
+    using Cloud = PointCloud<PointT>;
+    using CloudPtr = Cloud::Ptr;
+    using CloudConstPtr = Cloud::ConstPtr;
 
     BRISKDemo (Grabber& grabber)
       : cloud_viewer_ ("BRISK 2D Keypoints -- PointCloud")
@@ -99,7 +99,7 @@ class BRISKDemo
     void
     init ()
     {
-      std::function<void (const CloudConstPtr&) > cloud_cb = boost::bind (&BRISKDemo::cloud_callback, this, _1);
+      std::function<void (const CloudConstPtr&) > cloud_cb = [this] (const CloudConstPtr& cloud) { cloud_callback (cloud); };
       cloud_connection = grabber_.registerCallback (cloud_cb);
     }
 

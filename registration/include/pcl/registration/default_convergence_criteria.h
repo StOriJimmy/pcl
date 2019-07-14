@@ -39,6 +39,7 @@
 
 #pragma once
 
+#include <pcl/pcl_macros.h>
 #include <pcl/registration/eigen.h>
 #include <pcl/correspondence.h>
 #include <pcl/registration/convergence_criteria.h>
@@ -64,10 +65,10 @@ namespace pcl
     class DefaultConvergenceCriteria : public ConvergenceCriteria
     {
       public:
-        typedef boost::shared_ptr<DefaultConvergenceCriteria<Scalar> > Ptr;
-        typedef boost::shared_ptr<const DefaultConvergenceCriteria<Scalar> > ConstPtr;
+        using Ptr = boost::shared_ptr<DefaultConvergenceCriteria<Scalar> >;
+        using ConstPtr = boost::shared_ptr<const DefaultConvergenceCriteria<Scalar> >;
 
-        typedef Eigen::Matrix<Scalar, 4, 4> Matrix4;
+        using Matrix4 = Eigen::Matrix<Scalar, 4, 4>;
 
         enum ConvergenceState
         {
@@ -270,7 +271,7 @@ namespace pcl
         ConvergenceState convergence_state_;
 
       public:
-        EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+        PCL_MAKE_ALIGNED_OPERATOR_NEW
      };
   }
 }

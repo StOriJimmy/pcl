@@ -79,7 +79,7 @@
   #include <opencv2/imgproc/imgproc.hpp>
 //#include "video_recorder.h"
 #endif
-typedef pcl::ScopeTime ScopeTimeT;
+using ScopeTimeT = pcl::ScopeTime;
 
 #include "../src/internal.h"
 
@@ -111,12 +111,12 @@ namespace pcl
       using PointCloudColorHandler<PointT>::capable_;
       using PointCloudColorHandler<PointT>::cloud_;
 
-      typedef typename PointCloudColorHandler<PointT>::PointCloud::ConstPtr PointCloudConstPtr;
-      typedef pcl::PointCloud<RGB>::ConstPtr RgbCloudConstPtr;
+      using PointCloudConstPtr = typename PointCloudColorHandler<PointT>::PointCloud::ConstPtr;
+      using RgbCloudConstPtr = pcl::PointCloud<RGB>::ConstPtr;
 
       public:
-        typedef boost::shared_ptr<PointCloudColorHandlerRGBCloud<PointT> > Ptr;
-        typedef boost::shared_ptr<const PointCloudColorHandlerRGBCloud<PointT> > ConstPtr;
+        using Ptr = boost::shared_ptr<PointCloudColorHandlerRGBCloud<PointT> >;
+        using ConstPtr = boost::shared_ptr<const PointCloudColorHandlerRGBCloud<PointT> >;
         
         /** \brief Constructor. */
         PointCloudColorHandlerRGBCloud (const PointCloudConstPtr& cloud, const RgbCloudConstPtr& colors)
@@ -959,20 +959,29 @@ struct KinFuApp
   startMainLoop (bool triggered_capture)
   {   
     using namespace openni_wrapper;
-    typedef boost::shared_ptr<DepthImage> DepthImagePtr;
-    typedef boost::shared_ptr<Image> ImagePtr;
-        
-    std::function<void (const ImagePtr&, const DepthImagePtr&, float constant)> func1_dev = boost::bind (&KinFuApp::source_cb2_device, this, _1, _2, _3);
-    std::function<void (const DepthImagePtr&)> func2_dev = boost::bind (&KinFuApp::source_cb1_device, this, _1);
+    using DepthImagePtr = boost::shared_ptr<DepthImage>;
+    using ImagePtr = boost::shared_ptr<Image>;
 
-    std::function<void (const ImagePtr&, const DepthImagePtr&, float constant)> func1_oni = boost::bind (&KinFuApp::source_cb2_oni, this, _1, _2, _3);
-    std::function<void (const DepthImagePtr&)> func2_oni = boost::bind (&KinFuApp::source_cb1_oni, this, _1);
-    
+    std::function<void (const ImagePtr&, const DepthImagePtr&, float)> func1_dev = [this] (const ImagePtr& img, const DepthImagePtr& depth, float constant)
+    {
+      source_cb2_device (img, depth, constant);
+    };
+    std::function<void (const DepthImagePtr&)> func2_dev = [this] (const DepthImagePtr& depth) { source_cb1_device (depth); };
+
+    std::function<void (const ImagePtr&, const DepthImagePtr&, float)> func1_oni = [this] (const ImagePtr& img, const DepthImagePtr& depth, float constant)
+    {
+      source_cb2_oni (img, depth, constant);
+    };
+    std::function<void (const DepthImagePtr&)> func2_oni = [this] (const DepthImagePtr& depth) { source_cb1_oni (depth); };
+
     bool is_oni = dynamic_cast<pcl::ONIGrabber*>(&capture_) != nullptr;
     std::function<void (const ImagePtr&, const DepthImagePtr&, float constant)> func1 = is_oni ? func1_oni : func1_dev;
     std::function<void (const DepthImagePtr&)> func2 = is_oni ? func2_oni : func2_dev;
 
-    std::function<void (const pcl::PointCloud<pcl::PointXYZRGBA>::ConstPtr&) > func3 = boost::bind (&KinFuApp::source_cb3, this, _1);
+    std::function<void (const pcl::PointCloud<pcl::PointXYZRGBA>::ConstPtr&) > func3 = [this] (const pcl::PointCloud<pcl::PointXYZRGBA>::ConstPtr& cloud)
+    {
+      source_cb3 (cloud);
+    };
 
     bool need_colors = integrate_colors_ || registration_;
     if ( pcd_source_ && !capture_.providesCallback<void (const pcl::PointCloud<pcl::PointXYZRGBA>::ConstPtr&)>() )

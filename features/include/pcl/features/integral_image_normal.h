@@ -38,6 +38,7 @@
 
 #pragma once
 
+#include <pcl/pcl_macros.h>
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <pcl/features/feature.h>
@@ -70,8 +71,8 @@ namespace pcl
     using Feature<PointInT, PointOutT>::indices_;
 
     public:
-      typedef boost::shared_ptr<IntegralImageNormalEstimation<PointInT, PointOutT> > Ptr;
-      typedef boost::shared_ptr<const IntegralImageNormalEstimation<PointInT, PointOutT> > ConstPtr;
+      using Ptr = boost::shared_ptr<IntegralImageNormalEstimation<PointInT, PointOutT> >;
+      using ConstPtr = boost::shared_ptr<const IntegralImageNormalEstimation<PointInT, PointOutT> >;
 
       /** \brief Different types of border handling. */
         enum BorderPolicy
@@ -99,8 +100,8 @@ namespace pcl
         SIMPLE_3D_GRADIENT
       };
 
-      typedef typename Feature<PointInT, PointOutT>::PointCloudIn  PointCloudIn;
-      typedef typename Feature<PointInT, PointOutT>::PointCloudOut PointCloudOut;
+      using PointCloudIn = typename Feature<PointInT, PointOutT>::PointCloudIn;
+      using PointCloudOut = typename Feature<PointInT, PointOutT>::PointCloudOut;
 
       /** \brief Constructor */
       IntegralImageNormalEstimation ()
@@ -464,7 +465,7 @@ namespace pcl
       initSimple3DGradientMethod ();
 
     public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+      PCL_MAKE_ALIGNED_OPERATOR_NEW
   };
 }
 

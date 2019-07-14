@@ -42,7 +42,7 @@
 #  pragma GCC system_header
 #endif
 
-// Include PCL macros such as PCL_ERROR, etc
+// Include PCL macros such as PCL_ERROR, PCL_MAKE_ALIGNED_OPERATOR_NEW, etc
 #include <pcl/pcl_macros.h>
 
 #include <boost/shared_ptr.hpp>
@@ -57,8 +57,9 @@
 namespace pcl
 {
   // definitions used everywhere
-  using IndicesPtr = boost::shared_ptr <std::vector<int> >;
-  using IndicesConstPtr = boost::shared_ptr <const std::vector<int> >;
+  using Indices = std::vector<int>;
+  using IndicesPtr = boost::shared_ptr<Indices>;
+  using IndicesConstPtr = boost::shared_ptr<const Indices>;
 
   /////////////////////////////////////////////////////////////////////////////////////////
   /** \brief PCL base class. Implements methods that are used by most PCL algorithms.
@@ -176,7 +177,7 @@ namespace pcl
       deinitCompute ();
 
     public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+      PCL_MAKE_ALIGNED_OPERATOR_NEW
   };
 
   /////////////////////////////////////////////////////////////////////////////////////////
@@ -252,7 +253,7 @@ namespace pcl
       bool initCompute ();
       bool deinitCompute ();
     public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+      PCL_MAKE_ALIGNED_OPERATOR_NEW
   };
 }
 

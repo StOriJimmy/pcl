@@ -38,14 +38,15 @@
 #pragma once
 
 #include <pcl/pcl_base.h>
+#include <pcl/pcl_macros.h>
 #include <pcl/search/pcl_search.h>
 
 #include <functional>
 
 namespace pcl
 {
-  typedef std::vector<pcl::PointIndices> IndicesClusters;
-  typedef boost::shared_ptr<std::vector<pcl::PointIndices> > IndicesClustersPtr;
+  using IndicesClusters = std::vector<pcl::PointIndices>;
+  using IndicesClustersPtr = boost::shared_ptr<std::vector<pcl::PointIndices> >;
 
   /** \brief @b ConditionalEuclideanClustering performs segmentation based on Euclidean distance and a user-defined clustering condition.
     * \details The condition that need to hold is currently passed using a function pointer.
@@ -82,7 +83,7 @@ namespace pcl
   class ConditionalEuclideanClustering : public PCLBase<PointT>
   {
     protected:
-      typedef typename pcl::search::Search<PointT>::Ptr SearcherPtr;
+      using SearcherPtr = typename pcl::search::Search<PointT>::Ptr;
 
       using PCLBase<PointT>::input_;
       using PCLBase<PointT>::indices_;
@@ -258,7 +259,7 @@ namespace pcl
       pcl::IndicesClustersPtr large_clusters_;
 
     public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+      PCL_MAKE_ALIGNED_OPERATOR_NEW
   };
 }
 

@@ -52,9 +52,9 @@ template <typename PointType>
 class OpenNIPlanarSegmentation
 {
   public:
-    typedef pcl::PointCloud<PointType> Cloud;
-    typedef typename Cloud::Ptr CloudPtr;
-    typedef typename Cloud::ConstPtr CloudConstPtr;
+    using Cloud = pcl::PointCloud<PointType>;
+    using CloudPtr = typename Cloud::Ptr;
+    using CloudConstPtr = typename Cloud::ConstPtr;
 
     OpenNIPlanarSegmentation (const std::string& device_id = "", double threshold = 0.01)
       : viewer ("PCL OpenNI Planar Hull Segmentation Viewer"),
@@ -121,7 +121,7 @@ class OpenNIPlanarSegmentation
     {
       pcl::Grabber* interface = new pcl::OpenNIGrabber (device_id_);
 
-      std::function<void (const CloudConstPtr&)> f = boost::bind (&OpenNIPlanarSegmentation::cloud_cb_, this, _1);
+      std::function<void (const CloudConstPtr&)> f = [this] (const CloudConstPtr& cloud) { cloud_cb_ (cloud); };
       boost::signals2::connection c = interface->registerCallback (f);
       
       interface->start ();

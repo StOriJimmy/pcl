@@ -73,17 +73,17 @@ namespace openni_wrapper
   class PCL_EXPORTS OpenNIDevice
   {
     public:
-      typedef enum
+      enum DepthMode
       {
         OpenNI_shift_values = 0, // Shift values (disparity)
         OpenNI_12_bit_depth = 1, // Default mode: regular 12-bit depth
-      } DepthMode;
+      };
 
-      typedef boost::shared_ptr<OpenNIDevice> Ptr;
-      typedef std::function<void(boost::shared_ptr<Image>, void* cookie) > ImageCallbackFunction;
-      typedef std::function<void(boost::shared_ptr<DepthImage>, void* cookie) > DepthImageCallbackFunction;
-      typedef std::function<void(boost::shared_ptr<IRImage>, void* cookie) > IRImageCallbackFunction;
-      typedef unsigned CallbackHandle;
+      using Ptr = boost::shared_ptr<OpenNIDevice>;
+      using ImageCallbackFunction = std::function<void(boost::shared_ptr<Image>, void* cookie) >;
+      using DepthImageCallbackFunction = std::function<void(boost::shared_ptr<DepthImage>, void* cookie) >;
+      using IRImageCallbackFunction = std::function<void(boost::shared_ptr<IRImage>, void* cookie) >;
+      using CallbackHandle = unsigned;
 
     public:
 
@@ -446,9 +446,9 @@ namespace openni_wrapper
       OpenNIDevice (OpenNIDevice const &);
       OpenNIDevice& operator=(OpenNIDevice const &);
     protected:
-      typedef std::function<void(boost::shared_ptr<Image>) > ActualImageCallbackFunction;
-      typedef std::function<void(boost::shared_ptr<DepthImage>) > ActualDepthImageCallbackFunction;
-      typedef std::function<void(boost::shared_ptr<IRImage>) > ActualIRImageCallbackFunction;
+      using ActualImageCallbackFunction = std::function<void(boost::shared_ptr<Image>) >;
+      using ActualDepthImageCallbackFunction = std::function<void(boost::shared_ptr<DepthImage>) >;
+      using ActualIRImageCallbackFunction = std::function<void(boost::shared_ptr<IRImage>) >;
 
       OpenNIDevice (xn::Context& context, const xn::NodeInfo& device_node, const xn::NodeInfo& image_node, const xn::NodeInfo& depth_node, const xn::NodeInfo& ir_node);
       OpenNIDevice (xn::Context& context, const xn::NodeInfo& device_node, const xn::NodeInfo& depth_node, const xn::NodeInfo& ir_node);
@@ -579,8 +579,7 @@ namespace openni_wrapper
     float scale = static_cast<float> (output_x_resolution) / static_cast<float> (XN_SXGA_X_RES);
     if (isDepthRegistered ())
       return (rgb_focal_length_SXGA_ * scale);
-    else
-      return (depth_focal_length_SXGA_ * scale);
+    return (depth_focal_length_SXGA_ * scale);
   }
 
   ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -594,7 +593,7 @@ namespace openni_wrapper
   template<typename T> OpenNIDevice::CallbackHandle
   OpenNIDevice::registerImageCallback (void (T::*callback)(boost::shared_ptr<Image>, void* cookie), T& instance, void* custom_data) throw ()
   {
-    image_callback_[image_callback_handle_counter_] = boost::bind (callback, boost::ref (instance), _1, custom_data);
+    image_callback_[image_callback_handle_counter_] = [=, &instance] (boost::shared_ptr<Image> img) { (instance.*callback) (img, custom_data); };
     return (image_callback_handle_counter_++);
   }
 
@@ -602,7 +601,7 @@ namespace openni_wrapper
   template<typename T> OpenNIDevice::CallbackHandle
   OpenNIDevice::registerDepthCallback (void (T::*callback)(boost::shared_ptr<DepthImage>, void* cookie), T& instance, void* custom_data) throw ()
   {
-    depth_callback_[depth_callback_handle_counter_] = boost::bind ( callback,  boost::ref (instance), _1, custom_data);
+    depth_callback_[depth_callback_handle_counter_] = [=, &instance] (boost::shared_ptr<DepthImage> img) { (instance.*callback) (img, custom_data); };
     return (depth_callback_handle_counter_++);
   }
 
@@ -610,7 +609,7 @@ namespace openni_wrapper
   template<typename T> OpenNIDevice::CallbackHandle
   OpenNIDevice::registerIRCallback (void (T::*callback)(boost::shared_ptr<IRImage>, void* cookie), T& instance, void* custom_data) throw ()
   {
-    ir_callback_[ir_callback_handle_counter_] = boost::bind ( callback,  boost::ref (instance), _1, custom_data);
+    ir_callback_[ir_callback_handle_counter_] = [=, &instance] (boost::shared_ptr<IRImage> img) { (instance.*callback) (img, custom_data); };
     return (ir_callback_handle_counter_++);
   }
 

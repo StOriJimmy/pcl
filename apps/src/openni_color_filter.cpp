@@ -65,15 +65,15 @@ template <typename PointType>
 class OpenNIPassthrough
 {
   public:
-    typedef pcl::PointCloud<PointType> Cloud;
-    typedef typename Cloud::Ptr CloudPtr;
-    typedef typename Cloud::ConstPtr CloudConstPtr;
+    using Cloud = pcl::PointCloud<PointType>;
+    using CloudPtr = typename Cloud::Ptr;
+    using CloudConstPtr = typename Cloud::ConstPtr;
 
     OpenNIPassthrough (pcl::OpenNIGrabber& grabber, unsigned char red, unsigned char green, unsigned char blue, unsigned char radius)
     : viewer ("PCL OpenNI ColorFilter Viewer")
     , grabber_(grabber)
     {
-      std::function<void (const CloudConstPtr&)> f = boost::bind (&OpenNIPassthrough::cloud_cb_, this, _1);
+      std::function<void (const CloudConstPtr&)> f = [this] (const CloudConstPtr& cloud) { cloud_cb_ (cloud); };
       boost::signals2::connection c = grabber_.registerCallback (f);
 
       std::vector<bool> lookup(1<<24, false);

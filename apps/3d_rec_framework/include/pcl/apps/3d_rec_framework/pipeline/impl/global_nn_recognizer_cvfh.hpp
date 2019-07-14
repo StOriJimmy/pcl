@@ -18,7 +18,7 @@ template<template<class > class Distance, typename PointInT, typename FeatureT>
 
     if (use_cache_)
     {
-      typedef std::pair<std::string, int> mv_pair;
+      using mv_pair = std::pair<std::string, int>;
       mv_pair pair_model_view = std::make_pair (model.id_, view_id);
 
       std::map<mv_pair, Eigen::Matrix4f,
@@ -57,10 +57,7 @@ template<template<class > class Distance, typename PointInT, typename FeatureT>
       PersistenceUtils::readMatrixFromFile (dir.str (), pose_matrix);
       return true;
     }
-    else
-    {
-      return false;
-    }
+    return false;
   }
 
 template<template<class > class Distance, typename PointInT, typename FeatureT>

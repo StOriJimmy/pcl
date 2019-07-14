@@ -184,11 +184,8 @@ comparePointToRegion (PointT& pt, pcl::ModelCoefficients& model, pcl::PointCloud
     PCL_INFO ("inside!\n");
     return true;
   }
-  else
-  {
-    PCL_INFO ("not inside!\n");
-    return false;
-  }
+  PCL_INFO ("not inside!\n");
+  return false;
 
 }
 
@@ -211,7 +208,7 @@ OrganizedSegmentationDemo::OrganizedSegmentationDemo (pcl::Grabber& grabber) : g
   vis_->getInteractorStyle ()->setKeyboardModifier (pcl::visualization::INTERACTOR_KB_MOD_SHIFT);
   ui_->qvtk_widget->update ();
 
-  std::function<void (const CloudConstPtr&)> f = boost::bind (&OrganizedSegmentationDemo::cloud_cb, this, _1);
+  std::function<void (const CloudConstPtr&)> f = [this] (const CloudConstPtr& cloud) { cloud_cb (cloud); };
   boost::signals2::connection c = grabber_.registerCallback(f);
 
   connect (ui_->captureButton, SIGNAL(clicked()), this, SLOT(toggleCapturePressed()));

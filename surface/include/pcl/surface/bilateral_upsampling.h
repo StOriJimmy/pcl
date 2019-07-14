@@ -39,6 +39,7 @@
 
 #pragma once
 
+#include <pcl/pcl_macros.h>
 #include <pcl/surface/processing.h>
 
 namespace pcl
@@ -70,7 +71,7 @@ namespace pcl
       using PCLBase<PointInT>::deinitCompute;
       using CloudSurfaceProcessing<PointInT, PointOutT>::process;
 
-      typedef pcl::PointCloud<PointOutT> PointCloudOut;
+      using PointCloudOut = pcl::PointCloud<PointOutT>;
 
       Eigen::Matrix3f KinectVGAProjectionMatrix, KinectSXGAProjectionMatrix;
 
@@ -151,6 +152,6 @@ namespace pcl
       Eigen::Matrix3f projection_matrix_, unprojection_matrix_;
 
     public:
-      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+      PCL_MAKE_ALIGNED_OPERATOR_NEW
   };
 }

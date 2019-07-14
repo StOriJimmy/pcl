@@ -66,9 +66,9 @@ do \
 class OpenNIUniformSampling
 {
   public:
-    typedef pcl::PointCloud<pcl::PointXYZRGBA> Cloud;
-    typedef Cloud::Ptr CloudPtr;
-    typedef Cloud::ConstPtr CloudConstPtr;
+    using Cloud = pcl::PointCloud<pcl::PointXYZRGBA>;
+    using CloudPtr = Cloud::Ptr;
+    using CloudConstPtr = Cloud::ConstPtr;
 
     OpenNIUniformSampling (const std::string& device_id = "", 
                        float leaf_size = 0.05)
@@ -123,10 +123,10 @@ class OpenNIUniformSampling
     {
       pcl::Grabber* interface = new pcl::OpenNIGrabber (device_id_);
 
-      std::function<void (const CloudConstPtr&)> f = boost::bind (&OpenNIUniformSampling::cloud_cb_, this, _1);
+      std::function<void (const CloudConstPtr&)> f = [this] (const CloudConstPtr& cloud) { cloud_cb_ (cloud); };
       boost::signals2::connection c = interface->registerCallback (f);
-      viewer.runOnVisualizationThread (boost::bind(&OpenNIUniformSampling::viz_cb, this, _1), "viz_cb");
-      
+      viewer.runOnVisualizationThread ([this] (pcl::visualization::PCLVisualizer& viz) { viz_cb (viz); }, "viz_cb");
+
       interface->start ();
       
       while (!viewer.wasStopped ())

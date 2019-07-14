@@ -61,13 +61,13 @@
 using namespace std::chrono_literals;
 using namespace pcl::console;
 
-typedef pcl::visualization::PointCloudColorHandler<pcl::PCLPointCloud2> ColorHandler;
-typedef ColorHandler::Ptr ColorHandlerPtr;
-typedef ColorHandler::ConstPtr ColorHandlerConstPtr;
+using ColorHandler = pcl::visualization::PointCloudColorHandler<pcl::PCLPointCloud2>;
+using ColorHandlerPtr = ColorHandler::Ptr;
+using ColorHandlerConstPtr = ColorHandler::ConstPtr;
 
-typedef pcl::visualization::PointCloudGeometryHandler<pcl::PCLPointCloud2> GeometryHandler;
-typedef GeometryHandler::Ptr GeometryHandlerPtr;
-typedef GeometryHandler::ConstPtr GeometryHandlerConstPtr;
+using GeometryHandler = pcl::visualization::PointCloudGeometryHandler<pcl::PCLPointCloud2>;
+using GeometryHandlerPtr = GeometryHandler::Ptr;
+using GeometryHandlerConstPtr = GeometryHandler::ConstPtr;
 
 #define NORMALS_SCALE 0.01f
 #define PC_SCALE 0.001f
@@ -249,8 +249,8 @@ main (int argc, char** argv)
   bool fcolorparam = pcl::console::parse_multiple_3x_arguments (argc, argv, "-fc", fcolor_r, fcolor_g, fcolor_b);
 
   std::vector<double> pose_x, pose_y, pose_z, pose_roll, pose_pitch, pose_yaw;
-  bool poseparam = pcl::console::parse_multiple_3x_arguments (argc, argv, "-position", pose_x, pose_y, pose_z);
-  poseparam &= pcl::console::parse_multiple_3x_arguments (argc, argv, "-orientation", pose_roll, pose_pitch, pose_yaw);
+  pcl::console::parse_multiple_3x_arguments (argc, argv, "-position", pose_x, pose_y, pose_z);
+  pcl::console::parse_multiple_3x_arguments (argc, argv, "-orientation", pose_roll, pose_pitch, pose_yaw);
 
   std::vector<int> psize;
   pcl::console::parse_multiple_arguments (argc, argv, "-ps", psize);
@@ -730,7 +730,6 @@ main (int argc, char** argv)
       {
         if (p->wasStopped ())
         {
-          stopped = true;
           break;
         }
         p->spinOnce ();

@@ -79,8 +79,8 @@ using namespace boost::filesystem;
 template<typename PointType>
 class OpenNIGrabFrame
 {
-  typedef pcl::PointCloud<PointType> Cloud;
-  typedef typename Cloud::ConstPtr CloudConstPtr;  
+  using Cloud = pcl::PointCloud<PointType>;
+  using CloudConstPtr = typename Cloud::ConstPtr;  
   public:
     OpenNIGrabFrame (pcl::OpenNIGrabber &grabber)
     : visualizer_ (new pcl::visualization::PCLVisualizer ("OpenNI Viewer"))
@@ -186,7 +186,7 @@ class OpenNIGrabFrame
       
 
       // make callback function from member function
-      std::function<void (const CloudConstPtr&)> f = boost::bind (&OpenNIGrabFrame::cloud_cb_, this, _1);
+      std::function<void (const CloudConstPtr&)> f = [this] (const CloudConstPtr& cloud) { cloud_cb_ (cloud); };
 
       // connect callback function for desired signal. In this case its a point cloud with color values
       boost::signals2::connection c = grabber_.registerCallback (f);
