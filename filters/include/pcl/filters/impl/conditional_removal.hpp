@@ -56,9 +56,7 @@ pcl::FieldComparison<PointT>::FieldComparison (
 
   // Get all fields
   std::vector<pcl::PCLPointField> point_fields;
-  // Use a dummy cloud to get the field types in a clever way
-  PointCloud<PointT> dummyCloud;
-  pcl::getFields (dummyCloud, point_fields);
+  pcl::getFields<PointT> (point_fields);
 
   // Find field_name
   if (point_fields.empty ())
@@ -143,9 +141,7 @@ pcl::PackedRGBComparison<PointT>::PackedRGBComparison (
 {
   // get all the fields
   std::vector<pcl::PCLPointField> point_fields;
-  // Use a dummy cloud to get the field types in a clever way
-  PointCloud<PointT> dummyCloud;
-  pcl::getFields (dummyCloud, point_fields);
+  pcl::getFields<PointT> (point_fields);
 
   // Locate the "rgb" field
   size_t d;
@@ -235,9 +231,7 @@ pcl::PackedHSIComparison<PointT>::PackedHSIComparison (
 {
   // Get all the fields
   std::vector<pcl::PCLPointField> point_fields;
-  // Use a dummy cloud to get the field types in a clever way
-  PointCloud<PointT> dummyCloud;
-  pcl::getFields (dummyCloud, point_fields);
+  pcl::getFields<PointT> (point_fields);
 
   // Locate the "rgb" field
   size_t d;
@@ -326,7 +320,7 @@ pcl::PackedHSIComparison<PointT>::evaluate (const PointT &point) const
     // definitions taken from http://en.wikipedia.org/wiki/HSL_and_HSI
     float hx = (2.0f * r_ - g_ - b_) / 4.0f;  // hue x component -127 to 127
     float hy = static_cast<float> (g_ - b_) * 111.0f / 255.0f; // hue y component -111 to 111
-    h_ = static_cast<int8_t> (atan2(hy, hx) * 128.0f / M_PI);
+    h_ = static_cast<int8_t> (std::atan2(hy, hx) * 128.0f / M_PI);
 
     int32_t i = (r_+g_+b_)/3; // 0 to 255
     i_ = static_cast<uint8_t> (i);
@@ -384,9 +378,7 @@ pcl::TfQuadraticXYZComparison<PointT>::TfQuadraticXYZComparison () :
 {
   // get all the fields
   std::vector<pcl::PCLPointField> point_fields;
-  // Use a dummy cloud to get the field types in a clever way
-  PointCloud<PointT> dummyCloud;
-  pcl::getFields (dummyCloud, point_fields);
+  pcl::getFields<PointT> (point_fields);
 
   // Locate the "x" field
   size_t dX;
@@ -449,9 +441,7 @@ pcl::TfQuadraticXYZComparison<PointT>::TfQuadraticXYZComparison (const pcl::Comp
 {
   // get all the fields
   std::vector<pcl::PCLPointField> point_fields;
-  // Use a dummy cloud to get the field types in a clever way
-  PointCloud<PointT> dummyCloud;
-  pcl::getFields (dummyCloud, point_fields);
+  pcl::getFields<PointT> (point_fields);
 
   // Locate the "x" field
   size_t dX;

@@ -91,8 +91,8 @@ namespace pcl
                 float y1 = (b - sqrt (det)) / a;
                 float y2 = (b + sqrt (det)) / a;
 
-                min = std::min (static_cast<int> (floor (y1)), static_cast<int> (floor (y2)));
-                max = std::max (static_cast<int> (ceil (y1)), static_cast<int> (ceil (y2)));
+                min = std::min (static_cast<int> (std::floor (y1)), static_cast<int> (std::floor (y2)));
+                max = std::max (static_cast<int> (std::ceil (y1)), static_cast<int> (std::ceil (y2)));
                 minY = std::min (rows - 1, std::max (0, min));
                 maxY = std::max (std::min (rows - 1, max), 0);
             }
@@ -111,8 +111,8 @@ namespace pcl
                 float x1 = (b - sqrt (det)) / a;
                 float x2 = (b + sqrt (det)) / a;
 
-                min = std::min (static_cast<int> (floor (x1)), static_cast<int> (floor (x2)));
-                max = std::max (static_cast<int> (ceil (x1)), static_cast<int> (ceil (x2)));
+                min = std::min (static_cast<int> (std::floor (x1)), static_cast<int> (std::floor (x2)));
+                max = std::max (static_cast<int> (std::ceil (x1)), static_cast<int> (std::ceil (x2)));
                 minX = std::min (cols- 1, std::max (0, min));
                 maxX = std::max (std::min (cols - 1, max), 0);
             }
@@ -174,7 +174,7 @@ void optimized_shs5(const PointCloud<PointXYZRGB> &cloud, float tolerance, const
     SearchD search;    
     search.setInputCloud(cloud.makeShared());
 
-    vector< vector<int> > storage(100);
+    std::vector< std::vector<int> > storage(100);
 
     //  omp_set_num_threads(1);
     // Process all points in the indices vector
@@ -233,7 +233,7 @@ void optimized_shs5(const PointCloud<PointXYZRGB> &cloud, float tolerance, const
                     {
                         float h_l = hue[idx];
 
-                        if (fabs(h_l - h) < delta_hue)
+                        if (std::abs(h_l - h) < delta_hue)
                         {
                             if(idx & 1)
                                 seed_queue.push_back (idx);

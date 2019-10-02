@@ -106,7 +106,7 @@ pcl::SIFTKeypoint<PointInT, PointOutT>::detectKeypoints (PointCloudOut &output)
   }
 
   // Check if the output has a "scale" field
-  scale_idx_ = pcl::getFieldIndex<PointOutT> (output, "scale", out_fields_);
+  scale_idx_ = pcl::getFieldIndex<PointOutT> ("scale", out_fields_);
 
   // Make sure the output cloud is empty
   output.points.clear ();
@@ -239,7 +239,7 @@ void pcl::SIFTKeypoint<PointInT, PointOutT>::computeScaleSpace (
         const float &dist_sqr = nn_dist[i_neighbor];
         if (dist_sqr <= 9*sigma_sqr)
         {
-          float w = expf (-0.5f * dist_sqr / sigma_sqr);
+          float w = std::exp (-0.5f * dist_sqr / sigma_sqr);
           numerator += value * w;
           denominator += w;
         }
@@ -297,7 +297,7 @@ pcl::SIFTKeypoint<PointInT, PointOutT>::findScaleSpaceExtrema (
       const float &val = diff_of_gauss (i_point, i_scale);
 
       // Does the point have sufficient contrast?
-      if (fabs (val) >= min_contrast_)
+      if (std::abs (val) >= min_contrast_)
       {
         // Is it a local minimum?
         if ((val == min_val[i_scale]) && 

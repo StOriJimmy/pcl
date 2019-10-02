@@ -62,7 +62,7 @@ RangeImage::atan2LookUp (float y, float x)
   if (x==0 && y==0)
     return 0;
   float ret;
-  if (fabsf (x) < fabsf (y)) 
+  if (std::abs (x) < std::abs (y)) 
   {
     ret = atan_lookup_table[
       static_cast<int> (
@@ -85,7 +85,7 @@ RangeImage::atan2LookUp (float y, float x)
 inline float
 RangeImage::cosLookUp (float value)
 {
-  int cell_idx = static_cast<int> (pcl_lrintf ( (static_cast<float> (lookup_table_size-1)) * fabsf (value) / (2.0f * static_cast<float> (M_PI))));
+  int cell_idx = static_cast<int> (pcl_lrintf ( (static_cast<float> (lookup_table_size-1)) * std::abs (value) / (2.0f * static_cast<float> (M_PI))));
   return (cos_lookup_table[cell_idx]);
 }
 
@@ -240,11 +240,11 @@ RangeImage::doZBuffer (const PointCloudType& point_cloud, float noise_level, flo
   
   float x_real, y_real, range_of_current_point;
   int x, y;
-  for (typename pcl::PointCloud<PointType2>::VectorType::const_iterator it=points2.begin (); it!=points2.end (); ++it)
+  for (const auto& point: points2)
   {
-    if (!isFinite (*it))  // Check for NAN etc
+    if (!isFinite (point))  // Check for NAN etc
       continue;
-    Vector3fMapConst current_point = it->getVector3fMap ();
+    Vector3fMapConst current_point = point.getVector3fMap ();
     
     this->getImagePoint (current_point, x_real, y_real, range_of_current_point);
     this->real2DToInt2D (x_real, y_real, x, y);
@@ -564,8 +564,8 @@ RangeImage::calculate3DPoint (float image_x, float image_y, float range, Eigen::
   //std::cout << image_x<<","<<image_y<<","<<range;
   getAnglesFromImagePoint (image_x, image_y, angle_x, angle_y);
   
-  float cosY = cosf (angle_y);
-  point = Eigen::Vector3f (range * sinf (angle_x) * cosY, range * sinf (angle_y), range * cosf (angle_x)*cosY);
+  float cosY = std::cos (angle_y);
+  point = Eigen::Vector3f (range * sinf (angle_x) * cosY, range * sinf (angle_y), range * std::cos (angle_x)*cosY);
   point = to_world_system_ * point;
 }
 
@@ -599,7 +599,7 @@ void
 RangeImage::getAnglesFromImagePoint (float image_x, float image_y, float& angle_x, float& angle_y) const 
 {
   angle_y = (image_y+static_cast<float> (image_offset_y_))*angular_resolution_y_ - 0.5f*static_cast<float> (M_PI);
-  float cos_angle_y = cosf (angle_y);
+  float cos_angle_y = std::cos (angle_y);
   angle_x = (cos_angle_y==0.0f ? 0.0f : ( (image_x+ static_cast<float> (image_offset_x_))*angular_resolution_x_ - static_cast<float> (M_PI))/cos_angle_y);
 }
 
@@ -635,7 +635,7 @@ RangeImage::getImpactAngle (const PointWithRange& point1, const PointWithRange& 
           d     = std::sqrt (dSqr);
     float cos_impact_angle = (r2Sqr + dSqr - r1Sqr)/ (2.0f*r2*d);
     cos_impact_angle = (std::max) (0.0f, (std::min) (1.0f, cos_impact_angle));
-    impact_angle = acosf (cos_impact_angle);  // Using the cosine rule
+    impact_angle = std::acos (cos_impact_angle);  // Using the cosine rule
   }
   
   if (point1.range > point2.range)
@@ -654,7 +654,7 @@ RangeImage::getAcutenessValue (const PointWithRange& point1, const PointWithRang
   float ret = 1.0f - float (std::fabs (impact_angle)/ (0.5f*M_PI));
   if (impact_angle < 0.0f)
     ret = -ret;
-  //if (fabs (ret)>1)
+  //if (std::abs (ret)>1)
     //std::cout << PVARAC (impact_angle)<<PVARN (ret);
   return ret;
 }
@@ -715,7 +715,7 @@ RangeImage::getSurfaceAngleChange (int x, int y, int radius, float& angle_change
     }
     angle_change_x = transformed_left.dot (transformed_right);
     angle_change_x = (std::max) (0.0f, (std::min) (1.0f, angle_change_x));
-    angle_change_x = acosf (angle_change_x);
+    angle_change_x = std::acos (angle_change_x);
   }
   
   if (isObserved (x, y-radius) && isObserved (x, y+radius))
@@ -747,7 +747,7 @@ RangeImage::getSurfaceAngleChange (int x, int y, int radius, float& angle_change
     }
     angle_change_y = transformed_top.dot (transformed_bottom);
     angle_change_y = (std::max) (0.0f, (std::min) (1.0f, angle_change_y));
-    angle_change_y = acosf (angle_change_y);
+    angle_change_y = std::acos (angle_change_y);
   }
 }
 
@@ -761,10 +761,10 @@ RangeImage::getSurfaceAngleChange (int x, int y, int radius, float& angle_change
     //if (std::isinf (neighbor2.range))
       //return 0.0f;
     //else
-      //return acosf ( (Eigen::Vector3f (point.x, point.y, point.z)-getSensorPos ()).normalized ().dot ( (Eigen::Vector3f (neighbor2.x, neighbor2.y, neighbor2.z)-Eigen::Vector3f (point.x, point.y, point.z)).normalized ()));
+      //return std::acos ( (Eigen::Vector3f (point.x, point.y, point.z)-getSensorPos ()).normalized ().dot ( (Eigen::Vector3f (neighbor2.x, neighbor2.y, neighbor2.z)-Eigen::Vector3f (point.x, point.y, point.z)).normalized ()));
   //}
   //if (std::isinf (neighbor2.range))
-    //return acosf ( (Eigen::Vector3f (point.x, point.y, point.z)-getSensorPos ()).normalized ().dot ( (Eigen::Vector3f (neighbor1.x, neighbor1.y, neighbor1.z)-Eigen::Vector3f (point.x, point.y, point.z)).normalized ()));
+    //return std::acos ( (Eigen::Vector3f (point.x, point.y, point.z)-getSensorPos ()).normalized ().dot ( (Eigen::Vector3f (neighbor1.x, neighbor1.y, neighbor1.z)-Eigen::Vector3f (point.x, point.y, point.z)).normalized ()));
   
   //float d1_squared = squaredEuclideanDistance (point, neighbor1),
         //d1 = std::sqrt (d1_squared),
@@ -772,7 +772,7 @@ RangeImage::getSurfaceAngleChange (int x, int y, int radius, float& angle_change
         //d2 = std::sqrt (d2_squared),
         //d3_squared = squaredEuclideanDistance (neighbor1, neighbor2);
   //float cos_surface_change = (d1_squared + d2_squared - d3_squared)/ (2.0f*d1*d2),
-        //surface_change = acosf (cos_surface_change);
+        //surface_change = std::acos (cos_surface_change);
   //if (std::isnan (surface_change))
     //surface_change = static_cast<float> (M_PI);
   ////std::cout << PVARN (point)<<PVARN (neighbor1)<<PVARN (neighbor2)<<PVARN (cos_surface_change)<<PVARN (surface_change)<<PVARN (d1)<<PVARN (d2)<<PVARN (d1_squared)<<PVARN (d2_squared)<<PVARN (d3_squared);
@@ -887,7 +887,7 @@ RangeImage::getImpactAngleBasedOnLocalNormal (int x, int y, int radius) const
   Eigen::Vector3f normal;
   if (!getNormalForClosestNeighbors (x, y, radius, point, no_of_nearest_neighbors, normal, 1))
     return -std::numeric_limits<float>::infinity ();
-  return deg2rad (90.0f) - acosf (normal.dot ( (getSensorPos ()-getEigenVector3f (point)).normalized ()));
+  return deg2rad (90.0f) - std::acos (normal.dot ( (getSensorPos ()-getEigenVector3f (point)).normalized ()));
 }
 
 
@@ -974,7 +974,8 @@ RangeImage::getSurfaceInformation (int x, int y, int radius, const Eigen::Vector
   if (eigen_values_all_neighbors!=nullptr)
     eigen_values_all_neighbors->setZero ();
   
-  int blocksize = static_cast<int> (pow (static_cast<double> ( (2.0 * radius + 1.0)), 2.0));
+  const auto sqrt_blocksize = 2 * radius + 1;
+  const auto blocksize = sqrt_blocksize * sqrt_blocksize;
   
   PointWithRange given_point;
   given_point.x=point[0];  given_point.y=point[1];  given_point.z=point[2];
@@ -1051,7 +1052,8 @@ RangeImage::getSquaredDistanceOfNthNeighbor (int x, int y, int radius, int n, in
   if (!std::isfinite (point.range))
     return -std::numeric_limits<float>::infinity ();
   
-  int blocksize = static_cast<int> (pow (static_cast<double> (2.0 * radius + 1.0), 2.0));
+  const auto sqrt_blocksize = 2 * radius + 1;
+  const auto blocksize = sqrt_blocksize * sqrt_blocksize;
   std::vector<float> neighbor_distances (blocksize);
   int neighbor_counter = 0;
   for (int y2=y-radius; y2<=y+radius; y2+=step_size)
@@ -1122,9 +1124,8 @@ RangeImage::getAverageViewPoint (const PointCloudTypeWithViewpoints& point_cloud
 {
   Eigen::Vector3f average_viewpoint (0,0,0);
   int point_counter = 0;
-  for (unsigned int point_idx=0; point_idx<point_cloud.points.size (); ++point_idx)
+  for (const auto& point: point_cloud.points)
   {
-    const typename PointCloudTypeWithViewpoints::PointType& point = point_cloud.points[point_idx];
     if (!std::isfinite (point.vp_x) || !std::isfinite (point.vp_y) || !std::isfinite (point.vp_z))
       continue;
     average_viewpoint[0] += point.vp_x;
@@ -1218,11 +1219,11 @@ template <typename PointCloudType> void
 RangeImage::integrateFarRanges (const PointCloudType& far_ranges)
 {
   float x_real, y_real, range_of_current_point;
-  for (typename PointCloudType::const_iterator it  = far_ranges.points.begin (); it != far_ranges.points.end (); ++it)
+  for (const auto& point: far_ranges.points)
   {
-    //if (!isFinite (*it))  // Check for NAN etc
+    //if (!isFinite (point))  // Check for NAN etc
       //continue;
-    Vector3fMapConst current_point = it->getVector3fMap ();
+    Vector3fMapConst current_point = point.getVector3fMap ();
     
     this->getImagePoint (current_point, x_real, y_real, range_of_current_point);
     

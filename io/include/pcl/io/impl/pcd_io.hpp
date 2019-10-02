@@ -63,7 +63,7 @@ pcl::PCDWriter::generateHeader (const pcl::PointCloud<PointT> &cloud, const int 
          "\nFIELDS";
 
   std::vector<pcl::PCLPointField> fields;
-  pcl::getFields (cloud, fields);
+  pcl::getFields<PointT> (fields);
  
   std::stringstream field_names, field_types, field_sizes, field_counts;
   for (const auto &field : fields)
@@ -77,7 +77,7 @@ pcl::PCDWriter::generateHeader (const pcl::PointCloud<PointT> &cloud, const int 
       field_types << " " << "U";
     else
       field_types << " " << pcl::getFieldType (field.datatype);
-    int count = abs (static_cast<int> (field.count));
+    int count = std::abs (static_cast<int> (field.count));
     if (count == 0) count = 1;  // check for 0 counts (coming from older converter code)
     field_counts << " " << count;
   }
@@ -146,7 +146,7 @@ pcl::PCDWriter::writeBinary (const std::string &file_name,
   size_t fsize = 0;
   size_t data_size = 0;
   size_t nri = 0;
-  pcl::getFields (cloud, fields);
+  pcl::getFields<PointT> (fields);
   // Compute the total size of the fields
   for (const auto &field : fields)
   {
@@ -278,7 +278,7 @@ pcl::PCDWriter::writeBinaryCompressed (const std::string &file_name,
   size_t fsize = 0;
   size_t data_size = 0;
   size_t nri = 0;
-  pcl::getFields (cloud, fields);
+  pcl::getFields<PointT> (fields);
   std::vector<int> fields_sizes (fields.size ());
   // Compute the total size of the fields
   for (const auto &field : fields)
@@ -465,7 +465,7 @@ pcl::PCDWriter::writeASCII (const std::string &file_name, const pcl::PointCloud<
   fs.imbue (std::locale::classic ());
 
   std::vector<pcl::PCLPointField> fields;
-  pcl::getFields (cloud, fields);
+  pcl::getFields<PointT> (fields);
 
   // Write the header information
   fs << generateHeader<PointT> (cloud) << "DATA ascii\n";
@@ -626,7 +626,7 @@ pcl::PCDWriter::writeBinary (const std::string &file_name,
   size_t fsize = 0;
   size_t data_size = 0;
   size_t nri = 0;
-  pcl::getFields (cloud, fields);
+  pcl::getFields<PointT> (fields);
   // Compute the total size of the fields
   for (const auto &field : fields)
   {
@@ -749,7 +749,7 @@ pcl::PCDWriter::writeASCII (const std::string &file_name,
   fs.imbue (std::locale::classic ());
 
   std::vector<pcl::PCLPointField> fields;
-  pcl::getFields (cloud, fields);
+  pcl::getFields<PointT> (fields);
 
   // Write the header information
   fs << generateHeader<PointT> (cloud, static_cast<int> (indices.size ())) << "DATA ascii\n";

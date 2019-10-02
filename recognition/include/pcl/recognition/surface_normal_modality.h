@@ -188,7 +188,7 @@ namespace pcl
 	    pcl::PointCloud<PointXYZ>::VectorType ref_normals (nr_normals);
       
       const float normal0_angle = 40.0f * 3.14f / 180.0f;
-      ref_normals[0].x = cosf (normal0_angle);
+      ref_normals[0].x = std::cos (normal0_angle);
       ref_normals[0].y = 0.0f;
       ref_normals[0].z = -sinf (normal0_angle);
 
@@ -197,8 +197,8 @@ namespace pcl
       {
         const float angle = 2.0f * static_cast<float> (M_PI * normal_index * inv_nr_normals);
 
-        ref_normals[normal_index].x = cosf (angle) * ref_normals[0].x - sinf (angle) * ref_normals[0].y;
-        ref_normals[normal_index].y = sinf (angle) * ref_normals[0].x + cosf (angle) * ref_normals[0].y;
+        ref_normals[normal_index].x = std::cos (angle) * ref_normals[0].x - sinf (angle) * ref_normals[0].y;
+        ref_normals[normal_index].y = sinf (angle) * ref_normals[0].x + std::cos (angle) * ref_normals[0].y;
         ref_normals[normal_index].z = ref_normals[0].z;
       }
 
@@ -242,7 +242,7 @@ namespace pcl
                                      normal.y * ref_normals[normal_index].y +
                                      normal.z * ref_normals[normal_index].z;
 
-              const float abs_response = fabsf (response);
+              const float abs_response = std::abs (response);
               if (max_response < abs_response)
               {
                 max_response = abs_response;
@@ -630,7 +630,7 @@ pcl::SurfaceNormalModality<PointInT>::computeAndQuantizeSurfaceNormals ()
           const float i = qx - px;
           const float j = qy - py;
 
-          const float f = fabs(delta) < 0.05f ? 1.0f : 0.0f;
+          const float f = std::abs(delta) < 0.05f ? 1.0f : 0.0f;
 
           matA0 += f * i * i;
           matA1 += f * i * j;
@@ -672,7 +672,7 @@ pcl::SurfaceNormalModality<PointInT>::computeAndQuantizeSurfaceNormals ()
         surface_normals_.points[index].normal_z = normal_z;
         surface_normals_.points[index].curvature = bad_point;
 
-        float angle = 11.25f + atan2 (normal_y, normal_x)*180.0f/3.14f;
+        float angle = 11.25f + std::atan2 (normal_y, normal_x)*180.0f/3.14f;
 
         if (angle < 0.0f) angle += 360.0f;
         if (angle >= 360.0f) angle -= 360.0f;
@@ -892,7 +892,7 @@ pcl::SurfaceNormalModality<PointInT>::computeAndQuantizeSurfaceNormals2 ()
           l_ny *= l_norminv;
           l_nz *= l_norminv;
 
-          float angle = 22.5f + atan2f (l_ny, l_nx) * 180.0f / 3.14f;
+          float angle = 22.5f + std::atan2 (l_ny, l_nx) * 180.0f / 3.14f;
 
           if (angle < 0.0f) angle += 360.0f;
           if (angle >= 360.0f) angle -= 360.0f;
@@ -901,7 +901,7 @@ pcl::SurfaceNormalModality<PointInT>::computeAndQuantizeSurfaceNormals2 ()
 
           surface_normal_orientations_ (l_x, l_y) = angle;
 
-          //*lp_norm = fabs(l_nz)*255;
+          //*lp_norm = std::abs(l_nz)*255;
 
           //int l_val1 = static_cast<int>(l_nx * l_offsetx + l_offsetx);
           //int l_val2 = static_cast<int>(l_ny * l_offsety + l_offsety);
@@ -1378,7 +1378,7 @@ pcl::SurfaceNormalModality<PointInT>::quantizeSurfaceNormals ()
       //quantized_surface_normals_.data[row_index*width+col_index] =
       //  normal_lookup_(normal_x, normal_y, normal_z);
 
-      float angle = 11.25f + atan2f (normal_y, normal_x)*180.0f/3.14f;
+      float angle = 11.25f + std::atan2 (normal_y, normal_x)*180.0f/3.14f;
 
       if (angle < 0.0f) angle += 360.0f;
       if (angle >= 360.0f) angle -= 360.0f;

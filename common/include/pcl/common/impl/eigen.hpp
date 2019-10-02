@@ -39,6 +39,8 @@
 #ifndef PCL_COMMON_EIGEN_IMPL_HPP_
 #define PCL_COMMON_EIGEN_IMPL_HPP_
 
+#include <algorithm>
+
 #include <pcl/console/print.h>
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -50,7 +52,7 @@ pcl::computeRoots2 (const Scalar& b, const Scalar& c, Roots& roots)
   if (d < 0.0)  // no real roots ! THIS SHOULD NOT HAPPEN!
     d = 0.0;
 
-  Scalar sd = ::std::sqrt (d);
+  Scalar sd = std::sqrt (d);
 
   roots (2) = 0.5f * (b + sd);
   roots (1) = 0.5f * (b - sd);
@@ -78,7 +80,7 @@ pcl::computeRoots (const Matrix& m, Roots& roots)
         m (1, 2) * m (1, 2);
   Scalar c2 = m (0, 0) + m (1, 1) + m (2, 2);
 
-  if (fabs (c0) < Eigen::NumTraits < Scalar > ::epsilon ())  // one root is 0 -> quadratic equation
+  if (std::abs (c0) < Eigen::NumTraits < Scalar > ::epsilon ())  // one root is 0 -> quadratic equation
     computeRoots2 (c2, c1, roots);
   else
   {
@@ -127,7 +129,7 @@ pcl::eigen22 (const Matrix& mat, typename Matrix::Scalar& eigenvalue, Vector& ei
 {
   // if diagonal matrix, the eigenvalues are the diagonal elements
   // and the eigenvectors are not unique, thus set to Identity
-  if (fabs (mat.coeff (1)) <= std::numeric_limits<typename Matrix::Scalar>::min ())
+  if (std::abs (mat.coeff (1)) <= std::numeric_limits<typename Matrix::Scalar>::min ())
   {
     if (mat.coeff (0) < mat.coeff (2))
     {
@@ -153,7 +155,7 @@ pcl::eigen22 (const Matrix& mat, typename Matrix::Scalar& eigenvalue, Vector& ei
   if (temp < 0)
     temp = 0;
 
-  eigenvalue = trace - ::std::sqrt (temp);
+  eigenvalue = trace - std::sqrt (temp);
 
   eigenvector[0] = -mat.coeff (1);
   eigenvector[1] = mat.coeff (0) - eigenvalue;
@@ -166,7 +168,7 @@ pcl::eigen22 (const Matrix& mat, Matrix& eigenvectors, Vector& eigenvalues)
 {
   // if diagonal matrix, the eigenvalues are the diagonal elements
   // and the eigenvectors are not unique, thus set to Identity
-  if (fabs (mat.coeff (1)) <= std::numeric_limits<typename Matrix::Scalar>::min ())
+  if (std::abs (mat.coeff (1)) <= std::numeric_limits<typename Matrix::Scalar>::min ())
   {
     if (mat.coeff (0) < mat.coeff (3))
     {
@@ -198,7 +200,7 @@ pcl::eigen22 (const Matrix& mat, Matrix& eigenvectors, Vector& eigenvalues)
   if (temp < 0)
     temp = 0;
   else
-    temp = ::std::sqrt (temp);
+    temp = std::sqrt (temp);
 
   eigenvalues.coeffRef (0) = trace - temp;
   eigenvalues.coeffRef (1) = trace + temp;
@@ -207,7 +209,7 @@ pcl::eigen22 (const Matrix& mat, Matrix& eigenvectors, Vector& eigenvalues)
   eigenvectors.coeffRef (0) = -mat.coeff (1);
   eigenvectors.coeffRef (2) = mat.coeff (0) - eigenvalues.coeff (0);
   typename Matrix::Scalar norm = static_cast<typename Matrix::Scalar> (1.0)
-      / static_cast<typename Matrix::Scalar> (::std::sqrt (eigenvectors.coeffRef (0) * eigenvectors.coeffRef (0) + eigenvectors.coeffRef (2) * eigenvectors.coeffRef (2)));
+      / static_cast<typename Matrix::Scalar> (std::sqrt (eigenvectors.coeffRef (0) * eigenvectors.coeffRef (0) + eigenvectors.coeffRef (2) * eigenvectors.coeffRef (2)));
   eigenvectors.coeffRef (0) *= norm;
   eigenvectors.coeffRef (2) *= norm;
   eigenvectors.coeffRef (1) = eigenvectors.coeffRef (2);
@@ -663,9 +665,9 @@ pcl::getTransformationFromTwoUnitVectorsAndOrigin (const Eigen::Vector3f& y_dire
 template <typename Scalar> void
 pcl::getEulerAngles (const Eigen::Transform<Scalar, 3, Eigen::Affine> &t, Scalar &roll, Scalar &pitch, Scalar &yaw)
 {
-  roll = atan2 (t (2, 1), t (2, 2));
+  roll = std::atan2 (t (2, 1), t (2, 2));
   pitch = asin (-t (2, 0));
-  yaw = atan2 (t (1, 0), t (0, 0));
+  yaw = std::atan2 (t (1, 0), t (0, 0));
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -677,9 +679,9 @@ pcl::getTranslationAndEulerAngles (const Eigen::Transform<Scalar, 3, Eigen::Affi
   x = t (0, 3);
   y = t (1, 3);
   z = t (2, 3);
-  roll = atan2 (t (2, 1), t (2, 2));
+  roll = std::atan2 (t (2, 1), t (2, 2));
   pitch = asin (-t (2, 0));
-  yaw = atan2 (t (1, 0), t (0, 0));
+  yaw = std::atan2 (t (1, 0), t (0, 0));
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -688,8 +690,8 @@ pcl::getTransformation (Scalar x, Scalar y, Scalar z,
                         Scalar roll, Scalar pitch, Scalar yaw, 
                         Eigen::Transform<Scalar, 3, Eigen::Affine> &t)
 {
-  Scalar A = cos (yaw),  B = sin (yaw),  C  = cos (pitch), D  = sin (pitch),
-         E = cos (roll), F = sin (roll), DE = D*E,         DF = D*F;
+  Scalar A = std::cos (yaw),  B = sin (yaw),  C  = std::cos (pitch), D  = sin (pitch),
+         E = std::cos (roll), F = sin (roll), DE = D*E,         DF = D*F;
 
   t (0, 0) = A*C;  t (0, 1) = A*DF - B*E;  t (0, 2) = B*F + A*DE;  t (0, 3) = x;
   t (1, 0) = B*C;  t (1, 1) = A*E + B*DF;  t (1, 2) = B*DE - A*F;  t (1, 3) = y;
@@ -859,8 +861,7 @@ pcl::transformPlane (const pcl::ModelCoefficients::Ptr plane_in,
   Eigen::Matrix < Scalar, 4, 1 > v_plane_in (values.data ());
   pcl::transformPlane (v_plane_in, v_plane_in, transformation);
   plane_out->values.resize (4);
-  for (int i = 0; i < 4; i++)
-    plane_in->values[i] = v_plane_in[i];
+  std::copy_n(v_plane_in.data (), 4, plane_in->values.begin ());
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

@@ -565,7 +565,7 @@ FittingCurve2dAPDM::initNurbsCurve2D (int order, const vector_vec2d &data, int n
   for (int j = 0; j < ncps; j++)
   {
     cv (0) = r * sin (dcv * j);
-    cv (1) = r * cos (dcv * j);
+    cv (1) = r * std::cos (dcv * j);
     cv += mean;
     nurbs.SetCV (j, ON_3dPoint (cv (0), cv (1), 0.0));
   }
@@ -598,7 +598,7 @@ FittingCurve2dAPDM::initNurbsCurve2D (int order, const vector_vec2d &data, int n
 //  Eigen::Vector3d cv, cv_t;
 //  for (int j = 0; j < ncpsV; j++) {
 //    cv(0) = r * sin(dcv * j);
-//    cv(1) = r * cos(dcv * j);
+//    cv(1) = r * std::cos(dcv * j);
 //    cv(2) = 0.0;
 //    cv_t = eigenvectors * cv + mean;
 //    nurbs.SetCV(j, ON_3dPoint(cv_t(0), cv_t(1), cv_t(2)));
@@ -684,7 +684,7 @@ FittingCurve2dAPDM::assembleInterior (double wInt, double sigma2, double rScale,
     double w (wInt);
     if (z (2) > 0.0 && wFunction)
     {
-      w = wInt * exp (-(error * error) * ds);
+      w = wInt * std::exp (-(error * error) * ds);
     }
 
     {
@@ -692,7 +692,7 @@ FittingCurve2dAPDM::assembleInterior (double wInt, double sigma2, double rScale,
       m_data->interior_line_end.push_back (pt);
     }
 
-    //      w = 0.5 * wInt * exp(-(error * error) * ds);
+    //      w = 0.5 * wInt * std::exp(-(error * error) * ds);
 
     // evaluate if this point is the closest point
     //    int idx = NurbsTools::getClosestPoint(pt, m_data->interior);
@@ -783,7 +783,7 @@ FittingCurve2dAPDM::assembleClosestPoints (const std::vector<double> &elements, 
       m_data->closest_points_error.push_back (error2_3);
 
       double w (weight);
-      w = 0.5 * weight * exp (-(error2_2) * ds);
+      w = 0.5 * weight * std::exp (-(error2_2) * ds);
       //    w = weight * std::fabs(in.dot(p2-p1));
 
       //    if (weight > 0.0 && (std::fabs(xi2 - xi) < std::fabs(dxi)))

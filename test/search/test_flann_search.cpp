@@ -95,14 +95,14 @@ TEST (PCL, FlannSearch_nearestKSearch)
     ++counter;
   }
 
-  vector<int> k_indices;
+  std::vector<int> k_indices;
   k_indices.resize (no_of_neighbors);
-  vector<float> k_distances;
+  std::vector<float> k_distances;
   k_distances.resize (no_of_neighbors);
 
   FlannSearch->nearestKSearch (test_point, no_of_neighbors, k_indices, k_distances);
 
-  //if (k_indices.size () != no_of_neighbors)  cerr << "Found "<<k_indices.size ()<<" instead of "<<no_of_neighbors<<" neighbors.\n";
+  //if (k_indices.size () != no_of_neighbors)  std::cerr << "Found "<<k_indices.size ()<<" instead of "<<no_of_neighbors<<" neighbors.\n";
   EXPECT_EQ (k_indices.size (), no_of_neighbors);
 
   // Check if all found neighbors have distance smaller than max_dist
@@ -111,9 +111,9 @@ TEST (PCL, FlannSearch_nearestKSearch)
     const PointXYZ& point = cloud.points[k_index];
     bool ok = euclideanDistance (test_point, point) <= max_dist;
     if (!ok)
-    ok = (fabs (euclideanDistance (test_point, point)) - max_dist) <= 1e-6;
-    //if (!ok)  cerr << k_indices[i] << " is not correct...\n";
-    //else      cerr << k_indices[i] << " is correct...\n";
+    ok = (std::abs (euclideanDistance (test_point, point)) - max_dist) <= 1e-6;
+    //if (!ok)  std::cerr << k_indices[i] << " is not correct...\n";
+    //else      std::cerr << k_indices[i] << " is correct...\n";
     EXPECT_EQ (ok, true);
   }
 
@@ -147,9 +147,9 @@ TEST (PCL, FlannSearch_differentPointT)
   std::vector< std::vector< int > > indices;
   FlannSearch->nearestKSearchT (cloud_rgb, std::vector<int> (),no_of_neighbors,indices,dists);
 
-  vector<int> k_indices;
+  std::vector<int> k_indices;
   k_indices.resize (no_of_neighbors);
-  vector<float> k_distances;
+  std::vector<float> k_distances;
   k_distances.resize (no_of_neighbors);
 
   //vector<int> k_indices_t;
@@ -188,9 +188,9 @@ TEST (PCL, FlannSearch_multipointKnnSearch)
   std::vector< std::vector< int > > indices;
   FlannSearch->nearestKSearch (cloud_big, std::vector<int>(),no_of_neighbors,indices,dists);
 
-  vector<int> k_indices;
+  std::vector<int> k_indices;
   k_indices.resize (no_of_neighbors);
-  vector<float> k_distances;
+  std::vector<float> k_distances;
   k_distances.resize (no_of_neighbors);
 
   for (size_t i = 0; i < cloud_big.points.size (); ++i)
@@ -226,9 +226,9 @@ TEST (PCL, FlannSearch_knnByIndex)
   }
   flann_search->nearestKSearch (cloud_big, query_indices,no_of_neighbors,indices,dists);
 
-  vector<int> k_indices;
+  std::vector<int> k_indices;
   k_indices.resize (no_of_neighbors);
-  vector<float> k_distances;
+  std::vector<float> k_distances;
   k_distances.resize (no_of_neighbors);
 
   for (size_t i = 0; i < query_indices.size (); ++i)
@@ -257,9 +257,9 @@ TEST (PCL, FlannSearch_compareToKdTreeFlann)
 {
 
   int no_of_neighbors=3;
-  vector<int> k_indices;
+  std::vector<int> k_indices;
   k_indices.resize (no_of_neighbors);
-  vector<float> k_distances;
+  std::vector<float> k_distances;
   k_distances.resize (no_of_neighbors);
 
   pcl::search::Search<PointXYZ> *flann_search, *kdtree_search;
@@ -290,10 +290,10 @@ TEST (PCL, FlannSearch_compareToKdTreeFlann)
       kdtree_search->nearestKSearch (point, no_of_neighbors, k_indices, k_distances);
   }
 
-  vector<vector<int> > indices_flann;
-  vector<vector<float> > dists_flann;
-  vector<vector<int> > indices_tree;
-  vector<vector<float> > dists_tree;
+  std::vector<vector<int> > indices_flann;
+  std::vector<vector<float> > dists_flann;
+  std::vector<vector<int> > indices_tree;
+  std::vector<vector<float> > dists_tree;
   indices_flann.resize (cloud_big.size ());
   dists_flann.resize (cloud_big.size ());
   indices_tree.resize (cloud_big.size ());
@@ -333,7 +333,7 @@ TEST (PCL, FlannSearch_compareToKdTreeFlann)
   }
 
 
-  vector<int> query_indices;
+  std::vector<int> query_indices;
   for (size_t i = 0; i<cloud_big.size (); i+=2)
     query_indices.push_back (int (i));
 

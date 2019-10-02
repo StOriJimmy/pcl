@@ -670,7 +670,7 @@ pcl::visualization::PCLVisualizer::addCoordinateSystem (double scale, float x, f
 
 int
 feq (double a, double b) {
-    return fabs (a - b) < 1e-9;
+    return std::abs (a - b) < 1e-9;
 }
 
 void
@@ -682,7 +682,7 @@ double q[4];
   q[2] = qx.y();
   q[3] = qx.z();
 
-    double halftheta = acos (q[0]);
+    double halftheta = std::acos (q[0]);
     theta = halftheta * 2;
     double sinhalftheta = sin (halftheta);
     if (feq (halftheta, 0)) {
@@ -3713,7 +3713,7 @@ pcl::visualization::PCLVisualizer::renderViewTesselatedSphere (
     //If the view up is parallel to ray cam_pos - focalPoint then the transformation
     //is singular and no points are rendered...
     //make sure it is perpendicular
-    if (fabs (cam_pos_3f.dot (test)) == 1)
+    if (std::abs (cam_pos_3f.dot (test)) == 1)
     {
       //parallel, create
       test = cam_pos_3f.cross (Eigen::Vector3f::UnitX ());

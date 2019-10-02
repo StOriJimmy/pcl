@@ -67,7 +67,7 @@ const float zeroFloatEps8 = 1E-8f;
 inline bool
 areEquals (double val1, double val2, double zeroDoubleEps = zeroDoubleEps15)
 {
-  return (fabs (val1 - val2)<zeroDoubleEps);
+  return (std::abs (val1 - val2)<zeroDoubleEps);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -286,11 +286,11 @@ pcl::SHOTEstimationBase<PointInT, PointNT, PointOutT, PointRFT>::interpolateSing
     double zInFeatRef = delta.dot (current_frame_z);
 
     // To avoid numerical problems afterwards
-    if (fabs (yInFeatRef) < 1E-30)
+    if (std::abs (yInFeatRef) < 1E-30)
       yInFeatRef  = 0;
-    if (fabs (xInFeatRef) < 1E-30)
+    if (std::abs (xInFeatRef) < 1E-30)
       xInFeatRef  = 0;
-    if (fabs (zInFeatRef) < 1E-30)
+    if (std::abs (zInFeatRef) < 1E-30)
       zInFeatRef  = 0;
 
 
@@ -304,21 +304,21 @@ pcl::SHOTEstimationBase<PointInT, PointNT, PointOutT, PointRFT>::interpolateSing
     desc_index = desc_index << 1;
 
     if ((xInFeatRef * yInFeatRef > 0) || (xInFeatRef == 0.0))
-      desc_index += (fabs (xInFeatRef) >= fabs (yInFeatRef)) ? 0 : 4;
+      desc_index += (std::abs (xInFeatRef) >= std::abs (yInFeatRef)) ? 0 : 4;
     else
-      desc_index += (fabs (xInFeatRef) > fabs (yInFeatRef)) ? 4 : 0;
+      desc_index += (std::abs (xInFeatRef) > std::abs (yInFeatRef)) ? 4 : 0;
 
     desc_index += zInFeatRef > 0 ? 1 : 0;
 
     // 2 RADII
     desc_index += (distance > radius1_2_) ? 2 : 0;
 
-    int step_index = static_cast<int>(floor (binDistance[i_idx] +0.5));
+    int step_index = static_cast<int>(std::floor (binDistance[i_idx] +0.5));
     int volume_index = desc_index * (nr_bins+1);
 
     //Interpolation on the cosine (adjacent bins in the histogram)
     binDistance[i_idx] -= step_index;
-    double intWeight = (1- fabs (binDistance[i_idx]));
+    double intWeight = (1- std::abs (binDistance[i_idx]));
 
     if (binDistance[i_idx] > 0)
       shot[volume_index + ((step_index+1) % nr_bins)] += static_cast<float> (binDistance[i_idx]);
@@ -359,11 +359,11 @@ pcl::SHOTEstimationBase<PointInT, PointNT, PointOutT, PointRFT>::interpolateSing
     if (inclinationCos > 1.0)
       inclinationCos = 1.0;
 
-    double inclination = acos (inclinationCos);
+    double inclination = std::acos (inclinationCos);
 
     assert (inclination >= 0.0 && inclination <= PST_RAD_180);
 
-    if (inclination > PST_RAD_90 || (fabs (inclination - PST_RAD_90) < 1e-30 && zInFeatRef <= 0))
+    if (inclination > PST_RAD_90 || (std::abs (inclination - PST_RAD_90) < 1e-30 && zInFeatRef <= 0))
     {
       double inclinationDistance = (inclination - PST_RAD_135) / PST_RAD_90;
       if (inclination > PST_RAD_135)
@@ -391,7 +391,7 @@ pcl::SHOTEstimationBase<PointInT, PointNT, PointOutT, PointRFT>::interpolateSing
     if (yInFeatRef != 0.0 || xInFeatRef != 0.0)
     {
       //Interpolation on the azimuth (adjacent horizontal volumes)
-      double azimuth = atan2 (yInFeatRef, xInFeatRef);
+      double azimuth = std::atan2 (yInFeatRef, xInFeatRef);
 
       int sel = desc_index >> 2;
       double angularSectorSpan = PST_RAD_45;
@@ -465,11 +465,11 @@ pcl::SHOTColorEstimation<PointInT, PointNT, PointOutT, PointRFT>::interpolateDou
     double zInFeatRef = delta.dot (current_frame_z);
 
     // To avoid numerical problems afterwards
-    if (fabs (yInFeatRef) < 1E-30)
+    if (std::abs (yInFeatRef) < 1E-30)
       yInFeatRef  = 0;
-    if (fabs (xInFeatRef) < 1E-30)
+    if (std::abs (xInFeatRef) < 1E-30)
       xInFeatRef  = 0;
-    if (fabs (zInFeatRef) < 1E-30)
+    if (std::abs (zInFeatRef) < 1E-30)
       zInFeatRef  = 0;
 
     unsigned char bit4 = ((yInFeatRef > 0) || ((yInFeatRef == 0.0) && (xInFeatRef < 0))) ? 1 : 0;
@@ -482,17 +482,17 @@ pcl::SHOTColorEstimation<PointInT, PointNT, PointOutT, PointRFT>::interpolateDou
     desc_index = desc_index << 1;
 
     if ((xInFeatRef * yInFeatRef > 0) || (xInFeatRef == 0.0))
-      desc_index += (fabs (xInFeatRef) >= fabs (yInFeatRef)) ? 0 : 4;
+      desc_index += (std::abs (xInFeatRef) >= std::abs (yInFeatRef)) ? 0 : 4;
     else
-      desc_index += (fabs (xInFeatRef) > fabs (yInFeatRef)) ? 4 : 0;
+      desc_index += (std::abs (xInFeatRef) > std::abs (yInFeatRef)) ? 4 : 0;
 
     desc_index += zInFeatRef > 0 ? 1 : 0;
 
     // 2 RADII
     desc_index += (distance > radius1_2_) ? 2 : 0;
 
-    int step_index_shape = static_cast<int>(floor (binDistanceShape[i_idx] +0.5));
-    int step_index_color = static_cast<int>(floor (binDistanceColor[i_idx] +0.5));
+    int step_index_shape = static_cast<int>(std::floor (binDistanceShape[i_idx] +0.5));
+    int step_index_color = static_cast<int>(std::floor (binDistanceColor[i_idx] +0.5));
 
     int volume_index_shape = desc_index * (nr_bins_shape+1);
     int volume_index_color = shapeToColorStride + desc_index * (nr_bins_color+1);
@@ -501,8 +501,8 @@ pcl::SHOTColorEstimation<PointInT, PointNT, PointOutT, PointRFT>::interpolateDou
     binDistanceShape[i_idx] -= step_index_shape;
     binDistanceColor[i_idx] -= step_index_color;
 
-    double intWeightShape = (1- fabs (binDistanceShape[i_idx]));
-    double intWeightColor = (1- fabs (binDistanceColor[i_idx]));
+    double intWeightShape = (1- std::abs (binDistanceShape[i_idx]));
+    double intWeightColor = (1- std::abs (binDistanceColor[i_idx]));
 
     if (binDistanceShape[i_idx] > 0)
       shot[volume_index_shape + ((step_index_shape + 1) % nr_bins_shape)] += static_cast<float> (binDistanceShape[i_idx]);
@@ -558,11 +558,11 @@ pcl::SHOTColorEstimation<PointInT, PointNT, PointOutT, PointRFT>::interpolateDou
     if (inclinationCos > 1.0)
       inclinationCos = 1.0;
 
-    double inclination = acos (inclinationCos);
+    double inclination = std::acos (inclinationCos);
 
     assert (inclination >= 0.0 && inclination <= PST_RAD_180);
 
-    if (inclination > PST_RAD_90 || (fabs (inclination - PST_RAD_90) < 1e-30 && zInFeatRef <= 0))
+    if (inclination > PST_RAD_90 || (std::abs (inclination - PST_RAD_90) < 1e-30 && zInFeatRef <= 0))
     {
       double inclinationDistance = (inclination - PST_RAD_135) / PST_RAD_90;
       if (inclination > PST_RAD_135)
@@ -602,7 +602,7 @@ pcl::SHOTColorEstimation<PointInT, PointNT, PointOutT, PointRFT>::interpolateDou
     if (yInFeatRef != 0.0 || xInFeatRef != 0.0)
     {
       //Interpolation on the azimuth (adjacent horizontal volumes)
-      double azimuth = atan2 (yInFeatRef, xInFeatRef);
+      double azimuth = std::atan2 (yInFeatRef, xInFeatRef);
 
       int sel = desc_index >> 2;
       double angularSectorSpan = PST_RAD_45;

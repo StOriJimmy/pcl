@@ -114,7 +114,7 @@ pcl::BRISK2DEstimation<PointInT, PointOutT, KeypointT, IntensityT>::generateKern
   BriskPatternPoint* pattern_iterator = pattern_points_;
 
   // define the scale discretization:
-  static const float lb_scale = logf (scalerange_) / logf (2.0);
+  static const float lb_scale = std::log (scalerange_) / std::log (2.0);
   static const float lb_scale_step = lb_scale / (float (scales_));
 
   scale_list_ = new float[scales_];
@@ -141,7 +141,7 @@ pcl::BRISK2DEstimation<PointInT, PointOutT, KeypointT, IntensityT>::generateKern
           alpha = double (num) * 2 * M_PI / double (number_list[ring]);
           
           // feature rotation plus angle of the point
-          pattern_iterator->x = scale_list_[scale] * radius_list[ring] * static_cast<float> (cos (alpha + theta)); 
+          pattern_iterator->x = scale_list_[scale] * radius_list[ring] * static_cast<float> (std::cos (alpha + theta)); 
           pattern_iterator->y = scale_list_[scale] * radius_list[ring] * static_cast<float> (sin (alpha + theta));
           // and the gaussian kernel sigma
           if (ring == 0)
@@ -150,7 +150,7 @@ pcl::BRISK2DEstimation<PointInT, PointOutT, KeypointT, IntensityT>::generateKern
             pattern_iterator->sigma = static_cast<float> (sigma_scale * scale_list_[scale] * (double (radius_list[ring])) * sin (M_PI / double (number_list[ring])));
 
           // adapt the sizeList if necessary
-          const unsigned int size = static_cast<const unsigned int> (ceil (((scale_list_[scale] * radius_list[ring]) + pattern_iterator->sigma)) + 1);
+          const unsigned int size = static_cast<const unsigned int> (std::ceil (((scale_list_[scale] * radius_list[ring]) + pattern_iterator->sigma)) + 1);
 
           if (size_list_[scale] < size)
             size_list_[scale] = size;
@@ -211,7 +211,7 @@ pcl::BRISK2DEstimation<PointInT, PointOutT, KeypointT, IntensityT>::generateKern
   }
 
   // no bits:
-  strings_ = int (ceil ((float (no_short_pairs_)) / 128.0)) * 4 * 4;
+  strings_ = int (std::ceil ((float (no_short_pairs_)) / 128.0)) * 4 * 4;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////
@@ -593,7 +593,7 @@ pcl::BRISK2DEstimation<PointInT, PointOutT, KeypointT, IntensityT>::compute (
           direction0 += tmp0;
           direction1 += tmp1;
         }
-        kp.angle = atan2f (float (direction1), float (direction0)) / float (M_PI) * 180.0f;
+        kp.angle = std::atan2 (float (direction1), float (direction0)) / float (M_PI) * 180.0f;
         theta = static_cast<int> ((float (n_rot_) * kp.angle) / (360.0f) + 0.5f);
         if (theta < 0)
           theta += n_rot_;
@@ -604,7 +604,7 @@ pcl::BRISK2DEstimation<PointInT, PointOutT, KeypointT, IntensityT>::compute (
     else
     {
       // figure out the direction:
-      //int theta=rotationInvariance*round((_n_rot*atan2(direction.at<int>(0,0),direction.at<int>(1,0)))/(2*M_PI));
+      //int theta=rotationInvariance*round((_n_rot*std::atan2(direction.at<int>(0,0),direction.at<int>(1,0)))/(2*M_PI));
       if (!rotation_invariance_enabled_)
         theta = 0;
       else

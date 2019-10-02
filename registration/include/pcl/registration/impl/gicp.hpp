@@ -131,9 +131,9 @@ pcl::GeneralizedIterativeClosestPoint<PointSource, PointTarget>::computeRDerivat
 
   double phi = x[3], theta = x[4], psi = x[5];
 
-  double cphi = cos(phi), sphi = sin(phi);
-  double ctheta = cos(theta), stheta = sin(theta);
-  double cpsi = cos(psi), spsi = sin(psi);
+  double cphi = std::cos(phi), sphi = sin(phi);
+  double ctheta = std::cos(theta), stheta = sin(theta);
+  double cpsi = std::cos(psi), spsi = sin(psi);
 
   dR_dPhi(0,0) = 0.;
   dR_dPhi(1,0) = 0.;
@@ -195,9 +195,9 @@ pcl::GeneralizedIterativeClosestPoint<PointSource, PointTarget>::estimateRigidTr
   x[0] = transformation_matrix (0,3);
   x[1] = transformation_matrix (1,3);
   x[2] = transformation_matrix (2,3);
-  x[3] = atan2 (transformation_matrix (2,1), transformation_matrix (2,2));
+  x[3] = std::atan2 (transformation_matrix (2,1), transformation_matrix (2,2));
   x[4] = asin (-transformation_matrix (2,0));
-  x[5] = atan2 (transformation_matrix (1,0), transformation_matrix (0,0));
+  x[5] = std::atan2 (transformation_matrix (1,0), transformation_matrix (0,0));
 
   // Set temporary pointers
   tmp_src_ = &cloud_src;
@@ -311,7 +311,7 @@ pcl::GeneralizedIterativeClosestPoint<PointSource, PointTarget>::OptimizationFun
   f = 0;
   g.setZero ();
   Eigen::Matrix3d R = Eigen::Matrix3d::Zero ();
-  const int m = static_cast<const int> (gicp_->tmp_idx_src_->size ());
+  const int m = static_cast<int> (gicp_->tmp_idx_src_->size ());
   for (int i = 0; i < m; ++i)
   {
     // The last coordinate, p_src[3] is guaranteed to be set to 1.0 in registration.hpp
@@ -434,7 +434,7 @@ pcl::GeneralizedIterativeClosestPoint<PointSource, PointTarget>::computeTransfor
             ratio = 1./rotation_epsilon_;
           else
             ratio = 1./transformation_epsilon_;
-          double c_delta = ratio*fabs(previous_transformation_(k,l) - transformation_(k,l));
+          double c_delta = ratio*std::abs(previous_transformation_(k,l) - transformation_(k,l));
           if(c_delta > delta)
             delta = c_delta;
         }

@@ -59,9 +59,9 @@ pcl::NormalDistributionsTransform<PointSource, PointTarget>::NormalDistributions
   // Initializes the gaussian fitting parameters (eq. 6.8) [Magnusson 2009]
   gauss_c1 = 10.0 * (1 - outlier_ratio_);
   gauss_c2 = outlier_ratio_ / pow (resolution_, 3);
-  gauss_d3 = -log (gauss_c2);
-  gauss_d1_ = -log ( gauss_c1 + gauss_c2 ) - gauss_d3;
-  gauss_d2_ = -2 * log ((-log ( gauss_c1 * exp ( -0.5 ) + gauss_c2 ) - gauss_d3) / gauss_d1_);
+  gauss_d3 = -std::log (gauss_c2);
+  gauss_d1_ = -std::log ( gauss_c1 + gauss_c2 ) - gauss_d3;
+  gauss_d2_ = -2 * std::log ((-std::log ( gauss_c1 * std::exp ( -0.5 ) + gauss_c2 ) - gauss_d3) / gauss_d1_);
 
   transformation_epsilon_ = 0.1;
   max_iterations_ = 35;
@@ -79,9 +79,9 @@ pcl::NormalDistributionsTransform<PointSource, PointTarget>::computeTransformati
   // Initializes the gaussian fitting parameters (eq. 6.8) [Magnusson 2009]
   gauss_c1 = 10 * (1 - outlier_ratio_);
   gauss_c2 = outlier_ratio_ / pow (resolution_, 3);
-  gauss_d3 = -log (gauss_c2);
-  gauss_d1_ = -log ( gauss_c1 + gauss_c2 ) - gauss_d3;
-  gauss_d2_ = -2 * log ((-log ( gauss_c1 * exp ( -0.5 ) + gauss_c2 ) - gauss_d3) / gauss_d1_);
+  gauss_d3 = -std::log (gauss_c2);
+  gauss_d1_ = -std::log ( gauss_c1 + gauss_c2 ) - gauss_d3;
+  gauss_d2_ = -2 * std::log ((-std::log ( gauss_c1 * std::exp ( -0.5 ) + gauss_c2 ) - gauss_d3) / gauss_d1_);
 
   if (guess != Eigen::Matrix4f::Identity ())
   {
@@ -235,7 +235,7 @@ pcl::NormalDistributionsTransform<PointSource, PointTarget>::computeAngleDerivat
 {
   // Simplified math for near 0 angles
   double cx, cy, cz, sx, sy, sz;
-  if (fabs (p (3)) < 10e-5)
+  if (std::abs (p (3)) < 10e-5)
   {
     //p(3) = 0;
     cx = 1.0;
@@ -243,10 +243,10 @@ pcl::NormalDistributionsTransform<PointSource, PointTarget>::computeAngleDerivat
   }
   else
   {
-    cx = cos (p (3));
+    cx = std::cos (p (3));
     sx = sin (p (3));
   }
-  if (fabs (p (4)) < 10e-5)
+  if (std::abs (p (4)) < 10e-5)
   {
     //p(4) = 0;
     cy = 1.0;
@@ -254,11 +254,11 @@ pcl::NormalDistributionsTransform<PointSource, PointTarget>::computeAngleDerivat
   }
   else
   {
-    cy = cos (p (4));
+    cy = std::cos (p (4));
     sy = sin (p (4));
   }
 
-  if (fabs (p (5)) < 10e-5)
+  if (std::abs (p (5)) < 10e-5)
   {
     //p(5) = 0;
     cz = 1.0;
@@ -266,7 +266,7 @@ pcl::NormalDistributionsTransform<PointSource, PointTarget>::computeAngleDerivat
   }
   else
   {
-    cz = cos (p (5));
+    cz = std::cos (p (5));
     sz = sin (p (5));
   }
 
@@ -356,7 +356,7 @@ pcl::NormalDistributionsTransform<PointSource, PointTarget>::updateDerivatives (
 {
   Eigen::Vector3d cov_dxd_pi;
   // e^(-d_2/2 * (x_k - mu_k)^T Sigma_k^-1 (x_k - mu_k)) Equation 6.9 [Magnusson 2009]
-  double e_x_cov_x = exp (-gauss_d2_ * x_trans.dot (c_inv * x_trans) / 2);
+  double e_x_cov_x = std::exp (-gauss_d2_ * x_trans.dot (c_inv * x_trans) / 2);
   // Calculate probability of transformed points existence, Equation 6.9 [Magnusson 2009]
   double score_inc = -gauss_d1_ * e_x_cov_x;
 
@@ -451,7 +451,7 @@ pcl::NormalDistributionsTransform<PointSource, PointTarget>::updateHessian (Eige
 {
   Eigen::Vector3d cov_dxd_pi;
   // e^(-d_2/2 * (x_k - mu_k)^T Sigma_k^-1 (x_k - mu_k)) Equation 6.9 [Magnusson 2009]
-  double e_x_cov_x = gauss_d2_ * exp (-gauss_d2_ * x_trans.dot (c_inv * x_trans) / 2);
+  double e_x_cov_x = gauss_d2_ * std::exp (-gauss_d2_ * x_trans.dot (c_inv * x_trans) / 2);
 
   // Error checking for invalid values.
   if (e_x_cov_x > 1 || e_x_cov_x < 0 || std::isnan(e_x_cov_x))

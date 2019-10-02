@@ -72,7 +72,7 @@ pcl::RIFTEstimation<PointInT, GradientT, PointOutT>::computeRIFT (
     Eigen::Map<const Eigen::Vector3f> gradient_vector (& (gradient.points[indices[idx]].gradient[0]));
 
     float gradient_magnitude = gradient_vector.norm ();
-    float gradient_angle_from_center = acosf (gradient_vector.dot ((point - p0).normalized ()) / gradient_magnitude);
+    float gradient_angle_from_center = std::acos (gradient_vector.dot ((point - p0).normalized ()) / gradient_magnitude);
     if (!std::isfinite (gradient_angle_from_center))
       gradient_angle_from_center = 0.0;
 
@@ -96,7 +96,7 @@ pcl::RIFTEstimation<PointInT, GradientT, PointOutT>::computeRIFT (
       for (int d_idx = d_idx_min; d_idx <= d_idx_max; ++d_idx)
       {
         // To avoid boundary effects, use linear interpolation when updating each bin 
-        float w = (1.0f - fabsf (d - static_cast<float> (d_idx))) * (1.0f - fabsf (g - static_cast<float> (g_idx)));
+        float w = (1.0f - std::abs (d - static_cast<float> (d_idx))) * (1.0f - std::abs (g - static_cast<float> (g_idx)));
 
         rift_descriptor (d_idx, g_idx_wrapped) += w * gradient_magnitude;
       }

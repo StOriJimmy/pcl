@@ -389,30 +389,30 @@ TEST (PCL, IO)
 
   // Test getFieldIndex
   std::vector<pcl::PCLPointField> fields;
-  pcl::getFields (cloud, fields);
+  pcl::getFields<PointXYZI> (fields);
   EXPECT_EQ (fields.size (), size_t (4));
-  int x_idx = pcl::getFieldIndex (cloud, "x", fields);
+  int x_idx = pcl::getFieldIndex<PointXYZI> ("x", fields);
   EXPECT_EQ (x_idx, 0);
   EXPECT_EQ (fields[x_idx].offset, uint32_t (0));
   EXPECT_EQ (fields[x_idx].name, "x");
   EXPECT_EQ (fields[x_idx].datatype, pcl::PCLPointField::FLOAT32);
   EXPECT_EQ (fields[x_idx].count, uint32_t (1));
 
-  int y_idx = pcl::getFieldIndex (cloud, "y", fields);
+  int y_idx = pcl::getFieldIndex<PointXYZI> ("y", fields);
   EXPECT_EQ (y_idx, 1);
   EXPECT_EQ (fields[y_idx].offset, uint32_t (4));
   EXPECT_EQ (fields[y_idx].name, "y");
   EXPECT_EQ (fields[y_idx].datatype, pcl::PCLPointField::FLOAT32);
   EXPECT_EQ (fields[y_idx].count, uint32_t (1));
 
-  int z_idx = pcl::getFieldIndex (cloud, "z", fields);
+  int z_idx = pcl::getFieldIndex<PointXYZI> ("z", fields);
   EXPECT_EQ (z_idx, 2);
   EXPECT_EQ (fields[z_idx].offset, uint32_t (8));
   EXPECT_EQ (fields[z_idx].name, "z");
   EXPECT_EQ (fields[z_idx].datatype, pcl::PCLPointField::FLOAT32);
   EXPECT_EQ (fields[z_idx].count, uint32_t (1));
 
-  int intensity_idx = pcl::getFieldIndex (cloud, "intensity", fields);
+  int intensity_idx = pcl::getFieldIndex<PointXYZI> ("intensity", fields);
   EXPECT_EQ (intensity_idx, 3);
   EXPECT_EQ (fields[intensity_idx].offset, uint32_t (16));      // NOTE: intensity_idx.offset should be 12, but we are padding in PointXYZ (!)
   EXPECT_EQ (fields[intensity_idx].name, "intensity");
@@ -1036,7 +1036,7 @@ TEST (PCL, CopyPointCloud)
     cloud_b.points[i].rgba = 255;
   }
 
-  pcl::copyPointCloud<pcl::PointXYZ, pcl::PointXYZRGBA> (cloud_a, cloud_b);
+  pcl::copyPointCloud (cloud_a, cloud_b);
 
   for (size_t i = 0; i < cloud_a.points.size (); ++i)
   {
@@ -1047,7 +1047,7 @@ TEST (PCL, CopyPointCloud)
     cloud_a.points[i].x = cloud_a.points[i].y = cloud_a.points[i].z = 0;
   }
 
-  pcl::copyPointCloud<pcl::PointXYZRGBA, pcl::PointXYZ> (cloud_b, cloud_a);
+  pcl::copyPointCloud (cloud_b, cloud_a);
 
   for (size_t i = 0; i < cloud_a.points.size (); ++i)
   {

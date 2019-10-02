@@ -187,7 +187,7 @@ namespace pcl
       return;
     } 
     float a = in.h / 60;
-    int   i = static_cast<int> (floorf (a));
+    int   i = static_cast<int> (std::floor (a));
     float f = a - static_cast<float> (i);
     float p = in.v * (1 - in.s);
     float q = in.v * (1 - in.s * f);
@@ -361,13 +361,13 @@ namespace pcl
                                   PointCloud<PointXYZRGBA>&     out)
   {
     float bad_point = std::numeric_limits<float>::quiet_NaN();
-    size_t width_ = depth.width;
-    size_t height_ = depth.height;
+    std::size_t width_ = depth.width;
+    std::size_t height_ = depth.height;
     float constant_ = 1.0f / focal;
 
-    for (size_t v = 0; v < height_; v++)
+    for (std::size_t v = 0; v < height_; v++)
     {
-      for (size_t u = 0; u < width_; u++)
+      for (std::size_t u = 0; u < width_; u++)
       {
         PointXYZRGBA pt;
         float depth_ = depth.at (u, v).intensity;

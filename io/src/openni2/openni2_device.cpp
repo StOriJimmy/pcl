@@ -33,7 +33,6 @@
 #include <PS1080.h> // For XN_STREAM_PROPERTY_EMITTER_DCMOS_DISTANCE property
 
 #include <boost/algorithm/string/replace.hpp>
-#include <boost/chrono.hpp>
 
 #include "pcl/io/openni2/openni2_device.h"
 #include "pcl/io/openni2/openni2_convert.h"
@@ -48,8 +47,6 @@ using namespace pcl::io::openni2;
 
 using openni::VideoMode;
 using std::vector;
-
-using hr_clock = boost::chrono::high_resolution_clock;
 
 pcl::io::openni2::OpenNI2Device::OpenNI2Device (const std::string& device_URI) :
   ir_video_started_(false),
@@ -498,7 +495,7 @@ OpenNI2VideoMode
 pcl::io::openni2::OpenNI2Device::getDefaultIRMode () const
 {
   // Search for and return VGA@30 Hz mode
-  vector<OpenNI2VideoMode> modeList = getSupportedIRVideoModes ();
+  std::vector<OpenNI2VideoMode> modeList = getSupportedIRVideoModes ();
   for (const auto &mode : modeList)
   {
     if ( (mode.x_resolution_ == 640) && (mode.y_resolution_ == 480) && (mode.frame_rate_ == 30.0) )
@@ -511,7 +508,7 @@ OpenNI2VideoMode
 pcl::io::openni2::OpenNI2Device::getDefaultColorMode () const
 {
   // Search for and return VGA@30 Hz mode
-  vector<OpenNI2VideoMode> modeList = getSupportedColorVideoModes ();
+  std::vector<OpenNI2VideoMode> modeList = getSupportedColorVideoModes ();
   for (const auto &mode : modeList)
   {
     if ( (mode.x_resolution_ == 640) && (mode.y_resolution_ == 480) && (mode.frame_rate_ == 30.0) )
@@ -524,7 +521,7 @@ OpenNI2VideoMode
 pcl::io::openni2::OpenNI2Device::getDefaultDepthMode () const
 {
   // Search for and return VGA@30 Hz mode
-  vector<OpenNI2VideoMode> modeList = getSupportedDepthVideoModes ();
+  std::vector<OpenNI2VideoMode> modeList = getSupportedDepthVideoModes ();
   for (const auto &mode : modeList)
   {
     if ( (mode.x_resolution_ == 640) && (mode.y_resolution_ == 480) && (mode.frame_rate_ == 30.0) )
@@ -619,7 +616,7 @@ pcl::io::openni2::OpenNI2Device::findCompatibleDepthMode (const OpenNI2VideoMode
 
 // Generic support method for the above findCompatable...Mode calls above
 bool
-pcl::io::openni2::OpenNI2Device::findCompatibleVideoMode (const std::vector<OpenNI2VideoMode> supportedModes, const OpenNI2VideoMode& requested_mode, OpenNI2VideoMode& actual_mode) const
+pcl::io::openni2::OpenNI2Device::findCompatibleVideoMode (const std::vector<OpenNI2VideoMode>& supportedModes, const OpenNI2VideoMode& requested_mode, OpenNI2VideoMode& actual_mode) const
 {
   bool found = false;
   for (const auto &supportedMode : supportedModes)
@@ -847,17 +844,17 @@ std::ostream& pcl::io::openni2::operator<< (std::ostream& stream, const OpenNI2D
 void
 pcl::io::openni2::OpenNI2Device::setColorCallback (StreamCallbackFunction color_callback)
 {
-  color_frame_listener->setCallback (color_callback);
+  color_frame_listener->setCallback (std::move(color_callback));
 }
 
 void
 pcl::io::openni2::OpenNI2Device::setDepthCallback (StreamCallbackFunction depth_callback)
 {
-  depth_frame_listener->setCallback (depth_callback);
+  depth_frame_listener->setCallback (std::move(depth_callback));
 }
 
 void
 pcl::io::openni2::OpenNI2Device::setIRCallback (StreamCallbackFunction ir_callback)
 {
-  ir_frame_listener->setCallback (ir_callback);
+  ir_frame_listener->setCallback (std::move(ir_callback));
 }

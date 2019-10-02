@@ -71,9 +71,9 @@ pcl::ApproximateVoxelGrid<PointT>::applyFilter (PointCloud &output)
   // ---[ RGB special case
   std::vector<pcl::PCLPointField> fields;
   int rgba_index = -1;
-  rgba_index = pcl::getFieldIndex (*input_, "rgb", fields);
+  rgba_index = pcl::getFieldIndex<PointT> ("rgb", fields);
   if (rgba_index == -1)
-    rgba_index = pcl::getFieldIndex (*input_, "rgba", fields);
+    rgba_index = pcl::getFieldIndex<PointT> ("rgba", fields);
   if (rgba_index >= 0)
   {
     rgba_index = fields[rgba_index].offset;
@@ -91,9 +91,9 @@ pcl::ApproximateVoxelGrid<PointT>::applyFilter (PointCloud &output)
   size_t op = 0;    // output pointer
   for (size_t cp = 0; cp < input_->points.size (); ++cp) 
   {
-    int ix = static_cast<int> (floor (input_->points[cp].x * inverse_leaf_size_[0]));
-    int iy = static_cast<int> (floor (input_->points[cp].y * inverse_leaf_size_[1]));
-    int iz = static_cast<int> (floor (input_->points[cp].z * inverse_leaf_size_[2]));
+    int ix = static_cast<int> (std::floor (input_->points[cp].x * inverse_leaf_size_[0]));
+    int iy = static_cast<int> (std::floor (input_->points[cp].y * inverse_leaf_size_[1]));
+    int iz = static_cast<int> (std::floor (input_->points[cp].z * inverse_leaf_size_[2]));
     unsigned int hash = static_cast<unsigned int> ((ix * 7171 + iy * 3079 + iz * 4231) & (histsize_ - 1));
     he *hhe = &history_[hash];
     if (hhe->count && ((ix != hhe->ix) || (iy != hhe->iy) || (iz != hhe->iz))) 

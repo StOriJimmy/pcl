@@ -221,7 +221,7 @@ TEST (PCL, Octree_Pointcloud_Approx_Nearest_Neighbour_Search)
 
 
     // brute force search
-    double BFdistance = numeric_limits<double>::max ();
+    double BFdistance = std::numeric_limits<double>::max ();
     int BFindex = 0;
 
     for (size_t i = 0; i < cloudIn->points.size (); i++)
@@ -278,9 +278,9 @@ TEST (PCL, KdTreeWrapper_nearestKSearch)
     ++counter;
   }
 
-  vector<int> k_indices;
+  std::vector<int> k_indices;
   k_indices.resize (no_of_neighbors);
-  vector<float> k_distances;
+  std::vector<float> k_distances;
   k_distances.resize (no_of_neighbors);
 
   kdtree->nearestKSearch (test_point, no_of_neighbors, k_indices, k_distances);
@@ -293,9 +293,9 @@ TEST (PCL, KdTreeWrapper_nearestKSearch)
     const PointXYZ& point = cloud.points[k_indices[i]];
     bool ok = euclideanDistance (test_point, point) <= max_dist;
     if (!ok)
-      ok = (fabs (euclideanDistance (test_point, point)) - max_dist) <= 1e-6;
-    //if (!ok)  cerr << k_indices[i] << " is not correct...\n";
-    //else      cerr << k_indices[i] << " is correct...\n";
+      ok = (std::abs (euclideanDistance (test_point, point)) - max_dist) <= 1e-6;
+    //if (!ok)  std::cerr << k_indices[i] << " is not correct...\n";
+    //else      std::cerr << k_indices[i] << " is correct...\n";
     EXPECT_EQ (ok, true);
   }
 

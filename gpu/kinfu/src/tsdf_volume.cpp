@@ -152,7 +152,7 @@ pcl::gpu::TsdfVolume::fetchCloudHost (PointCloud<PointType>& cloud, bool connect
   cloud.points.clear ();
   cloud.points.reserve (10000);
 
-  const int DIVISOR = device::DIVISOR; // SHRT_MAX;
+  constexpr int DIVISOR = device::DIVISOR; // SHRT_MAX;
 
 #define FETCH(x, y, z) volume_host[(x) + (y) * volume_x + (z) * volume_y * volume_x]
 
@@ -189,7 +189,7 @@ pcl::gpu::TsdfVolume::fetchCloudHost (PointCloud<PointType>& cloud, bool connect
               if ((F > 0 && Fn < 0) || (F < 0 && Fn > 0))
               {
                 Vector3f Vn = ((Array3i (x+dx, y+dy, z+dz).cast<float>() + 0.5f) * cell_size).matrix ();
-                Vector3f point = (V * (float)abs (Fn) + Vn * (float)abs (F)) / (float)(abs (F) + abs (Fn));
+                Vector3f point = (V * (float)std::abs (Fn) + Vn * (float)std::abs (F)) / (float)(std::abs (F) + std::abs (Fn));
 
                 pcl::PointXYZ xyz;
                 xyz.x = point (0);
@@ -213,7 +213,7 @@ pcl::gpu::TsdfVolume::fetchCloudHost (PointCloud<PointType>& cloud, bool connect
               if ((F > 0 && Fn < 0) || (F < 0 && Fn > 0))
               {
                 Vector3f Vn = ((Array3i (x+dx, y+dy, z+dz).cast<float>() + 0.5f) * cell_size).matrix ();
-                Vector3f point = (V * (float)abs(Fn) + Vn * (float)abs(F))/(float)(abs(F) + abs (Fn));
+                Vector3f point = (V * (float)std::abs(Fn) + Vn * (float)std::abs(F))/(float)(std::abs(F) + std::abs (Fn));
 
                 pcl::PointXYZ xyz;
                 xyz.x = point (0);
@@ -245,7 +245,7 @@ pcl::gpu::TsdfVolume::fetchCloudHost (PointCloud<PointType>& cloud, bool connect
             if ((F > 0 && Fn < 0) || (F < 0 && Fn > 0))
             {
               Vector3f Vn = ((Array3i (x+dx, y+dy, z+dz).cast<float>() + 0.5f) * cell_size).matrix ();
-              Vector3f point = (V * (float)abs (Fn) + Vn * (float)abs (F)) / (float)(abs (F) + abs (Fn));
+              Vector3f point = (V * (float)std::abs (Fn) + Vn * (float)std::abs (F)) / (float)(std::abs (F) + std::abs (Fn));
 
               pcl::PointXYZ xyz;
               xyz.x = point (0);

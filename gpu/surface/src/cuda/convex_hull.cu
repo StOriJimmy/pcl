@@ -39,7 +39,6 @@
 #include "device.h"
 #include <limits>
 
-#include <pcl/gpu/utils/device/limits.hpp>
 #include <pcl/gpu/utils/device/algorithm.hpp>
 #include <pcl/gpu/utils/device/warp.hpp>
 #include <pcl/gpu/utils/device/static_check.hpp>
@@ -134,7 +133,7 @@ namespace pcl
 		  thrust::tuple<float, int> operator()(const thrust::tuple<PointType, int>& in) const
 		  {
 			  float3 x0 = tr(in.get<0>());
-              float dist = fabs(dot(n, x0 - x1));
+              float dist = std::abs(dot(n, x0 - x1));
 			  return thrust::tuple<float, int>(dist, in.get<1>());
 		  }
 	  };
@@ -278,7 +277,7 @@ namespace pcl
           int negs_inds[4];
           int neg_count = 0;
           
-          int idx = numeric_limits<int>::max();
+          int idx = std::numeric_limits<int>::max();
           float dist = 0;
 
           #pragma unroll
@@ -291,7 +290,7 @@ namespace pcl
              int i1 = negs_inds[1];
              int i2 = negs_inds[2];
              
-             int ir = fabs(dists[i1]) < fabs(dists[i2]) ? i2 : i1;
+             int ir = std::abs(dists[i1]) < std::abs(dists[i2]) ? i2 : i1;
              negs_inds[1] = ir;
              --neg_count;
           }
@@ -301,7 +300,7 @@ namespace pcl
              int i1 = negs_inds[0];
              int i2 = negs_inds[1];
              
-             int ir = fabs(dists[i1]) < fabs(dists[i2]) ? i2 : i1;
+             int ir = std::abs(dists[i1]) < std::abs(dists[i2]) ? i2 : i1;
              negs_inds[0] = ir;
              --neg_count;              
           }
@@ -309,7 +308,7 @@ namespace pcl
           if (neg_count == 1)
           {
             idx = negs_inds[0];
-            dist = diag - fabs(dists[idx]); // to ensure that sorting order is inverse, i.e. distant points go first
+            dist = diag - std::abs(dists[idx]); // to ensure that sorting order is inverse, i.e. distant points go first
           }
 
           //if (neg_count == 0)
@@ -377,7 +376,7 @@ namespace pcl
 
         bool last_thread = facet == facet_count;
 
-        int search_value = !last_thread ? facet : numeric_limits<int>::max();		
+        int search_value = !last_thread ? facet : std::numeric_limits<int>::max();		
 		int index = lower_bound(b, e, search_value, LessThanByFacet()) - b;			
         
         if (last_thread)
@@ -614,7 +613,7 @@ namespace pcl
 
           if (hi == perm_index)
           {
-            uint64_type res = numeric_limits<int>::max();
+            uint64_type res = std::numeric_limits<int>::max();
 		    res <<= 32;		                      
             facets_dists[point_idx] = res;
           }
@@ -650,7 +649,7 @@ namespace pcl
             int negs_inds[3];
             int neg_count = 0;
 
-            int new_idx = numeric_limits<int>::max();
+            int new_idx = std::numeric_limits<int>::max();
             float dist = 0;
 
             int indeces[] = { facet, facet + facet_count, facet + facet_count * 2 };
@@ -665,7 +664,7 @@ namespace pcl
               int i1 = negs_inds[1];
               int i2 = negs_inds[2];
            
-              int ir = fabs(dists[i1]) < fabs(dists[i2]) ? i2 : i1;
+              int ir = std::abs(dists[i1]) < std::abs(dists[i2]) ? i2 : i1;
               negs_inds[1] = ir;
               --neg_count;
             }
@@ -675,7 +674,7 @@ namespace pcl
               int i1 = negs_inds[0];
               int i2 = negs_inds[1];
            
-              int ir = fabs(dists[i1]) < fabs(dists[i2]) ? i2 : i1;
+              int ir = std::abs(dists[i1]) < std::abs(dists[i2]) ? i2 : i1;
               negs_inds[0] = ir;
               --neg_count;              
             }
@@ -683,7 +682,7 @@ namespace pcl
             if (neg_count == 1)
             {
               new_idx = negs_inds[0];
-              dist = diag - fabs(dists[new_idx]); // to ensure that sorting order is inverse, i.e. distant points go first
+              dist = diag - std::abs(dists[new_idx]); // to ensure that sorting order is inverse, i.e. distant points go first
               new_idx = indeces[new_idx];
             }
 

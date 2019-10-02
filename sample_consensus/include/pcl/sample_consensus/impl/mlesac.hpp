@@ -118,7 +118,7 @@ pcl::MaximumLikelihoodSampleConsensus<PointT>::computeModel (int debug_verbosity
     {
       // Likelihood of a datum given that it is an inlier
       for (size_t i = 0; i < indices_size; ++i)
-        p_inlier_prob[i] = gamma * exp (- (distances[i] * distances[i] ) / 2 * (sigma_ * sigma_) ) /
+        p_inlier_prob[i] = gamma * std::exp (- (distances[i] * distances[i] ) / 2 * (sigma_ * sigma_) ) /
                            (sqrt (2 * M_PI) * sigma_);
 
       // Likelihood of a datum given that it is an outlier
@@ -130,10 +130,10 @@ pcl::MaximumLikelihoodSampleConsensus<PointT>::computeModel (int debug_verbosity
       gamma /= static_cast<double>(sac_model_->getIndices ()->size ());
     }
 
-    // Find the log likelihood of the model -L = -sum [log (pInlierProb + pOutlierProb)]
+    // Find the std::log likelihood of the model -L = -sum [std::log (pInlierProb + pOutlierProb)]
     double d_cur_penalty = 0;
     for (size_t i = 0; i < indices_size; ++i)
-      d_cur_penalty += log (p_inlier_prob[i] + p_outlier_prob);
+      d_cur_penalty += std::log (p_inlier_prob[i] + p_outlier_prob);
     d_cur_penalty = - d_cur_penalty;
 
     // Better match ?
@@ -151,17 +151,17 @@ pcl::MaximumLikelihoodSampleConsensus<PointT>::computeModel (int debug_verbosity
         if (distance <= 2 * sigma_)
           n_inliers_count++;
 
-      // Compute the k parameter (k=log(z)/log(1-w^n))
+      // Compute the k parameter (k=std::log(z)/std::log(1-w^n))
       double w = static_cast<double> (n_inliers_count) / static_cast<double> (sac_model_->getIndices ()->size ());
       double p_no_outliers = 1 - pow (w, static_cast<double> (selection.size ()));
       p_no_outliers = (std::max) (std::numeric_limits<double>::epsilon (), p_no_outliers);       // Avoid division by -Inf
       p_no_outliers = (std::min) (1 - std::numeric_limits<double>::epsilon (), p_no_outliers);   // Avoid division by 0.
-      k = log (1 - probability_) / log (p_no_outliers);
+      k = std::log (1 - probability_) / std::log (p_no_outliers);
     }
 
     ++iterations_;
     if (debug_verbosity_level > 1)
-      PCL_DEBUG ("[pcl::MaximumLikelihoodSampleConsensus::computeModel] Trial %d out of %d. Best penalty is %f.\n", iterations_, static_cast<int> (ceil (k)), d_best_penalty);
+      PCL_DEBUG ("[pcl::MaximumLikelihoodSampleConsensus::computeModel] Trial %d out of %d. Best penalty is %f.\n", iterations_, static_cast<int> (std::ceil (k)), d_best_penalty);
     if (iterations_ > max_iterations_)
     {
       if (debug_verbosity_level > 0)

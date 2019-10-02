@@ -129,13 +129,13 @@ class ObjectSelection
     keyboard_callback (const visualization::KeyboardEvent&, void*)
     {
       //if (event.getKeyCode())
-      //  cout << "the key \'" << event.getKeyCode() << "\' (" << event.getKeyCode() << ") was";
+      //  std::cout << "the key \'" << event.getKeyCode() << "\' (" << event.getKeyCode() << ") was";
       //else
-      //  cout << "the special key \'" << event.getKeySym() << "\' was";
+      //  std::cout << "the special key \'" << event.getKeySym() << "\' was";
       //if (event.keyDown())
-      //  cout << " pressed" << endl;
+      //  std::cout << " pressed" << std::endl;
       //else
-      //  cout << " released" << endl;
+      //  std::cout << " released" << std::endl;
     }
     
     /////////////////////////////////////////////////////////////////////////
@@ -144,7 +144,7 @@ class ObjectSelection
     {
       if (mouse_event.getType() == visualization::MouseEvent::MouseButtonPress && mouse_event.getButton() == visualization::MouseEvent::LeftButton)
       {
-        cout << "left button pressed @ " << mouse_event.getX () << " , " << mouse_event.getY () << endl;
+        std::cout << "left button pressed @ " << mouse_event.getX () << " , " << mouse_event.getY () << std::endl;
       }
     }
 
@@ -192,7 +192,7 @@ class ObjectSelection
       exppd.setHeightLimits (0.001, 0.5);           // up to half a meter
       exppd.segment (*points_above_plane);
 
-      vector<PointIndices> euclidean_label_indices;
+      std::vector<PointIndices> euclidean_label_indices;
       // Prefer a faster method if the cloud is organized, over EuclidanClusterExtraction
       if (cloud_->isOrganized ())
       {
@@ -262,9 +262,9 @@ class ObjectSelection
       object.reset ();
 
       // Segment out all planes
-      vector<ModelCoefficients> model_coefficients;
-      vector<PointIndices> inlier_indices, boundary_indices;
-      vector<PlanarRegion<PointT>, Eigen::aligned_allocator<PlanarRegion<PointT> > > regions;
+      std::vector<ModelCoefficients> model_coefficients;
+      std::vector<PointIndices> inlier_indices, boundary_indices;
+      std::vector<PlanarRegion<PointT>, Eigen::aligned_allocator<PlanarRegion<PointT> > > regions;
 
       // Prefer a faster method if the cloud is organized, over RANSAC
       if (cloud_->isOrganized ())
@@ -288,7 +288,7 @@ class ObjectSelection
 
         // Use one of the overloaded segmentAndRefine calls to get all the information that we want out
         PointCloud<Label>::Ptr labels (new PointCloud<Label>);
-        vector<PointIndices> label_indices;
+        std::vector<PointIndices> label_indices;
         mps.segmentAndRefine (regions, model_coefficients, inlier_indices, labels, label_indices, boundary_indices);
       }
       else
@@ -341,7 +341,7 @@ class ObjectSelection
       }
       print_highlight ("Number of planar regions detected: %lu for a cloud of %lu points\n", regions.size (), cloud_->size ());
 
-      double max_dist = numeric_limits<double>::max ();
+      double max_dist = std::numeric_limits<double>::max ();
       // Compute the distances from all the planar regions to the picked point, and select the closest region
       int idx = -1;
       for (size_t i = 0; i < regions.size (); ++i)
@@ -417,8 +417,8 @@ class ObjectSelection
       if (idx == -1)
         return;
 
-      vector<int> indices (1);
-      vector<float> distances (1);
+      std::vector<int> indices (1);
+      std::vector<float> distances (1);
 
       // Get the point that was picked
       PointT picked_pt;
@@ -527,9 +527,9 @@ class ObjectSelection
       if (cloud_->isOrganized ())
       {
         // If the dataset is organized, and has RGB data, create an image viewer
-        vector<pcl::PCLPointField> fields;
+        std::vector<pcl::PCLPointField> fields;
         int rgba_index = -1;
-        rgba_index = getFieldIndex (*cloud_, "rgba", fields);
+        rgba_index = getFieldIndex<PointT> ("rgba", fields);
        
         if (rgba_index >= 0)
         {

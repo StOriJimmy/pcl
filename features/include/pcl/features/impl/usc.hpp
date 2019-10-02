@@ -93,7 +93,7 @@ pcl::UniqueShapeContext<PointInT, PointOutT, PointRFT>::initCompute ()
   // Fills radii interval based on formula (1) in section 2.1 of Frome's paper
   radii_interval_.resize (radius_bins_ + 1);
   for (size_t j = 0; j < radius_bins_ + 1; j++)
-    radii_interval_[j] = static_cast<float> (exp (log (min_radius_) + ((static_cast<float> (j) / static_cast<float> (radius_bins_)) * log (search_radius_/min_radius_))));
+    radii_interval_[j] = static_cast<float> (std::exp (std::log (min_radius_) + ((static_cast<float> (j) / static_cast<float> (radius_bins_)) * std::log (search_radius_/min_radius_))));
 
   // Fill theta didvisions of elevation
   theta_divisions_.resize (elevation_bins_+1);
@@ -122,7 +122,7 @@ pcl::UniqueShapeContext<PointInT, PointOutT, PointRFT>::initCompute ()
     for (size_t k = 0; k < elevation_bins_; k++)
     {
       // "theta" term of the volume integral
-      float integr_theta = cosf (deg2rad (theta_divisions_[k])) - cosf (deg2rad (theta_divisions_[k+1]));
+      float integr_theta = std::cos (deg2rad (theta_divisions_[k])) - std::cos (deg2rad (theta_divisions_[k+1]));
       // Volume
       float V = integr_phi * integr_theta * integr_r;
       // Compute cube root of the computed volume commented for performance but left
@@ -186,7 +186,7 @@ pcl::UniqueShapeContext<PointInT, PointOutT, PointRFT>::computePointDescriptor (
     Eigen::Vector3f no = neighbour - origin;
     no.normalize ();
     float theta = normal.dot (no);
-    theta = pcl::rad2deg (acosf (std::min (1.0f, std::max (-1.0f, theta))));
+    theta = pcl::rad2deg (std::acos (std::min (1.0f, std::max (-1.0f, theta))));
 
     /// Bin (j, k, l)
     size_t j = 0;

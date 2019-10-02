@@ -138,12 +138,12 @@ namespace pcl
 __inline double
 pcl_round (double number)
 {
-  return (number < 0.0 ? ceil (number - 0.5) : floor (number + 0.5));
+  return (number < 0.0 ? std::ceil (number - 0.5) : std::floor (number + 0.5));
 }
 __inline float
 pcl_round (float number)
 {
-  return (number < 0.0f ? ceilf (number - 0.5f) : floorf (number + 0.5f));
+  return (number < 0.0f ? std::ceil (number - 0.5f) : std::floor (number + 0.5f));
 }
 
 #ifdef __GNUC__
@@ -205,7 +205,7 @@ pcl_round (float number)
 #endif
 
 #ifndef SET_ARRAY
-#define SET_ARRAY(var, value, size) { for (int i = 0; i < static_cast<int> (size); ++i) var[i]=value; }
+#define SET_ARRAY(var, value, size) { for (decltype(size) i = 0; i < size; ++i) var[i]=value; }
 #endif
 
 #ifndef PCL_EXTERN_C
@@ -295,7 +295,7 @@ pcl_round (float number)
 #endif
 
 inline void*
-aligned_malloc (size_t size)
+aligned_malloc (std::size_t size)
 {
   void *ptr;
 #if   defined (MALLOC_ALIGNED)
@@ -344,3 +344,22 @@ aligned_free (void* ptr)
 #define PCL_MAKE_ALIGNED_OPERATOR_NEW \
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW \
   using _custom_allocator_type_trait = void;
+
+/**
+ * \brief Macro to add a no-op or a fallthrough attribute based on compiler feature
+ *
+ * \ingroup common
+ */
+#if __has_cpp_attribute(fallthrough) && !(defined(__clang__) && __cplusplus < 201703L)
+  #define PCL_FALLTHROUGH [[fallthrough]];
+#elif defined(__clang__)
+  #define PCL_FALLTHROUGH [[clang::fallthrough]];
+#elif defined(__GNUC__)
+  #if __GNUC__ >= 7
+    #define PCL_FALLTHROUGH [[gnu::fallthrough]];
+  #else
+    #define PCL_FALLTHROUGH ;
+  #endif
+#else
+  #define PCL_FALLTHROUGH ;
+#endif

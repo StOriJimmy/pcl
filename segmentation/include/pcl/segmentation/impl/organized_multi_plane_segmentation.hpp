@@ -163,7 +163,7 @@ pcl::OrganizedMultiPlaneSegmentation<PointT, PointNT, PointLT>::segment (std::ve
       float curvature;
       float eig_sum = clust_cov.coeff (0) + clust_cov.coeff (4) + clust_cov.coeff (8);
       if (eig_sum != 0)
-        curvature = fabsf (eigen_value / eig_sum);
+        curvature = std::abs (eigen_value / eig_sum);
       else
         curvature = 0;
 
@@ -233,7 +233,7 @@ pcl::OrganizedMultiPlaneSegmentation<PointT, PointNT, PointLT>::segmentAndRefine
   std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f> > centroids;
   std::vector <Eigen::Matrix3f, Eigen::aligned_allocator<Eigen::Matrix3f> > covariances;
   segment (model_coefficients, inlier_indices, centroids, covariances, *labels, label_indices);
-  refine (model_coefficients, inlier_indices, centroids, covariances, labels, label_indices);
+  refine (model_coefficients, inlier_indices, labels, label_indices);
   regions.resize (model_coefficients.size ());
   boundary_indices.resize (model_coefficients.size ());
 
@@ -277,7 +277,7 @@ pcl::OrganizedMultiPlaneSegmentation<PointT, PointNT, PointLT>::segmentAndRefine
   std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f> > centroids;
   std::vector <Eigen::Matrix3f, Eigen::aligned_allocator<Eigen::Matrix3f> > covariances;
   segment (model_coefficients, inlier_indices, centroids, covariances, *labels, label_indices);
-  refine (model_coefficients, inlier_indices, centroids, covariances, labels, label_indices);
+  refine (model_coefficients, inlier_indices, labels, label_indices);
   regions.resize (model_coefficients.size ());
   boundary_indices.resize (model_coefficients.size ());
   
@@ -312,8 +312,6 @@ pcl::OrganizedMultiPlaneSegmentation<PointT, PointNT, PointLT>::segmentAndRefine
 template<typename PointT, typename PointNT, typename PointLT> void
 pcl::OrganizedMultiPlaneSegmentation<PointT, PointNT, PointLT>::refine (std::vector<ModelCoefficients>& model_coefficients, 
                                                                         std::vector<PointIndices>& inlier_indices,
-                                                                        std::vector<Eigen::Vector4f, Eigen::aligned_allocator<Eigen::Vector4f> >&,
-                                                                        std::vector <Eigen::Matrix3f, Eigen::aligned_allocator<Eigen::Matrix3f> >&,
                                                                         PointCloudLPtr& labels,
                                                                         std::vector<pcl::PointIndices>& label_indices)
 {

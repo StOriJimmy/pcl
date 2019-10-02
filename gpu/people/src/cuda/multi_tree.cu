@@ -40,7 +40,6 @@
 
 #include <pcl/gpu/people/tree.h>
 #include <pcl/gpu/people/label_common.h>
-#include <pcl/gpu/utils/device/limits.hpp>
 #include <pcl/gpu/utils/safe_call.hpp>
 #include <pcl/gpu/utils/texture_binder.hpp>
 #include <stdio.h>
@@ -95,10 +94,10 @@ namespace pcl
         if (testFG)
         {
           if( d1 - depth > constFGThresh ) 
-            d1 = numeric_limits<short>::max();
+            d1 = std::numeric_limits<short>::max();
 
           if( d2 - depth > constFGThresh ) 
-            d2 = numeric_limits<short>::max();
+            d2 = std::numeric_limits<short>::max();
         }
 
         int delta = d1-d2;
@@ -143,7 +142,7 @@ namespace pcl
         // This maps a char4 pointer on a char pointer
         char* pixel = (char*)&multiLabels.ptr(v)[u];
         // This test assures that in next iterations the FGPreperation is taking into account see utils.cu
-        if(depth.ptr(v)[u] == numeric_limits<unsigned short>::max())
+        if(depth.ptr(v)[u] == std::numeric_limits<unsigned short>::max())
           pixel[treeId] = 29;         // see label_common.h for Background label (=29)
                                       // TODO remove this hardcoded label with enum part_t label
         else
@@ -268,7 +267,7 @@ namespace pcl
             char4 labels_neighbor = tex2D(multilabelTex, u+i,v+j); 
             char* bob = (char*)&labels_neighbor; //horrible but char4's have xyzw members
             //TODO: redo this part
-            int weight = abs(depth-depth_neighbor) < 50 ? 1:0; // 5cms
+            int weight = std::abs(depth-depth_neighbor) < 50 ? 1:0; // 5cms
             for(int ti = 0; ti < numTrees; ++ti)
               bins[ bob[ti] ] += weight;
           }
@@ -355,7 +354,7 @@ namespace pcl
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-pcl::device::CUDATree::CUDATree (int treeHeight_arg, const vector<Node>& nodes, const vector<Label>& leaves)
+pcl::device::CUDATree::CUDATree (int treeHeight_arg, const std::vector<Node>& nodes, const std::vector<Label>& leaves)
 {
   treeHeight = treeHeight_arg;
   numNodes = (1 << treeHeight) - 1;

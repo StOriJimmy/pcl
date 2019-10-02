@@ -44,6 +44,7 @@
 // C++
 #include <iostream>
 #include <fstream>
+#include <random>
 #include <sstream>
 #include <string>
 #include <exception>
@@ -1069,7 +1070,7 @@ namespace pcl
           double c = planes[(i*4)+2];
           double d = planes[(i*4)+3];
 
-          //cout << i << ": " << a << "x + " << b << "y + " << c << "z + " << d << endl;
+          //std::cout << i << ": " << a << "x + " << b << "y + " << c << "z + " << d << std::endl;
 
           Eigen::Vector3d normal(a, b, c);
 
@@ -1079,12 +1080,12 @@ namespace pcl
 
           //  Basic VFC algorithm
           Eigen::Vector3d center = node_metadata_->getVoxelCenter();
-          Eigen::Vector3d radius (fabs (static_cast<double> (max_bb.x () - center.x ())),
-                                  fabs (static_cast<double> (max_bb.y () - center.y ())),
-                                  fabs (static_cast<double> (max_bb.z () - center.z ())));
+          Eigen::Vector3d radius (std::abs (static_cast<double> (max_bb.x () - center.x ())),
+                                  std::abs (static_cast<double> (max_bb.y () - center.y ())),
+                                  std::abs (static_cast<double> (max_bb.z () - center.z ())));
 
           double m = (center.x () * a) + (center.y () * b) + (center.z () * c) + d;
-          double n = (radius.x () * fabs(a)) + (radius.y () * fabs(b)) + (radius.z () * fabs(c));
+          double n = (radius.x () * std::abs(a)) + (radius.y () * std::abs(b)) + (radius.z () * std::abs(c));
 
           if (m + n < 0){
             result = OUTSIDE;
@@ -1098,8 +1099,8 @@ namespace pcl
   //        Eigen::Vector3d n_vertex; //neg vertex
   //        get_np_vertices(normal, p_vertex, n_vertex, min_bb, max_bb);
   //
-  //        cout << "n_vertex: " << n_vertex.x () << ", " << n_vertex.y () << ", " << n_vertex.z () << endl;
-  //        cout << "p_vertex: " << p_vertex.x () << ", " << p_vertex.y () << ", " << p_vertex.z () << endl;
+  //        std::cout << "n_vertex: " << n_vertex.x () << ", " << n_vertex.y () << ", " << n_vertex.z () << std::endl;
+  //        std::cout << "p_vertex: " << p_vertex.x () << ", " << p_vertex.y () << ", " << p_vertex.z () << std::endl;
 
           // is the positive vertex outside?
   //        if (pl[i].distance(b.getVertexP(pl[i].normal)) < 0)
@@ -1127,14 +1128,14 @@ namespace pcl
 
           // This should be the same as above
   //        double m = (a * n_vertex.x ()) + (b * n_vertex.y ()) + (c * n_vertex.z ());
-  //        cout << "m = " << m << endl;
+  //        std::cout << "m = " << m << std::endl;
   //        if (m > -d)
   //        {
   //          result = OUTSIDE;
   //        }
   //
   //        double n = (a * p_vertex.x ()) + (b * p_vertex.y ()) + (c * p_vertex.z ());
-  //        cout << "n = " << n << endl;
+  //        std::cout << "n = " << n << std::endl;
   //        if (n > -d)
   //        {
   //          result = INTERSECT;
@@ -1149,13 +1150,13 @@ namespace pcl
 
 //      switch(result){
 //        case OUTSIDE:
-//          //cout << this->depth_ << " [OUTSIDE]: " << node_metadata_->getPCDFilename() << endl;
+//          //std::cout << this->depth_ << " [OUTSIDE]: " << node_metadata_->getPCDFilename() << std::endl;
 //          return;
 //        case INTERSECT:
-//          //cout << this->depth_ << " [INTERSECT]: " << node_metadata_->getPCDFilename() << endl;
+//          //std::cout << this->depth_ << " [INTERSECT]: " << node_metadata_->getPCDFilename() << std::endl;
 //          break;
 //        case INSIDE:
-//          //cout << this->depth_ << " [INSIDE]: " << node_metadata_->getPCDFilename() << endl;
+//          //std::cout << this->depth_ << " [INSIDE]: " << node_metadata_->getPCDFilename() << std::endl;
 //          break;
 //      }
 
@@ -1222,18 +1223,18 @@ namespace pcl
           double c = planes[(i*4)+2];
           double d = planes[(i*4)+3];
 
-          //cout << i << ": " << a << "x + " << b << "y + " << c << "z + " << d << endl;
+          //std::cout << i << ": " << a << "x + " << b << "y + " << c << "z + " << d << std::endl;
 
           Eigen::Vector3d normal(a, b, c);
 
           //  Basic VFC algorithm
           Eigen::Vector3d center = node_metadata_->getVoxelCenter();
-          Eigen::Vector3d radius (fabs (static_cast<double> (max_bb.x () - center.x ())),
-                                  fabs (static_cast<double> (max_bb.y () - center.y ())),
-                                  fabs (static_cast<double> (max_bb.z () - center.z ())));
+          Eigen::Vector3d radius (std::abs (static_cast<double> (max_bb.x () - center.x ())),
+                                  std::abs (static_cast<double> (max_bb.y () - center.y ())),
+                                  std::abs (static_cast<double> (max_bb.z () - center.z ())));
 
           double m = (center.x () * a) + (center.y () * b) + (center.z () * c) + d;
-          double n = (radius.x () * fabs(a)) + (radius.y () * fabs(b)) + (radius.z () * fabs(c));
+          double n = (radius.x () * std::abs(a)) + (radius.y () * std::abs(b)) + (radius.z () * std::abs(c));
 
           if (m + n < 0){
             result = OUTSIDE;
@@ -1420,7 +1421,7 @@ namespace pcl
             {
               PCL_DEBUG ("[pcl::outofocre::OutofcoreOctreeBaseNode::%s] Size of cloud before: %lu\n", __FUNCTION__, dst_blob->width*dst_blob->height );
               PCL_DEBUG ("[pcl::outofcore::OutofcoreOctreeBaseNode::%s] Concatenating point cloud\n", __FUNCTION__);
-              int res = pcl::concatenatePointCloud (*dst_blob, *tmp_blob, *dst_blob);
+              int res = pcl::concatenate (*dst_blob, *tmp_blob, *dst_blob);
               (void)res;
               assert (res == 1);
 
@@ -1470,7 +1471,7 @@ namespace pcl
               PCL_DEBUG ("[pcl::outofcore::OutofcoreOctreeBaseNode::%s] Concatenating point cloud in place\n", __FUNCTION__);
               boost::uint64_t orig_points_in_destination = dst_blob->width*dst_blob->height;
               (void)orig_points_in_destination;
-              int res = pcl::concatenatePointCloud (*dst_blob, *tmp_blob_within_bb, *dst_blob);
+              int res = pcl::concatenate (*dst_blob, *tmp_blob_within_bb, *dst_blob);
               (void)res;
               assert (res == 1);
               assert (dst_blob->width*dst_blob->height == indices.size () + orig_points_in_destination);
@@ -1619,7 +1620,7 @@ namespace pcl
               extractor.filter (*downsampled_points);
               
               //concatenate the result into the destination cloud
-              pcl::concatenatePointCloud (*dst_blob, *downsampled_points, *dst_blob);
+              pcl::concatenate (*dst_blob, *downsampled_points, *dst_blob);
             }
           }
         }
@@ -1682,7 +1683,7 @@ namespace pcl
           }//force the payload cache to deconstruct here
 
           //use STL random_shuffle and push back a random selection of the points onto our list
-          std::random_shuffle (payload_cache_within_region.begin (), payload_cache_within_region.end ());
+          std::shuffle (payload_cache_within_region.begin (), payload_cache_within_region.end (), std::mt19937(std::random_device()()));
           size_t numpick = static_cast<size_t> (percent * static_cast<double> (payload_cache_within_region.size ()));;
 
           for (size_t i = 0; i < numpick; i++)

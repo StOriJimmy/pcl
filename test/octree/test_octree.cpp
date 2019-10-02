@@ -1011,7 +1011,7 @@ TEST (PCL, Octree_Pointcloud_Change_Detector_Test)
         cloudIn);
   }
 
-  vector<int> newPointIdxVector;
+  std::vector<int> newPointIdxVector;
 
   // get a vector of new points, which did not exist in previous buffer
   octree.getPointIndicesFromNewVoxels (newPointIdxVector);
@@ -1328,7 +1328,7 @@ TEST(PCL, Octree_Pointcloud_Approx_Nearest_Neighbour_Search)
     }
 
     // brute force search
-    double BFdistance = numeric_limits<double>::max ();
+    double BFdistance = std::numeric_limits<double>::max ();
     int BFindex = 0;
 
     for (size_t i = 0; i < cloudIn->points.size (); i++)
@@ -1404,7 +1404,7 @@ TEST (PCL, Octree_Pointcloud_Neighbours_Within_Radius_Search)
     double searchRadius = 5.0 * static_cast<float> (rand () / RAND_MAX);
 
     // bruteforce radius search
-    vector<int> cloudSearchBruteforce;
+    std::vector<int> cloudSearchBruteforce;
     for (size_t i = 0; i < cloudIn->points.size (); i++)
     {
       pointDist = sqrt (
@@ -1419,8 +1419,8 @@ TEST (PCL, Octree_Pointcloud_Neighbours_Within_Radius_Search)
       }
     }
 
-    vector<int> cloudNWRSearch;
-    vector<float> cloudNWRRadius;
+    std::vector<int> cloudNWRSearch;
+    std::vector<float> cloudNWRRadius;
 
     // execute octree radius search
     octree.radiusSearch (searchPoint, searchRadius, cloudNWRSearch, cloudNWRRadius);

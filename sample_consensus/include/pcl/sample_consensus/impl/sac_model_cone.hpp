@@ -110,7 +110,7 @@ pcl::SampleConsensusModelCone<PointT, PointNT>::computeModelCoefficients (
   ap3.normalize ();
 
   //compute opening angle
-  float opening_angle = ( acosf (ap1.dot (axis_dir)) + acosf (ap2.dot (axis_dir)) + acosf (ap3.dot (axis_dir)) ) / 3.0f;
+  float opening_angle = ( std::acos (ap1.dot (axis_dir)) + std::acos (ap2.dot (axis_dir)) + std::acos (ap3.dot (axis_dir)) ) / 3.0f;
 
   model_coefficients.resize (7);
   // model_coefficients.template head<3> ()    = line_pt.template head<3> ();
@@ -170,17 +170,17 @@ pcl::SampleConsensusModelCone<PointT, PointNT>::getDistancesToModel (
     height.normalize ();
 
     // Calculate the cones perfect normals
-    Eigen::Vector4f cone_normal = sinf (opening_angle) * height + cosf (opening_angle) * dir;
+    Eigen::Vector4f cone_normal = sinf (opening_angle) * height + std::cos (opening_angle) * dir;
 
     // Approximate the distance from the point to the cone as the difference between
     // dist(point,cone_axis) and actual cone radius
-    double d_euclid = fabs (pointToAxisDistance (pt, model_coefficients) - actual_cone_radius);
+    double d_euclid = std::abs (pointToAxisDistance (pt, model_coefficients) - actual_cone_radius);
 
     // Calculate the angular distance between the point normal and the (dir=pt_proj->pt) vector
-    double d_normal = fabs (getAngle3D (n, cone_normal));
+    double d_normal = std::abs (getAngle3D (n, cone_normal));
     d_normal = (std::min) (d_normal, M_PI - d_normal);
 
-    distances[i] = fabs (normal_distance_weight_ * d_normal + (1 - normal_distance_weight_) * d_euclid);
+    distances[i] = std::abs (normal_distance_weight_ * d_normal + (1 - normal_distance_weight_) * d_euclid);
   }
 }
 
@@ -226,17 +226,17 @@ pcl::SampleConsensusModelCone<PointT, PointNT>::selectWithinDistance (
     height.normalize ();
 
     // Calculate the cones perfect normals
-    Eigen::Vector4f cone_normal = sinf (opening_angle) * height + cosf (opening_angle) * pp_pt_dir;
+    Eigen::Vector4f cone_normal = sinf (opening_angle) * height + std::cos (opening_angle) * pp_pt_dir;
 
     // Approximate the distance from the point to the cone as the difference between
     // dist(point,cone_axis) and actual cone radius
-    double d_euclid = fabs (pointToAxisDistance (pt, model_coefficients) - actual_cone_radius);
+    double d_euclid = std::abs (pointToAxisDistance (pt, model_coefficients) - actual_cone_radius);
 
     // Calculate the angular distance between the point normal and the (dir=pt_proj->pt) vector
-    double d_normal = fabs (getAngle3D (n, cone_normal));
+    double d_normal = std::abs (getAngle3D (n, cone_normal));
     d_normal = (std::min) (d_normal, M_PI - d_normal);
 
-    double distance = fabs (normal_distance_weight_ * d_normal + (1 - normal_distance_weight_) * d_euclid);
+    double distance = std::abs (normal_distance_weight_ * d_normal + (1 - normal_distance_weight_) * d_euclid);
     
     if (distance < threshold)
     {
@@ -288,17 +288,17 @@ pcl::SampleConsensusModelCone<PointT, PointNT>::countWithinDistance (
     height.normalize ();
 
     // Calculate the cones perfect normals
-    Eigen::Vector4f cone_normal = sinf (opening_angle) * height + cosf (opening_angle) * pp_pt_dir;
+    Eigen::Vector4f cone_normal = sinf (opening_angle) * height + std::cos (opening_angle) * pp_pt_dir;
 
     // Approximate the distance from the point to the cone as the difference between
     // dist(point,cone_axis) and actual cone radius
-    double d_euclid = fabs (pointToAxisDistance (pt, model_coefficients) - actual_cone_radius);
+    double d_euclid = std::abs (pointToAxisDistance (pt, model_coefficients) - actual_cone_radius);
 
     // Calculate the angular distance between the point normal and the (dir=pt_proj->pt) vector
-    double d_normal = fabs (getAngle3D (n, cone_normal));
+    double d_normal = std::abs (getAngle3D (n, cone_normal));
     d_normal = (std::min) (d_normal, M_PI - d_normal);
 
-    if (fabs (normal_distance_weight_ * d_normal + (1 - normal_distance_weight_) * d_euclid) < threshold)
+    if (std::abs (normal_distance_weight_ * d_normal + (1 - normal_distance_weight_) * d_euclid) < threshold)
       nr_p++;
   }
   return (nr_p);
@@ -473,7 +473,7 @@ pcl::SampleConsensusModelCone<PointT, PointNT>::doSamplesVerifyModel (
 
     // Approximate the distance from the point to the cone as the difference between
     // dist(point,cone_axis) and actual cone radius
-    if (fabs (static_cast<double>(pointToAxisDistance (pt, model_coefficients) - actual_cone_radius)) > threshold)
+    if (std::abs (static_cast<double>(pointToAxisDistance (pt, model_coefficients) - actual_cone_radius)) > threshold)
       return (false);
   }
 
@@ -508,7 +508,7 @@ pcl::SampleConsensusModelCone<PointT, PointNT>::isModelValid (const Eigen::Vecto
     coeff[3] = 0;
 
     Eigen::Vector4f axis (axis_[0], axis_[1], axis_[2], 0);
-    double angle_diff = fabs (getAngle3D (axis, coeff));
+    double angle_diff = std::abs (getAngle3D (axis, coeff));
     angle_diff = (std::min) (angle_diff, M_PI - angle_diff);
     // Check whether the current cone model satisfies our angle threshold criterion with respect to the given axis
     if (angle_diff > eps_angle_)

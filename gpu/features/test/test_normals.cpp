@@ -50,9 +50,9 @@ using namespace pcl::gpu;
 TEST(PCL_FeaturesGPU, normals_lowlevel)
 {       
     DataSource source;
-    cout << "Cloud size: " << source.cloud->points.size() << endl;
-    cout << "Radius: " << source.radius << endl;
-    cout << "K: " << source.k << endl;
+    std::cout << "Cloud size: " << source.cloud->points.size() << std::endl;
+    std::cout << "Radius: " << source.radius << std::endl;
+    std::cout << "K: " << source.k << std::endl;
 
     //source.runCloudViewer();
 
@@ -63,7 +63,7 @@ TEST(PCL_FeaturesGPU, normals_lowlevel)
     cloud.upload(source.cloud->points);
 
     // convert to single array format
-    vector<int> neighbors_all(source.max_nn_size * cloud.size());
+    std::vector<int> neighbors_all(source.max_nn_size * cloud.size());
     PtrStep<int> ps(&neighbors_all[0], source.max_nn_size * PtrStep<int>::elem_size);    
     for(size_t i = 0; i < cloud.size(); ++i)
         copy(source.neighbors_all[i].begin(), source.neighbors_all[i].end(), ps.ptr(i));
@@ -75,7 +75,7 @@ TEST(PCL_FeaturesGPU, normals_lowlevel)
     gpu::NormalEstimation::computeNormals(cloud, indices, normals);
     gpu::NormalEstimation::flipNormalTowardsViewpoint(cloud, 0.f, 0.f, 0.f, normals);
 
-    vector<PointXYZ> downloaded;
+    std::vector<PointXYZ> downloaded;
     normals.download(downloaded);
 
     for(size_t i = 0; i < downloaded.size(); ++i)
@@ -99,11 +99,11 @@ TEST(PCL_FeaturesGPU, normals_lowlevel)
 TEST(PCL_FeaturesGPU, normals_highlevel_1)
 {       
     DataSource source;
-    cout << "Cloud size: " << source.cloud->points.size() << endl;
-    cout << "Radius: " << source.radius << endl;
-    cout << "Max_elems: " <<  source.max_elements << endl;
+    std::cout << "Cloud size: " << source.cloud->points.size() << std::endl;
+    std::cout << "Radius: " << source.radius << std::endl;
+    std::cout << "Max_elems: " <<  source.max_elements << std::endl;
 
-    cout << "!indices, !surface" << endl;
+    std::cout << "!indices, !surface" << std::endl;
     
     //source.runCloudViewer();
 
@@ -139,7 +139,7 @@ TEST(PCL_FeaturesGPU, normals_highlevel_1)
     pcl::gpu::NormalEstimation::Normals normals_device;
     ne_device.compute(normals_device);
 
-    vector<PointXYZ> downloaded;
+    std::vector<PointXYZ> downloaded;
     normals_device.download(downloaded);
 
     for(size_t i = 0; i < downloaded.size(); ++i)
@@ -163,11 +163,11 @@ TEST(PCL_FeaturesGPU, normals_highlevel_1)
 TEST(PCL_FeaturesGPU, normals_highlevel_2)
 {       
     DataSource source;
-    cout << "Cloud size: " << source.cloud->points.size() << endl;
-    cout << "Radius: " << source.radius << endl;
-    cout << "Max_elems: " <<  source.max_elements << endl;    
+    std::cout << "Cloud size: " << source.cloud->points.size() << std::endl;
+    std::cout << "Radius: " << source.radius << std::endl;
+    std::cout << "Max_elems: " <<  source.max_elements << std::endl;    
 
-    cout << "indices, !surface" << endl;
+    std::cout << "indices, !surface" << std::endl;
     
     //source.runCloudViewer();
 
@@ -204,7 +204,7 @@ TEST(PCL_FeaturesGPU, normals_highlevel_2)
     pcl::gpu::NormalEstimation::Normals normals_device;
     ne_device.compute(normals_device);
 
-    vector<PointXYZ> downloaded;
+    std::vector<PointXYZ> downloaded;
     normals_device.download(downloaded);
 
     for(size_t i = 0; i < downloaded.size(); ++i)
@@ -228,11 +228,11 @@ TEST(PCL_FeaturesGPU, normals_highlevel_2)
 TEST(PCL_FeaturesGPU, normals_highlevel_3)
 {       
     DataSource source;
-    cout << "Cloud size: " << source.cloud->points.size() << endl;
-    cout << "Radius: " << source.radius << endl;
-    cout << "Max_elems: " <<  source.max_elements << endl;
+    std::cout << "Cloud size: " << source.cloud->points.size() << std::endl;
+    std::cout << "Radius: " << source.radius << std::endl;
+    std::cout << "Max_elems: " <<  source.max_elements << std::endl;
 
-    cout << "!indices, surface" << endl;
+    std::cout << "!indices, surface" << std::endl;
 
     //source.runCloudViewer();
 
@@ -269,7 +269,7 @@ TEST(PCL_FeaturesGPU, normals_highlevel_3)
     pcl::gpu::NormalEstimation::Normals normals_device;
     ne_device.compute(normals_device);
 
-    vector<PointXYZ> downloaded;
+    std::vector<PointXYZ> downloaded;
     normals_device.download(downloaded);
 
     for(size_t i = 0; i < downloaded.size(); ++i)
@@ -302,11 +302,11 @@ TEST(PCL_FeaturesGPU, normals_highlevel_3)
 TEST(PCL_FeaturesGPU, normals_highlevel_4)
 {       
     DataSource source;
-    cout << "Cloud size: " << source.cloud->points.size() << endl;
-    cout << "Radius: " << source.radius << endl;
-    cout << "Max_elems: " <<  source.max_elements << endl;
+    std::cout << "Cloud size: " << source.cloud->points.size() << std::endl;
+    std::cout << "Radius: " << source.radius << std::endl;
+    std::cout << "Max_elems: " <<  source.max_elements << std::endl;
     
-    cout << "indices, surface" << endl;
+    std::cout << "indices, surface" << std::endl;
 
     //source.runCloudViewer();
 
@@ -343,7 +343,7 @@ TEST(PCL_FeaturesGPU, normals_highlevel_4)
     pcl::gpu::NormalEstimation::Normals normals_device;
     ne_device.compute(normals_device);
 
-    vector<PointXYZ> downloaded;
+    std::vector<PointXYZ> downloaded;
     normals_device.download(downloaded);
 
    for(size_t i = 0; i < downloaded.size(); ++i)

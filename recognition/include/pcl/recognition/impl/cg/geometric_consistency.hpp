@@ -79,7 +79,7 @@ pcl::GeometricConsistencyGrouping<PointModelT, PointSceneT>::clusterCorresponden
 
   //temp copy of scene cloud with the type cast to ModelT in order to use Ransac
   PointCloudPtr temp_scene_cloud_ptr (new PointCloud ());
-  pcl::copyPointCloud<PointSceneT, PointModelT> (*scene_, *temp_scene_cloud_ptr);
+  pcl::copyPointCloud (*scene_, *temp_scene_cloud_ptr);
 
   pcl::registration::CorrespondenceRejectorSampleConsensus<PointModelT> corr_rejector;
   corr_rejector.setMaximumIterations (10000);
@@ -116,7 +116,7 @@ pcl::GeometricConsistencyGrouping<PointModelT, PointSceneT>::clusterCorresponden
           dist_ref = scene_point_k - scene_point_j;
           dist_trg = model_point_k - model_point_j;
 
-          double distance = fabs (dist_ref.norm () - dist_trg.norm ());
+          double distance = std::abs (dist_ref.norm () - dist_trg.norm ());
 
           if (distance > gc_size_)
           {

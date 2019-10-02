@@ -96,7 +96,7 @@ pcl::PFHEstimation<PointInT, PointNT, PointOutT>::computePointPFHSignature (
         key = std::pair<int, int> (p1, p2);
 
         // Check to see if we already estimated this pair in the global hashmap
-        std::map<std::pair<int, int>, Eigen::Vector4f, std::less<std::pair<int, int> >, Eigen::aligned_allocator<std::pair<const std::pair<int, int>, Eigen::Vector4f> > >::iterator fm_it = feature_map_.find (key);
+        std::map<std::pair<int, int>, Eigen::Vector4f, std::less<>, Eigen::aligned_allocator<std::pair<const std::pair<int, int>, Eigen::Vector4f> > >::iterator fm_it = feature_map_.find (key);
         if (fm_it != feature_map_.end ())
         {
           pfh_tuple_ = fm_it->second;
@@ -118,15 +118,15 @@ pcl::PFHEstimation<PointInT, PointNT, PointOutT>::computePointPFHSignature (
           continue;
 
       // Normalize the f1, f2, f3 features and push them in the histogram
-      f_index_[0] = static_cast<int> (floor (nr_split * ((pfh_tuple_[0] + M_PI) * d_pi_)));
+      f_index_[0] = static_cast<int> (std::floor (nr_split * ((pfh_tuple_[0] + M_PI) * d_pi_)));
       if (f_index_[0] < 0)         f_index_[0] = 0;
       if (f_index_[0] >= nr_split) f_index_[0] = nr_split - 1;
 
-      f_index_[1] = static_cast<int> (floor (nr_split * ((pfh_tuple_[1] + 1.0) * 0.5)));
+      f_index_[1] = static_cast<int> (std::floor (nr_split * ((pfh_tuple_[1] + 1.0) * 0.5)));
       if (f_index_[1] < 0)         f_index_[1] = 0;
       if (f_index_[1] >= nr_split) f_index_[1] = nr_split - 1;
 
-      f_index_[2] = static_cast<int> (floor (nr_split * ((pfh_tuple_[2] + 1.0) * 0.5)));
+      f_index_[2] = static_cast<int> (std::floor (nr_split * ((pfh_tuple_[2] + 1.0) * 0.5)));
       if (f_index_[2] < 0)         f_index_[2] = 0;
       if (f_index_[2] >= nr_split) f_index_[2] = nr_split - 1;
 

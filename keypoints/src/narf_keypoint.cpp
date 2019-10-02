@@ -146,7 +146,7 @@ namespace
     Eigen::Vector3f rotated_direction = rotation*direction;
     Eigen::Vector2f direction_vector (rotated_direction[0], rotated_direction[1]);
     direction_vector.normalize ();
-    float angle = 0.5f*normAngle (2.0f*acosf (direction_vector[0]));
+    float angle = 0.5f*normAngle (2.0f*std::acos (direction_vector[0]));
     return (angle);
   }
   
@@ -330,7 +330,7 @@ NarfKeypoint::calculateCompleteInterestImage ()
             x2 = index2 - y2*range_image.width;
         const PointWithRange& point2 = range_image.getPoint (index2);
         
-        float pixelDistance = static_cast<float> (std::max (abs (x2-x), abs (y2-y)));
+        float pixelDistance = static_cast<float> (std::max (std::abs (x2-x), std::abs (y2-y)));
         float distance_squared = squaredEuclideanDistance (point, point2);
         if (pixelDistance > 2.0f)  // Always consider immediate neighbors, even if to far away
         {
@@ -364,7 +364,7 @@ NarfKeypoint::calculateCompleteInterestImage ()
                      current_negative_score, positive_score);
         float angle = nkdGetDirectionAngle (surface_change_direction, rotation_to_viewer_coordinate_system);
         int histogram_cell = (std::min) (angle_histogram_size-1,
-                          static_cast<int> (pcl_lrint (floorf ( (angle+deg2rad (90.0f))/deg2rad (180.0f) * angle_histogram_size))));
+                          static_cast<int> (pcl_lrint (std::floor ( (angle+deg2rad (90.0f))/deg2rad (180.0f) * angle_histogram_size))));
         float& histogram_value = angle_histogram[histogram_cell];
         
         histogram_value = (std::max) (histogram_value, positive_score);
@@ -513,7 +513,7 @@ NarfKeypoint::calculateSparseInterestImage ()
           x2 = index2 - y2*range_image.width;
       const PointWithRange& point2 = range_image.getPoint (index2);
       
-      float pixelDistance = static_cast<float> (std::max (abs (x2-x), abs (y2-y)));
+      float pixelDistance = static_cast<float> (std::max (std::abs (x2-x), std::abs (y2-y)));
 
       float distance_squared = squaredEuclideanDistance (point, point2);
       if (distance_squared <= radius_overhead_squared) 
@@ -545,7 +545,7 @@ NarfKeypoint::calculateSparseInterestImage ()
       
       float angle = nkdGetDirectionAngle (surface_change_direction, rotation_to_viewer_coordinate_system);
       int histogram_cell = (std::min) (angle_histogram_size-1,
-                                       static_cast<int> (pcl_lrint (floorf ( (angle+deg2rad (90.0f))/deg2rad (180.0f) * angle_histogram_size))));
+                                       static_cast<int> (pcl_lrint (std::floor ( (angle+deg2rad (90.0f))/deg2rad (180.0f) * angle_histogram_size))));
       float& histogram_value = angle_histogram[histogram_cell];
       histogram_value = (std::max) (histogram_value, surface_change_score);
       angle_elements[histogram_cell].push_back (std::make_pair(index2, surface_change_score));
@@ -647,7 +647,7 @@ NarfKeypoint::calculateSparseInterestImage ()
             const PointWithRange& point3 = range_image.getPoint (index3);
             float surface_change_score = relevent_point_index.second;
             
-            float pixelDistance = static_cast<float> (std::max (abs (x3-x2), abs (y3-y2)));
+            float pixelDistance = static_cast<float> (std::max (std::abs (x3-x2), std::abs (y3-y2)));
             float distance = (point3.getVector3fMap ()-point2.getVector3fMap ()).norm ();
             float distance_factor = radius_reciprocal*distance;
             float positive_score, current_negative_score;

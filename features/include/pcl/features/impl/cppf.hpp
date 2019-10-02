@@ -88,12 +88,12 @@ pcl::CPPFEstimation<PointInT, PointNT, PointOutT>::computeFeature (PointCloudOut
           Eigen::Vector3f model_reference_point = input_->points[i].getVector3fMap (),
                           model_reference_normal = normals_->points[i].getNormalVector3fMap (),
                           model_point = input_->points[j].getVector3fMap ();
-          Eigen::AngleAxisf rotation_mg (acosf (model_reference_normal.dot (Eigen::Vector3f::UnitX ())),
+          Eigen::AngleAxisf rotation_mg (std::acos (model_reference_normal.dot (Eigen::Vector3f::UnitX ())),
                                          model_reference_normal.cross (Eigen::Vector3f::UnitX ()).normalized ());
           Eigen::Affine3f transform_mg = Eigen::Translation3f ( rotation_mg * ((-1) * model_reference_point)) * rotation_mg;
 
           Eigen::Vector3f model_point_transformed = transform_mg * model_point;
-          float angle = atan2f ( -model_point_transformed(2), model_point_transformed(1));
+          float angle = std::atan2 ( -model_point_transformed(2), model_point_transformed(1));
           if (std::sin (angle) * model_point_transformed(2) < 0.0f)
             angle *= (-1);
           p.alpha_m = -angle;

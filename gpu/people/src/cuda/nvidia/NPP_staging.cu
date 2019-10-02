@@ -2365,13 +2365,13 @@ __global__ void resizeSuperSample_32f(NcvSize32u srcSize,
     float yBegin = fmax (y - scaleY, 0.0f);
     float yEnd   = fmin (y + scaleY, rh - 1.0f);
     // x range of source samples
-    float floorXBegin = floorf (xBegin);
-    float ceilXEnd    = ceilf (xEnd);
+    float floorXBegin = std::floor (xBegin);
+    float ceilXEnd    = std::ceil (xEnd);
     int iXBegin = srcROI.x + (int) floorXBegin;
     int iXEnd   = srcROI.x + (int) ceilXEnd;
     // y range of source samples
-    float floorYBegin = floorf (yBegin);
-    float ceilYEnd    = ceilf (yEnd);
+    float floorYBegin = std::floor (yBegin);
+    float ceilYEnd    = std::ceil (yEnd);
     int iYBegin = srcROI.y + (int) floorYBegin;
     int iYEnd   = srcROI.y + (int) ceilYEnd;
 
@@ -2404,7 +2404,7 @@ __global__ void resizeSuperSample_32f(NcvSize32u srcSize,
 __forceinline__
 __device__ float bicubicCoeff(float x_)
 {
-    float x = fabsf(x_);
+    float x = std::abs(x_);
     if (x <= 1.0f)
     {
         return x * x * (1.5f * x - 2.5f) + 1.0f;
@@ -2451,11 +2451,11 @@ __global__ void resizeBicubic(NcvSize32u srcSize,
 
     // sampling range
     // border mode is clamp
-    float xmin = fmax (ceilf (x - 2.0f), 0.0f);
-    float xmax = fmin (floorf (x + 2.0f), rw - 1.0f);
+    float xmin = fmax (std::ceil (x - 2.0f), 0.0f);
+    float xmax = fmin (std::floor (x + 2.0f), rw - 1.0f);
 
-    float ymin = fmax (ceilf (y - 2.0f), 0.0f);
-    float ymax = fmin (floorf (y + 2.0f), rh - 1.0f);
+    float ymin = fmax (std::ceil (y - 2.0f), 0.0f);
+    float ymax = fmin (std::floor (y + 2.0f), rh - 1.0f);
 
     // shift data window to match ROI
     rx += 0.5f;
