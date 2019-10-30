@@ -66,11 +66,11 @@ pcl::VoxelGridLabel::applyFilter (PointCloud &output)
     getMinMax3D<pcl::PointXYZRGBL>(*input_, min_p, max_p);
 
   // Check that the leaf size is not too small, given the size of the data
-  int64_t dx = static_cast<int64_t>((max_p[0] - min_p[0]) * inverse_leaf_size_[0])+1;
-  int64_t dy = static_cast<int64_t>((max_p[1] - min_p[1]) * inverse_leaf_size_[1])+1;
-  int64_t dz = static_cast<int64_t>((max_p[2] - min_p[2]) * inverse_leaf_size_[2])+1;
+  std::int64_t dx = static_cast<std::int64_t>((max_p[0] - min_p[0]) * inverse_leaf_size_[0])+1;
+  std::int64_t dy = static_cast<std::int64_t>((max_p[1] - min_p[1]) * inverse_leaf_size_[1])+1;
+  std::int64_t dz = static_cast<std::int64_t>((max_p[2] - min_p[2]) * inverse_leaf_size_[2])+1;
 
-  if( (dx*dy*dz) > static_cast<int64_t>(std::numeric_limits<int32_t>::max()) )
+  if( (dx*dy*dz) > static_cast<std::int64_t>(std::numeric_limits<std::int32_t>::max()) )
   {
     PCL_WARN("[pcl::%s::applyFilter] Leaf size is too small for the input dataset. Integer indices would overflow.", getClassName().c_str());
     output.clear();
@@ -137,7 +137,7 @@ pcl::VoxelGridLabel::applyFilter (PointCloud &output)
           continue;
 
       // Get the distance value
-      const uint8_t* pt_data = reinterpret_cast<const uint8_t*> (&input_->points[cp]);
+      const std::uint8_t* pt_data = reinterpret_cast<const std::uint8_t*> (&input_->points[cp]);
       float distance_value = 0;
       memcpy (&distance_value, pt_data + fields[distance_idx].offset, sizeof (float));
 
@@ -212,10 +212,10 @@ pcl::VoxelGridLabel::applyFilter (PointCloud &output)
     try
     { 
       // Resizing won't reset old elements to -1.  If leaf_layout_ has been used previously, it needs to be re-initialized to -1
-      uint32_t new_layout_size = div_b_[0]*div_b_[1]*div_b_[2];
+      std::uint32_t new_layout_size = div_b_[0]*div_b_[1]*div_b_[2];
       //This is the number of elements that need to be re-initialized to -1
-      uint32_t reinit_size = std::min (static_cast<unsigned int> (new_layout_size), static_cast<unsigned int> (leaf_layout_.size()));
-      for (uint32_t i = 0; i < reinit_size; i++)
+      std::uint32_t reinit_size = std::min (static_cast<unsigned int> (new_layout_size), static_cast<unsigned int> (leaf_layout_.size()));
+      for (std::uint32_t i = 0; i < reinit_size; i++)
       {
         leaf_layout_[i] = -1;
       }        
@@ -265,7 +265,7 @@ pcl::VoxelGridLabel::applyFilter (PointCloud &output)
       if (label_index >= 0)
       {
         // store the label in a map data structure
-        uint32_t label = input_->points[index_vector[cp].cloud_point_index].label;
+        std::uint32_t label = input_->points[index_vector[cp].cloud_point_index].label;
         std::map<int, int>::iterator it = labels.find (label);
         if (it == labels.end ())
           labels.insert (labels.begin (), std::pair<int, int> (label, 1));
@@ -348,6 +348,6 @@ pcl::VoxelGridLabel::applyFilter (PointCloud &output)
     cp = i;
     ++index;
   }
-  output.width = static_cast<uint32_t> (output.points.size ());
+  output.width = static_cast<std::uint32_t> (output.points.size ());
 }
 

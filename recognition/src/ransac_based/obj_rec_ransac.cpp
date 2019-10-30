@@ -181,7 +181,7 @@ pcl::recognition::ObjRecRANSAC::sampleOrientedPointPairs (int num_iterations, co
   }
 
   // The random generator
-  UniformGenerator<int> randgen (0, num_full_leaves - 1, static_cast<uint32_t> (time (nullptr)));
+  UniformGenerator<int> randgen (0, num_full_leaves - 1, static_cast<std::uint32_t> (time (nullptr)));
 
   // Init the vector with the ids
   std::vector<int> ids (num_full_leaves);
@@ -581,7 +581,7 @@ pcl::recognition::ObjRecRANSAC::filterGraphOfConflictingHypotheses (ORRGraph<Hyp
   // Compute the penalty for each graph node
   for (auto &node : nodes)
   {
-    size_t num_of_explained = 0;
+    std::size_t num_of_explained = 0;
 
     // Accumulate the number of pixels the neighbors are explaining
     for (const auto &neigh : node->getNeighbors ())

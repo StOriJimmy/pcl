@@ -66,11 +66,11 @@ TEST(PolygonMesh, concatenate_header)
 TEST(PolygonMesh, concatenate_cloud)
 {
     PointCloud<PointXYZ> cloud_template;
-    const size_t size = 10 * 480;
+    const std::size_t size = 10 * 480;
 
     cloud_template.width = 10;
     cloud_template.height = 480;
-    for (uint32_t i = 0; i < size; ++i)
+    for (std::uint32_t i = 0; i < size; ++i)
     {
         cloud_template.points.emplace_back(3.0f * static_cast<float>(i) + 0, 
                                            3.0f * static_cast<float> (i) + 1,

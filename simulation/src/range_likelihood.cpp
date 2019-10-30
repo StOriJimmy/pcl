@@ -253,12 +253,12 @@ max_level(int a, int b)
 void
 display_tic_toc(vector<double>& tic_toc, const string& fun_name)
 {
-  size_t tic_toc_size = tic_toc.size();
+  std::size_t tic_toc_size = tic_toc.size();
 
   double percent_tic_toc_last = 0;
   double dtime = tic_toc[tic_toc_size - 1] - tic_toc[0];
   std::cout << "fraction_" << fun_name << ",";
-  for (size_t i = 0; i < tic_toc_size; i++) {
+  for (std::size_t i = 0; i < tic_toc_size; i++) {
     double percent_tic_toc =
         (tic_toc[i] - tic_toc[0]) / (tic_toc[tic_toc_size - 1] - tic_toc[0]);
     std::cout << percent_tic_toc - percent_tic_toc_last << ", ";
@@ -266,7 +266,7 @@ display_tic_toc(vector<double>& tic_toc, const string& fun_name)
   }
   std::cout << "\ntime_" << fun_name << ",";
   double time_tic_toc_last = 0;
-  for (size_t i = 0; i < tic_toc_size; i++) {
+  for (std::size_t i = 0; i < tic_toc_size; i++) {
     double percent_tic_toc =
         (tic_toc[i] - tic_toc[0]) / (tic_toc[tic_toc_size - 1] - tic_toc[0]);
     std::cout << percent_tic_toc * dtime - time_tic_toc_last << ", ";
@@ -303,7 +303,7 @@ pcl::simulation::RangeLikelihood::RangeLikelihood(
   width_ = cols_ * col_width;
 
   depth_buffer_ = new float[width_ * height_];
-  color_buffer_ = new uint8_t[width_ * height_ * 3];
+  color_buffer_ = new std::uint8_t[width_ * height_ * 3];
 
   // Set Default Camera Intrinstic Parameters. techquad
   // Correspond closely to those stated here:
@@ -832,7 +832,7 @@ pcl::simulation::RangeLikelihood::getPointCloud(
   float zn = z_near_;
   float zf = z_far_;
 
-  const uint8_t* color_buffer = getColorBuffer();
+  const std::uint8_t* color_buffer = getColorBuffer();
 
   // TODO: support decimation
   // Copied the format of RangeImagePlanar::setDepthImage()
@@ -1240,7 +1240,7 @@ RangeLikelihood::getDepthBuffer() const
   return depth_buffer_;
 }
 
-const uint8_t*
+const std::uint8_t*
 RangeLikelihood::getColorBuffer() const
 {
   // It's only possible to read the color buffer if it

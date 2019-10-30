@@ -75,9 +75,9 @@ pcl::visualization::getRandomColors (pcl::RGB &rgb, double min, double max)
     sum = r + g + b;
   }
   while (sum <= min || sum >= max);
-  rgb.r = uint8_t (r * 255.0);
-  rgb.g = uint8_t (g * 255.0);
-  rgb.b = uint8_t (b * 255.0);
+  rgb.r = std::uint8_t (r * 255.0);
+  rgb.g = std::uint8_t (g * 255.0);
+  rgb.b = std::uint8_t (b * 255.0);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////
@@ -418,7 +418,7 @@ pcl::visualization::getColormapLUT (LookUpTableRepresentationProperties colormap
       double white[3] = {1.0, 1.0, 1.0};
       double blue[3]  = {0.0, 0.0, 1.0};
       
-      for (size_t i = 0; i < 128; i++)
+      for (std::size_t i = 0; i < 128; i++)
       {
         double weight = static_cast<double>(i) / 128.0;
         table->SetTableValue  ( i,
@@ -427,7 +427,7 @@ pcl::visualization::getColormapLUT (LookUpTableRepresentationProperties colormap
                                 white[2] * weight + blue[2] * (1 - weight)  );
       }
       
-      for (size_t i = 128; i < 256; i++)
+      for (std::size_t i = 128; i < 256; i++)
       {
         double weight = (static_cast<double>(i) -128.0) / 128.0;
         table->SetTableValue  ( i,
@@ -443,7 +443,7 @@ pcl::visualization::getColormapLUT (LookUpTableRepresentationProperties colormap
       table->SetSaturationRange (1, 1);
       table->SetAlphaRange (1, 1);
       table->SetNumberOfTableValues (pcl::ViridisLUT::size ());
-      for (size_t i = 0; i < pcl::ViridisLUT::size (); i++)
+      for (std::size_t i = 0; i < pcl::ViridisLUT::size (); i++)
       {
         pcl::RGB c = pcl::ViridisLUT::at (i);
         table->SetTableValue (i, static_cast<double> (c.r) / 255.0,

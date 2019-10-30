@@ -141,7 +141,7 @@ private:
     GL_POLYGON;
   */
   GLenum mode_;
-  size_t nvertices_;
+  std::size_t nvertices_;
 };
 
 /** Renders a single quad providing position (-1,-1,0) - (1,1,0) and texture coordinates
@@ -176,7 +176,7 @@ public:
   ~TexturedQuad();
 
   void
-  setTexture(const uint8_t* data);
+  setTexture(const std::uint8_t* data);
 
   void
   render();

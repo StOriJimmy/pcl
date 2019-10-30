@@ -59,7 +59,16 @@ template <typename PointT> int
 pcl::getFieldIndex (const std::string &field_name, 
                     std::vector<pcl::PCLPointField> &fields)
 {
-  getFields<PointT> (fields);
+  fields = getFields<PointT> ();
+  const auto& ref = fields;
+  return pcl::getFieldIndex<PointT> (field_name, ref);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+template <typename PointT> int
+pcl::getFieldIndex (const std::string &field_name,
+                    const std::vector<pcl::PCLPointField> &fields)
+{
   const auto result = std::find_if(fields.begin (), fields.end (),
       [&field_name](const auto& field) { return field.name == field_name; });
   if (result == fields.end ())
@@ -71,16 +80,24 @@ pcl::getFieldIndex (const std::string &field_name,
 template <typename PointT> void
 pcl::getFields (const pcl::PointCloud<PointT> &, std::vector<pcl::PCLPointField> &fields)
 {
-  getFields<PointT> (fields);
+  fields = getFields<PointT> ();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 template <typename PointT> void
 pcl::getFields (std::vector<pcl::PCLPointField> &fields)
 {
-  fields.clear ();
+  fields = getFields<PointT> ();
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+template <typename PointT> std::vector<pcl::PCLPointField>
+pcl::getFields ()
+{
+  std::vector<pcl::PCLPointField> fields;
   // Get the fields list
   pcl::for_each_type<typename pcl::traits::fieldList<PointT>::type>(pcl::detail::FieldAdder<PointT>(fields));
+  return fields;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -88,8 +105,7 @@ template <typename PointT> std::string
 pcl::getFieldsList (const pcl::PointCloud<PointT> &)
 {
   // Get the fields list
-  std::vector<pcl::PCLPointField> fields;
-  pcl::for_each_type<typename pcl::traits::fieldList<PointT>::type>(pcl::detail::FieldAdder<PointT>(fields));
+  const auto fields = getFields<PointT>();
   std::string result;
   for (std::size_t i = 0; i < fields.size () - 1; ++i)
     result += fields[i].name + " ";
@@ -139,7 +155,7 @@ pcl::copyPointCloud (const pcl::PointCloud<PointT> &cloud_in,
   // Allocate enough space and copy the basics
   cloud_out.points.resize (indices.size ());
   cloud_out.header   = cloud_in.header;
-  cloud_out.width    = static_cast<uint32_t>(indices.size ());
+  cloud_out.width    = static_cast<std::uint32_t>(indices.size ());
   cloud_out.height   = 1;
   cloud_out.is_dense = cloud_in.is_dense;
   cloud_out.sensor_orientation_ = cloud_in.sensor_orientation_;
@@ -159,7 +175,7 @@ pcl::copyPointCloud (const pcl::PointCloud<PointInT> &cloud_in,
   // Allocate enough space and copy the basics
   cloud_out.points.resize (indices.size ());
   cloud_out.header   = cloud_in.header;
-  cloud_out.width    = uint32_t (indices.size ());
+  cloud_out.width    = std::uint32_t (indices.size ());
   cloud_out.height   = 1;
   cloud_out.is_dense = cloud_in.is_dense;
   cloud_out.sensor_orientation_ = cloud_in.sensor_orientation_;
@@ -349,7 +365,7 @@ pcl::copyPointCloud (const pcl::PointCloud<PointT> &cloud_in, pcl::PointCloud<Po
       const PointT* in = &(cloud_in.points[0]);
       PointT* out = &(cloud_out.points[0]);
       PointT* out_inner = out + cloud_out.width*top + left;
-      for (uint32_t i = 0; i < cloud_in.height; i++, out_inner += cloud_out.width, in += cloud_in.width)
+      for (std::uint32_t i = 0; i < cloud_in.height; i++, out_inner += cloud_out.width, in += cloud_in.width)
       {
         if (out_inner != in)
           memcpy (out_inner, in, cloud_in.width * sizeof (PointT));
@@ -376,7 +392,7 @@ pcl::copyPointCloud (const pcl::PointCloud<PointT> &cloud_in, pcl::PointCloud<Po
           PointT* out = &(cloud_out.points[0]);
           PointT* out_inner = out + cloud_out.width*top + left;
 
-          for (uint32_t i = 0; i < cloud_in.height; i++, out_inner += cloud_out.width, in += cloud_in.width)
+          for (std::uint32_t i = 0; i < cloud_in.height; i++, out_inner += cloud_out.width, in += cloud_in.width)
           {
             if (out_inner != in)
               memcpy (out_inner, in, cloud_in.width * sizeof (PointT));
@@ -419,7 +435,7 @@ pcl::copyPointCloud (const pcl::PointCloud<PointT> &cloud_in, pcl::PointCloud<Po
         PointT* out = &(cloud_out.points[0]);
         PointT* out_inner = out + cloud_out.width*top + left;
 
-        for (uint32_t i = 0; i < cloud_in.height; i++, out_inner += cloud_out.width, in += cloud_in.width)
+        for (std::uint32_t i = 0; i < cloud_in.height; i++, out_inner += cloud_out.width, in += cloud_in.width)
         {
           if (out_inner != in)
             memcpy (out_inner, in, cloud_in.width * sizeof (PointT));
